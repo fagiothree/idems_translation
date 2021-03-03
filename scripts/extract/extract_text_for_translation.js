@@ -2,7 +2,9 @@ var fs = require('fs');
 var path = require("path");
 //import {reorder_flows_alphabetically_by_name, extract_bits_to_be_translated, create_file_for_translators, remove_repetitions } from "./functions_to_extract_text_for_translation.js";
 
-var input_path = path.join(__dirname, "./flavour/Malaysia/input/plh-master-renamed.json");
+//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
+var input_path = path.join(__dirname, "../../flavour/Malaysia/input/ipv.json");
+//var input_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/philippines_flavour_flows.json");
 var json_string = fs.readFileSync(input_path).toString();
 var obj = JSON.parse(json_string);
 
@@ -16,33 +18,29 @@ bits_to_translate = JSON.stringify(bits, null, 2);
 file_for_transl = JSON.stringify(file_for_transl, null, 2);
 file_for_transl_no_rep = JSON.stringify(file_for_transl_no_rep, null, 2);
 
-
 /*
-output_path = path.join(__dirname, "../../products/covid-19-parenting/deployment/Philippines/translation/philippines_step_1_file_for_transl.json.json");
+
+output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_1_file_for_transl.json.json");
 //output_path = path.join(__dirname, "../../products/covid-19-parenting/development/translation/eng/intermediary-files/current-flows/current_step_1_file_for_transl.json");
 //output_path = path.join(__dirname, "../../products/virtual-maths-camp/development/translation/eng/intermediary-files/step_1_file_for_transl.json");
 fs.writeFile(output_path, bits_to_translate, function (err, result) {
     if (err) console.log('error', err);
 });
 
-output_path = path.join(__dirname, "../../products/covid-19-parenting/deployment/Philippines/translation/philippines_step_2_file_for_transl.json");
-//output_path = path.join(__dirname, "../../products/covid-19-parenting/development/translation/eng/intermediary-files/current_flows/current_step_2_file_for_transl_content.json");
-//output_path = path.join(__dirname, "../../products/covid-19-parenting/development/translation/eng/intermediary-files/current_flows/current_step_2_file_for_transl_supportive.json");
-//output_path = path.join(__dirname, "../../products/covid-19-parenting/development/translation/eng/intermediary-files/current-flows/current_step_2_file_for_transl_remaining.json");
-//output_path = path.join(__dirname, "../../products/virtual-maths-camp/development/translation/eng/intermediary-files/step_2_file_for_transl.json");
+output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_2_file_for_transl.json");
 fs.writeFile(output_path, file_for_transl, function (err, result) {
     if (err) console.log('error', err);
 });
 
 
-output_path = path.join(__dirname, "../../products/covid-19-parenting/deployment/Philippines/translation/philippines_step_3_file_for_transl.json");
+output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_3_file_for_transl.json");
 //output_path = path.join(__dirname, "../../products/virtual-maths-camp/development/translation/eng/step_3_file_for_transl_no_rep.json");
 fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
     if (err) console.log('error', err);
 });
 
-*/
 
+*/
 
 
 /////////////////////////////////////////////////////////////////
