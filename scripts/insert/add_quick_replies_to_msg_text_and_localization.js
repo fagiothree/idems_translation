@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require("path");
-var input_path = path.join(__dirname, "../products/covid-19-parenting/development/translation/msa/plh_master_msa.json");
+var input_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa.json");
 
 var json_string = fs.readFileSync(input_path).toString();
 var obj = JSON.parse(json_string);
@@ -14,7 +14,7 @@ var debug = "";
 var debug_lang = {};
 debug_lang.msa = "";
 
-var select_phrase_msa = "Sila pilih nombor untuk pilihan berikut:";
+var select_phrase_msa = "Sila pilih nombor bagi pilihan berikut:";
 var select_phrases = {};
 select_phrases.msa = select_phrase_msa;
 
@@ -356,7 +356,7 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
                                         // find matching quick reply in localization
                                         for (lang in curr_loc) {
                                             for (var qr = 0; qr < curr_transl_quick_replies[lang].length; qr++) {
-                                                var quick_reply = curr_quick_repliecurr_transl_quick_replies[lang][qr];
+                                                var quick_reply = curr_transl_quick_replies[lang][qr];
                                                 var r_exp = new RegExp(arg, "i");
 
                                                 if (r_exp.test(quick_reply)) {
@@ -434,7 +434,7 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
                                         // find matching quick reply in localization
                                         for (lang in curr_loc) {
                                             for (var qr = 0; qr < curr_transl_quick_replies[lang].length; qr++) {
-                                                var quick_reply = curr_quick_repliecurr_transl_quick_replies[lang][qr];
+                                                var quick_reply = curr_transl_quick_replies[lang][qr];
 
                                                 if (quick_reply.toLowerCase().trim() == arg_lang[lang].toLowerCase().trim()) {
                                                     new_test_lang[lang] = new_test_lang[lang] + selectors[qr] + ",";
@@ -493,19 +493,19 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
 
 }
 new_flows = JSON.stringify(obj, null, 2);
-var output_path = path.join(__dirname, "../products/covid-19-parenting/development/translation/msa/plh_master_msa_no_qr.json");
+var output_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa_no_qr.json");
 fs.writeFile(output_path, new_flows, function (err, result) {
     if (err) console.log('error', err);
 });
 
 
 
-var output_path = path.join(__dirname, "../products/covid-19-parenting/development/translation/msa/debug.txt");
+var output_path = path.join(__dirname, "../../flavour/Malaysia/output/debug.txt");
 fs.writeFile(output_path, debug, function (err, result) {
     if (err) console.log('error', err);
 });
 
-var output_path = path.join(__dirname, "../products/covid-19-parenting/development/translation/msa/debug_msa.txt");
+var output_path = path.join(__dirname, "../../flavour/Malaysia/output/debug_msa.txt");
 fs.writeFile(output_path, debug_lang.msa, function (err, result) {
     if (err) console.log('error', err);
 });
