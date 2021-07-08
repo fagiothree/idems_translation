@@ -42,7 +42,7 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
 
                     // do the same for each language in localization
                     for (lang in curr_loc) {
-                        obj.flows[fl].localization[lang][act_id].text = obj.flows[fl].localization[lang][act_id].text + "\n\n" + select_phrases[lang];
+                        obj.flows[fl].localization[lang][act_id].text[0] = obj.flows[fl].localization[lang][act_id].text[0] + "\n\n" + select_phrases[lang];
                     }
 
                     // save in a list selectors to be used with the quick replies
@@ -70,7 +70,7 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
 
                         // do the same for each language in the localization (using the same selectors, since the order of quick replies is the same) 
                         for (lang in curr_loc) {
-                            obj.flows[fl].localization[lang][act_id].text = obj.flows[fl].localization[lang][act_id].text + "\n" + selectors[qr] + ". " + curr_loc[lang][act_id].quick_replies[qr];
+                            obj.flows[fl].localization[lang][act_id].text[0] = obj.flows[fl].localization[lang][act_id].text[0] + "\n" + selectors[qr] + ". " + curr_loc[lang][act_id].quick_replies[qr];
                         }
 
 
@@ -95,7 +95,7 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
 
                     debug = debug + "\n" + obj.flows[fl].nodes[nd].actions[ac].text + "\n";
                     for (lang in curr_loc) {
-                        debug_lang[lang] = debug_lang[lang] + "\n" + obj.flows[fl].localization[lang][act_id].text + "\n";
+                        debug_lang[lang] = debug_lang[lang] + "\n" + obj.flows[fl].localization[lang][act_id].text[0] + "\n";
                     }
 
 

@@ -2,8 +2,8 @@ var fs = require('fs');
 var path = require("path");
 //import {reorder_flows_alphabetically_by_name, extract_bits_to_be_translated, create_file_for_translators, remove_repetitions } from "./functions_to_extract_text_for_translation.js";
 
-//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
-var input_path = path.join(__dirname, "../../flavour/Malaysia/input/ipv.json");
+var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
+//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/welcome.json");
 //var input_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/philippines_flavour_flows.json");
 var json_string = fs.readFileSync(input_path).toString();
 var obj = JSON.parse(json_string);
@@ -70,7 +70,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
 
     var word_tests = ["has_any_word", "has_all_words", "has_phrase", "has_only_phrase", "has_beginning"];
 
-
+    var bits_lengths = [];
 
     for (var fl = 0; fl < obj.flows.length; fl++) {
         for (var n = 0; n < obj.flows[fl].nodes.length; n++) {
@@ -82,6 +82,15 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
                     trasl_to_add.text = [curr_act.text];
                     trasl_to_add.quick_replies = curr_act.quick_replies;
                     eng_localization[msg_id] = trasl_to_add;
+
+                    var char_count = curr_act.text.length;
+                    curr_act.quick_replies.forEach(qr =>{
+                        char_count = char_count + qr.length;
+                    })
+                    if (curr_act.quick_replies.length >0){
+                        char_count +=50;
+                    }
+                    bits_lengths.push(char_count)
                 }
             }
             if (obj.flows[fl].nodes[n].hasOwnProperty('router')) {
@@ -114,6 +123,9 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
         localization = {};
         eng_localization = {};
     }
+    var average = (bits_lengths.reduce((a, b) => a + b, 0))/bits_lengths.length;
+    console.log("average length " + average)
+    console.log(bits_lengths)
     return bits_to_translate;
 }
 
@@ -123,6 +135,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
 
     var new_file = [];
     var word_count = 0;
+    var char_count = 0;
     var count = 1;
 
     for (var fl in obj) {
@@ -135,7 +148,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
             //break
 
         //}
-        console.log(obj[fl].name)
+        //console.log(obj[fl].name)
         var localization = obj[fl].localization.eng;
         for (var key_bit in localization) {
             var bit = localization[key_bit];
@@ -177,6 +190,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
                         atom_to_translate.source_text = atom_to_translate.text;
                         new_file.push(Object.assign({}, atom_to_translate));
                         word_count = word_count + atom_to_translate.text.split(" ").length;
+                        char_count = char_count + atom_to_translate.text.length;
                         atom_to_translate = {};
                         atom_to_translate.has_extraline = 0;
                     }
@@ -197,6 +211,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
                     atom_to_translate.word_count = word_count;
                     new_file.push(Object.assign({}, atom_to_translate));
                     word_count = word_count + atom_to_translate.text.split(" ").length;
+                    char_count = char_count + atom_to_translate.text.length;
                 }
             }
             if (bit.hasOwnProperty('arguments')) {
@@ -213,6 +228,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
                 atom_to_translate.word_count = word_count;
                 new_file.push(Object.assign({}, atom_to_translate));
                 word_count = word_count + atom_to_translate.text.split(" ").length;
+                char_count = char_count + atom_to_translate.text.length;
             }
 
 
@@ -235,7 +251,8 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
             */
 
     }
-    console.log(word_count)
+    console.log("word count: "  + word_count)
+    console.log("char count: "  + char_count)
     return new_file;
 }
 
@@ -247,6 +264,7 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
     var new_file = [];
 
     var word_count = 0;
+    var char_count = 0;
     var bit_types = ["text", "quick_replies", "arguments"];
     var new_bit = {};
 
@@ -264,11 +282,13 @@ fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
             if (obj_same_text[0].hasOwnProperty('note')) { new_bit.note = obj_same_text[0].note };
             new_file.push(Object.assign({}, new_bit));
             word_count = word_count + unique_string.split(" ").length;
+            char_count = char_count + unique_string.length;
             new_bit = {};
         })
 
     });
 
     console.log ("without rep " + word_count)
+    console.log ("without rep " + char_count)
 return new_file;
 }
