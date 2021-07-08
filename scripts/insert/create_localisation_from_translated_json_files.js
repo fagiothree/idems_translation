@@ -10,6 +10,12 @@ var latest_flows = JSON.parse(json_string);
 
 var new_lang = "msa";
 
+
+var input_path_transl = path.join(__dirname, "../../flavour/Malaysia/inventory/msa_translation_OFFICIAL.json");
+var json_string = fs.readFileSync(input_path_transl).toString();
+var obj_transl_full = JSON.parse(json_string);
+
+/*
 // load all translated files
 var input_path_transl_2 = path.join(__dirname, "../../flavour/Malaysia/input/msa/step_3_file_for_transl_content_msa.json");
 var input_path_transl_3 = path.join(__dirname, "../../flavour/Malaysia/input/msa/step_3_file_for_transl_supportive_msa.json");
@@ -22,7 +28,6 @@ var input_path_transl_8 = path.join(__dirname, "../../flavour/Malaysia/input/msa
 var input_path_transl_9 = path.join(__dirname, "../../flavour/Malaysia/input/msa/extra_checkins_MS.json");
 var input_path_transl_10 = path.join(__dirname, "../../flavour/Malaysia/input/msa/being_translated/comics.json");
 
-
 var json_string_1 = fs.readFileSync(input_path_transl_1).toString();
 var json_string_2 = fs.readFileSync(input_path_transl_2).toString();
 var json_string_3 = fs.readFileSync(input_path_transl_3).toString();
@@ -33,9 +38,6 @@ var json_string_7 = fs.readFileSync(input_path_transl_7).toString();
 var json_string_8 = fs.readFileSync(input_path_transl_8).toString();
 var json_string_9 = fs.readFileSync(input_path_transl_9).toString();
 var json_string_10 = fs.readFileSync(input_path_transl_10).toString();
-
-
-
 
 
 var obj_transl_1 = JSON.parse(json_string_1);
@@ -50,9 +52,12 @@ var obj_transl_9 = JSON.parse(json_string_9);
 var obj_transl_10 = JSON.parse(json_string_10);
 
 var obj_transl_full = obj_transl_1.concat(obj_transl_2).concat(obj_transl_3).concat(obj_transl_4).concat(obj_transl_5).concat(obj_transl_6).concat(obj_transl_7).concat(obj_transl_8).concat(obj_transl_9).concat(obj_transl_10);
-var unused_translations = Object.assign([], obj_transl_full);
 var all_transl = JSON.stringify(obj_transl_1.concat(obj_transl_2).concat(obj_transl_3).concat(obj_transl_4).concat(obj_transl_5).concat(obj_transl_6).concat(obj_transl_7).concat(obj_transl_8).concat(obj_transl_9), null, 2);
 
+*/
+
+
+var unused_translations = Object.assign([], obj_transl_full);
 
 // initialise output variables
 var flows_localizations = {};
@@ -77,6 +82,8 @@ for (var fl = 0; fl < latest_flows.flows.length; fl++){
     translated_step_2 = [];
 
     // create translation for step_2 using the translated files (in format step_3), 
+    
+    /*
     // first looking into the corresponding set of translations based on the flow name, and then into
     // the others if there is no match
 
@@ -92,12 +99,17 @@ for (var fl = 0; fl < latest_flows.flows.length; fl++){
     else{
         var corresp_transl_set = obj_transl_4;
     }
+    */
 
     for (var bit = 0; bit < step_2.length; bit++){
+        /*
         var curr_bit_translation = corresp_transl_set.filter( tr=> (tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase() == step_2[bit].text.toLowerCase() ));
         if  (curr_bit_translation.length == 0){
             curr_bit_translation = obj_transl_full.filter( tr=> (tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase() == step_2[bit].text.toLowerCase() ));
         }
+        */
+
+        var curr_bit_translation = obj_transl_full.filter( tr=> (tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase() == step_2[bit].text.toLowerCase() )); 
         if (curr_bit_translation.length >1){
             
             var transl_1 = curr_bit_translation[0].text;
@@ -192,11 +204,6 @@ fs.writeFile(output_path, missing_bits_step_3, function (err, result) {
 });
 
 
-
-var output_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/all_transla.json");
-fs.writeFile(output_path, all_transl, function (err, result) {
-    if (err) console.log('error', err);
-});
 
 var flows_with_localiz = JSON.stringify(latest_flows, null, 2);
 var output_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa.json");
