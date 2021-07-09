@@ -1,6 +1,11 @@
 var fs = require('fs');
 var path = require("path");
-var input_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa.json");
+
+
+//var input_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa.json");
+
+let input_args = process.argv.slice(2);
+let input_path = input_args[0];
 
 var json_string = fs.readFileSync(input_path).toString();
 var obj = JSON.parse(json_string);
@@ -493,19 +498,22 @@ for (var fl = 0; fl < obj.flows.length; fl++) {
 
 }
 new_flows = JSON.stringify(obj, null, 2);
-var output_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa_no_qr.json");
+//var output_path = path.join(__dirname, "../../flavour/Malaysia/output/plh_malaysia_flavour_msa_no_qr.json");
+var output_path = input_args[1];
+
 fs.writeFile(output_path, new_flows, function (err, result) {
     if (err) console.log('error', err);
 });
 
 
-
-var output_path = path.join(__dirname, "../../flavour/Malaysia/output/debug.txt");
+/*
+var output_path_debug_eng = path.join(__dirname, "../../flavour/Malaysia/output/debug.txt");
 fs.writeFile(output_path, debug, function (err, result) {
     if (err) console.log('error', err);
 });
+*/
 
-var output_path = path.join(__dirname, "../../flavour/Malaysia/output/debug_msa.txt");
-fs.writeFile(output_path, debug_lang.msa, function (err, result) {
+var output_path_debug_transl = input_args[2]; //path.join(__dirname, "../../flavour/Malaysia/output/debug_msa.txt");
+fs.writeFile(output_path_debug_transl, debug_lang.msa, function (err, result) {
     if (err) console.log('error', err);
 });
