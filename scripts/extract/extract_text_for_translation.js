@@ -1,53 +1,41 @@
-var fs = require('fs');
-var path = require("path");
-//import {reorder_flows_alphabetically_by_name, extract_bits_to_be_translated, create_file_for_translators, remove_repetitions } from "./functions_to_extract_text_for_translation.js";
+const fs = require('fs');
+const path = require('path');
 
-let country = "Philippines";
-//var input_path = path.join(__dirname, "../../flavour/"+ country +"/input/plh-international-flavour_ABtesting.json");
-//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
-//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/welcome.json");
-var input_path = path.join(__dirname, "../../flavour/Philippines/input/philippines_flavour_flows.json");
-var json_string = fs.readFileSync(input_path).toString();
-var obj = JSON.parse(json_string);
+const args = process.argv.slice(2);
+const input_file = args[0];
+const output_dir = args[1];
+
+const json_string = fs.readFileSync(input_file).toString();
+const obj = JSON.parse(json_string);
 
 //obj = reorder_flows_alphabetically_by_name(obj);
-var bits = extract_bits_to_be_translated(obj);
-var file_for_transl = create_file_for_translators(bits);
-var file_for_transl_no_rep = remove_repetitions(file_for_transl);
+const bits = extract_bits_to_be_translated(obj);
+const file_for_transl = create_file_for_translators(bits);
+const file_for_transl_no_rep = remove_repetitions(file_for_transl);
 
-
-bits_to_translate = JSON.stringify(bits, null, 2);
-file_for_transl = JSON.stringify(file_for_transl, null, 2);
-file_for_transl_no_rep = JSON.stringify(file_for_transl_no_rep, null, 2);
-
-/*
-
-output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_1_file_for_transl.json.json");
-//output_path = path.join(__dirname, "../../products/covid-19-parenting/development/translation/eng/intermediary-files/current-flows/current_step_1_file_for_transl.json");
-//output_path = path.join(__dirname, "../../products/virtual-maths-camp/development/translation/eng/intermediary-files/step_1_file_for_transl.json");
-fs.writeFile(output_path, bits_to_translate, function (err, result) {
-    if (err) console.log('error', err);
-});
-
-output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_2_file_for_transl.json");
-fs.writeFile(output_path, file_for_transl, function (err, result) {
-    if (err) console.log('error', err);
-});
-
-
-output_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/current_flows/philippines_step_3_file_for_transl.json");
-//output_path = path.join(__dirname, "../../products/virtual-maths-camp/development/translation/eng/step_3_file_for_transl_no_rep.json");
-fs.writeFile(output_path, file_for_transl_no_rep, function (err, result) {
-    if (err) console.log('error', err);
-});
-
-
-*/
-
+writeOutputFile(output_dir, "step_1.json", bits);
+writeOutputFile(output_dir, "step_2.json", file_for_transl);
+writeOutputFile(output_dir, "step_3.json", file_for_transl_no_rep);
 
 /////////////////////////////////////////////////////////////////
 // functions to create files for translators
 ///////////////////////////////////////////////////////////////
+
+function writeOutputFile(outputDir, filename, data) {
+    const output_file = path.join(output_dir, filename);
+    const json = JSON.stringify(data, null, 2);
+    fs.writeFile(
+        output_file,
+        json,
+        output_file_error_handler
+    );
+}
+
+function output_file_error_handler(err) {
+    if (err)  {
+        console.log('error', err);
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
  function reorder_flows_alphabetically_by_name(obj) {
