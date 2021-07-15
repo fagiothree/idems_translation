@@ -2,11 +2,12 @@ var fs = require('fs');
 var path = require("path");
 var stringSimilarity = require("string-similarity");
 
-var input_path_unused = path.join(__dirname, "../flavour/Malaysia/inventory/msa/inventory_unused_translations_step_3.json");
+var input_path_unused = path.join(__dirname, "../../flavour/Philippines/inventory/inventory_unused_translations_step_3.json");
+//var input_path_unused = path.join(__dirname, "../../flavour/Malaysia/input/msa/all_translations_msa.json");
 var json_string_unused = fs.readFileSync(input_path_unused).toString();
 var unused_transl = JSON.parse(json_string_unused);
 
-var input_path_missing = path.join(__dirname, "../flavour/Malaysia/inventory/msa/missing_bits_to_translate.json");
+var input_path_missing = path.join(__dirname, "../../flavour/Philippines/inventory/missing_bits_to_translate.json");
 var json_string_missing = fs.readFileSync(input_path_missing).toString();
 var missing_transl = JSON.parse(json_string_missing);
 
@@ -32,7 +33,7 @@ missing_transl.forEach(bit =>{
 
 console.log(couples_best_matches.length)
 couples_best_matches = JSON.stringify(couples_best_matches, null, 2);
-var output_path = path.join(__dirname, "../flavour/Malaysia/inventory/msa/couple_best_matches.json");
+var output_path = path.join(__dirname, "../../flavour/Philippines/inventory/couple_best_matches.json");
 fs.writeFile(output_path, couples_best_matches, function (err, result) {
     if (err) console.log('error', err);
 });
