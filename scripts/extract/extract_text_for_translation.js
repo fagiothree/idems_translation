@@ -2,9 +2,11 @@ var fs = require('fs');
 var path = require("path");
 //import {reorder_flows_alphabetically_by_name, extract_bits_to_be_translated, create_file_for_translators, remove_repetitions } from "./functions_to_extract_text_for_translation.js";
 
-var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
+let country = "Philippines";
+//var input_path = path.join(__dirname, "../../flavour/"+ country +"/input/plh-international-flavour_ABtesting.json");
+//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh_international_flavour.json");
 //var input_path = path.join(__dirname, "../../flavour/Malaysia/input/welcome.json");
-//var input_path = path.join(__dirname, "../flavour/Philippines/files_for_translators/philippines_flavour_flows.json");
+var input_path = path.join(__dirname, "../../flavour/Philippines/input/philippines_flavour_flows.json");
 var json_string = fs.readFileSync(input_path).toString();
 var obj = JSON.parse(json_string);
 

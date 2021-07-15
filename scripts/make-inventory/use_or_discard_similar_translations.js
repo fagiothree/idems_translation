@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require("path");
 
-var input_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/reviewed_couple_best_matches.json");
+var input_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/reviewed_by_paula_ab_test_couple_best_matches.json");
 var json_string = fs.readFileSync(input_path).toString();
 var obj_reviewed_matches = JSON.parse(json_string);
 
@@ -27,14 +27,14 @@ obj_reviewed_matches.forEach(missing_bit => {
 
 restored_bits = JSON.stringify(restored_bits, null, 2);
 
-output_path = path.join(__dirname, "../../flavour/Malaysia/input/msa/additions.json");
+output_path = path.join(__dirname, "../../flavour/Malaysia/input/msa/ab_testing_restored_additions.json");
 fs.writeFile(output_path, restored_bits, function (err, result) {
     if (err) console.log('error', err);
 });
 
 partially_translated_bits = JSON.stringify(partially_translated_bits, null, 2);
 
-output_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/partially_transalted_bits.json");
+output_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/ab_testing_partially_transalted_bits.json");
 fs.writeFile(output_path, partially_translated_bits, function (err, result) {
     if (err) console.log('error', err);
 });

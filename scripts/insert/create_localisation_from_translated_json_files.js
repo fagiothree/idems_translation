@@ -4,19 +4,21 @@ var path = require("path");
 
 let input_args = process.argv.slice(2);
 
+let country = "Philippines";
 
 // load latest version of the flows
 let input_path = input_args[0];
-//var input_path = path.join(__dirname, "../../flavour/Malaysia/input/plh-international-flavour_ABtesting.json");
+//var input_path = path.join(__dirname, "../../flavour/"+ country +"/input/plh-international-flavour_ABtesting.json");
 var json_string = fs.readFileSync(input_path).toString();
 var latest_flows = JSON.parse(json_string);
 
 
 //var new_lang = "msa";
+//var new_lang = "phl";
 var new_lang = input_args[2];
 
 
-//var input_path_transl = path.join(__dirname, "../../flavour/Malaysia/inventory/msa_translation_OFFICIAL.json");
+//var input_path_transl = path.join(__dirname, "../../flavour/"+country+"/input/OFFICIAL_philippines_tranlsation.json");
 var input_path_transl = input_args[1];
 var json_string = fs.readFileSync(input_path_transl).toString();
 var obj_transl_full = JSON.parse(json_string);
@@ -64,6 +66,8 @@ var all_transl = JSON.stringify(obj_transl_1.concat(obj_transl_2).concat(obj_tra
 
 
 var unused_translations = Object.assign([], obj_transl_full);
+var duplicates = "";
+var dupl_count = 1;
 
 // initialise output variables
 var flows_localizations = {};
@@ -128,16 +132,20 @@ for (var fl = 0; fl < latest_flows.flows.length; fl++){
         }
 
         if (curr_bit_translation.length >1){
-           // console.log("error: " + curr_bit_translation.length + " matches for bit " + step_2[bit].text + " in flow "+ curr_flow_name)
-            //curr_bit_translation.forEach(bit => { console.log(bit.text)})
-            break
+
+           duplicates = duplicates + dupl_count + "-------------------------------------------" +"\n" + curr_bit_translation.length + " matches for bit " + step_2[bit].text + " in flow "+ curr_flow_name + "\n";
+           curr_bit_translation.forEach(bit => { duplicates = duplicates + bit.text + "\n ---- \n"})
+           let translated_bit = (Object.assign({}, step_2[bit]));
+           translated_bit.text = curr_bit_translation[0].text;
+           unused_translations = unused_translations.filter(tr => !(tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase().trim() == step_2[bit].text.toLowerCase().trim() ));
+            dupl_count++
         } else if (curr_bit_translation.length == 0){
 
             missing_bits.push((Object.assign({}, step_2[bit])))
         }
         else{
             
-            var translated_bit = (Object.assign({}, step_2[bit]));
+            let translated_bit = (Object.assign({}, step_2[bit]));
             translated_bit.text = curr_bit_translation[0].text;
             translated_step_2.push(translated_bit);
             unused_translations = unused_translations.filter(tr => !(tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase().trim() == step_2[bit].text.toLowerCase().trim() ));
@@ -187,17 +195,17 @@ var output_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/inv
 fs.writeFile(output_path, partially_translated_flows, function (err, result) {
     if (err) console.log('error', err);
 });
-
-
+*/
+/*
 unused_translations = JSON.stringify(unused_translations, null, 2);
-var output_path = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/inventory_unused_translations_step_3.json");
+var output_path = path.join(__dirname, "../../flavour/"+country+"/inventory/inventory_unused_translations_step_3.json");
 fs.writeFile(output_path, unused_translations, function (err, result) {
     if (err) console.log('error', err);
 });
-
-
+*/
+/*
 flows_localizations = JSON.stringify(flows_localizations, null, 2);
-var output_path = path.join(__dirname, "../../flavour/Malaysia/intermediary/msa/flows_localisations.json");
+var output_path = path.join(__dirname, "../../flavour/"+country+"/intermediary/msa/flows_localisations.json");
 fs.writeFile(output_path, flows_localizations, function (err, result) {
     if (err) console.log('error', err);
 });
@@ -205,7 +213,7 @@ fs.writeFile(output_path, flows_localizations, function (err, result) {
 
 
 missing_bits_step_3 = JSON.stringify(missing_bits_step_3, null, 2);
-//var output_path_missing = path.join(__dirname, "../../flavour/Malaysia/inventory/msa/missing.json");
+//var output_path_missing = path.join(__dirname, "../../flavour/"+country+"/inventory/missing_bits_to_translate.json");
 var output_path_missing = input_args[4];
 fs.writeFile(output_path_missing, missing_bits_step_3, function (err, result) {
     if (err) console.log('error', err);
@@ -219,6 +227,13 @@ var output_path_flows = input_args[3];
 fs.writeFile(output_path_flows, flows_with_localiz, function (err, result) {
     if (err) console.log('error', err);
 });
+
+/*
+var output_path_dupl = "C:/Users/fagio/Desktop/debug_duplicates_phil.txt"
+fs.writeFile(output_path_dupl, duplicates, function (err, result) {
+    if (err) console.log('error', err);
+});
+*/
 
 
 
