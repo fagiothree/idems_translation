@@ -1,15 +1,23 @@
 {
-  "name": "rp-translate",
+  "name": "translate-rapidpro",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tool to add localizations to RapidPro flows.",
   "main": "index.js",
   "dependencies": {
     "string-similarity": "^4.0.4"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "mocha": "^9.0.2"
   },
-  "author": "",
-  "license": "ISC"
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "IDEMS International",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fagiothree/translate-RapidPro"
+  },
+  "homepage": "https://github.com/fagiothree/translate-RapidPro#readme",
+  "bugs": "https://github.com/fagiothree/translate-RapidPro/issues"
 }
