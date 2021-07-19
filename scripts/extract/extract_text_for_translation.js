@@ -2,42 +2,37 @@ const fs = require('fs');
 const path = require('path');
 
 
-function index(input_file, output_dir) {
-    const json_string = fs.readFileSync(input_file).toString();
-    const obj = JSON.parse(json_string);
+function index(inputFile, outputDir) {
+    const jsonString = fs.readFileSync(inputFile).toString();
+    const obj = JSON.parse(jsonString);
 
-    //obj = reorder_flows_alphabetically_by_name(obj);
-    const bits = extract_bits_to_be_translated(obj);
-    const file_for_transl = create_file_for_translators(bits);
-    const file_for_transl_no_rep = remove_repetitions(file_for_transl);
+    //obj = reorderFlowsAlphabeticallyByName(obj);
+    const bits = extractTextForTranslation(obj);
+    const fileForTransl = create_file_for_translators(bits);
+    const fileForTranslNoRep = remove_repetitions(fileForTransl);
 
-    writeOutputFile(output_dir, "step_1.json", bits);
-    writeOutputFile(output_dir, "step_2.json", file_for_transl);
-    writeOutputFile(output_dir, "step_3.json", file_for_transl_no_rep);
+    writeOutputFile(outputDir, "step_1.json", bits);
+    writeOutputFile(outputDir, "step_2.json", fileForTransl);
+    writeOutputFile(outputDir, "step_3.json", fileForTranslNoRep);
 }
 
-/////////////////////////////////////////////////////////////////
-// functions to create files for translators
-///////////////////////////////////////////////////////////////
-
 function writeOutputFile(outputDir, filename, data) {
-    const output_file = path.join(outputDir, filename);
+    const outputFile = path.join(outputDir, filename);
     const json = JSON.stringify(data, null, 2);
     fs.writeFile(
-        output_file,
+        outputFile,
         json,
-        output_file_error_handler
+        outputFileErrorHandler
     );
 }
 
-function output_file_error_handler(err) {
+function outputFileErrorHandler(err) {
     if (err)  {
         console.log('error', err);
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
- function reorder_flows_alphabetically_by_name(obj) {
+function reorderFlowsAlphabeticallyByName(obj) {
     obj.flows.sort(function (a, b) {
         var x = a.name.toLowerCase();
         var y = b.name.toLowerCase();
@@ -48,74 +43,62 @@ function output_file_error_handler(err) {
     return obj;
 }
 
+function extractTextForTranslation(obj) {
+    const CASE_TYPES_TO_TRANSLATE = [
+        "has_any_word",
+        "has_all_words",
+        "has_phrase",
+        "has_only_phrase",
+        "has_beginning"
+    ];
 
-/////////////////////////////////////////////
-////////////////////////// step 1
+    let bitsToTranslate = {};
+    let bitsLengths = [];
 
- function extract_bits_to_be_translated(obj) {
-    var bits_to_translate = {};
-    var localization = {};
-    var eng_localization = {};
-
-    var word_tests = ["has_any_word", "has_all_words", "has_phrase", "has_only_phrase", "has_beginning"];
-
-    var bits_lengths = [];
-
-    for (var fl = 0; fl < obj.flows.length; fl++) {
-        for (var n = 0; n < obj.flows[fl].nodes.length; n++) {
-            for (var ac = 0; ac < obj.flows[fl].nodes[n].actions.length; ac++) {
-                var curr_act = obj.flows[fl].nodes[n].actions[ac];
-                if (curr_act.type == "send_msg") {
-                    var msg_id = curr_act.uuid;
-                    var trasl_to_add = {};
-                    trasl_to_add.text = [curr_act.text];
-                    trasl_to_add.quick_replies = curr_act.quick_replies;
-                    eng_localization[msg_id] = trasl_to_add;
-
-                    var char_count = curr_act.text.length;
-                    curr_act.quick_replies.forEach(qr =>{
-                        char_count = char_count + qr.length;
-                    })
-                    if (curr_act.quick_replies.length >0){
+    obj.flows.forEach(flow => {
+        let eng_localization = {};
+        flow.nodes.forEach(node => {
+            node.actions.forEach(action => {
+                if (action.type === 'send_msg') {
+                    eng_localization[action.uuid] = {
+                        text: [action.text],
+                        quick_replies: action.quick_replies
+                    };
+                    let char_count = action.quick_replies.reduce(
+                        (acc, qr) => acc + qr.length,
+                        action.text.length
+                    );
+                    if (action.quick_replies.length > 0){
                         char_count +=50;
                     }
-                    bits_lengths.push(char_count)
+                    bitsLengths.push(char_count);
                 }
-            }
-            if (obj.flows[fl].nodes[n].hasOwnProperty('router')) {
-                if (obj.flows[fl].nodes[n].router.operand == "@input.text") {
-                    for (var c = 0; c < obj.flows[fl].nodes[n].router.cases.length; c++) {
-                        var curr_case = obj.flows[fl].nodes[n].router.cases[c];
-                        if (word_tests.includes(curr_case.type)) {
-                            var case_id = curr_case.uuid;
-                            var trasl_to_add = {};
-                            trasl_to_add.arguments = curr_case.arguments;
-                            eng_localization[case_id] = trasl_to_add;
+            });
 
-                        }
+            if (node.hasOwnProperty('router') && node.router.operand === '@input.text') {
+                node.router.cases.forEach(c => {
+                    if (CASE_TYPES_TO_TRANSLATE.includes(c.type)) {
+                        eng_localization[c.uuid] = {
+                            arguments: c.arguments
+                        };
                     }
-
-                }
-
-
-
+                });
             }
-        }
+        });
 
-        var flow_id = obj.flows[fl].uuid;
-        var flow_info = {};
-        flow_info.flowid = flow_id;
-        flow_info.name = obj.flows[fl].name;
-        localization.eng = eng_localization;
-        flow_info.localization = localization;
-        bits_to_translate[flow_id] = flow_info;
-        localization = {};
-        eng_localization = {};
-    }
-    var average = (bits_lengths.reduce((a, b) => a + b, 0))/bits_lengths.length;
-    console.log("average length " + average)
-    console.log(bits_lengths)
-    return bits_to_translate;
+        bitsToTranslate[flow.uuid] = {
+            flowid: flow.uuid,
+            name: flow.name,
+            localization: {
+                eng: eng_localization
+            }
+        };
+    });
+
+    var average = bitsLengths.reduce((a, b) => a + b, 0) / bitsLengths.length;
+    console.log("average length " + average);
+    console.log(bitsLengths);
+    return bitsToTranslate;
 }
 
 
@@ -284,5 +267,5 @@ return new_file;
 
 module.exports = {
     index,
-    extract_bits_to_be_translated
+    extractTextForTranslation
 };
