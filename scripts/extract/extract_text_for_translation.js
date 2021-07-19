@@ -1,28 +1,27 @@
 const fs = require('fs');
 const path = require('path');
 
-const args = process.argv.slice(2);
-const input_file = args[0];
-const output_dir = args[1];
 
-const json_string = fs.readFileSync(input_file).toString();
-const obj = JSON.parse(json_string);
+function index(input_file, output_dir) {
+    const json_string = fs.readFileSync(input_file).toString();
+    const obj = JSON.parse(json_string);
 
-//obj = reorder_flows_alphabetically_by_name(obj);
-const bits = extract_bits_to_be_translated(obj);
-const file_for_transl = create_file_for_translators(bits);
-const file_for_transl_no_rep = remove_repetitions(file_for_transl);
+    //obj = reorder_flows_alphabetically_by_name(obj);
+    const bits = extract_bits_to_be_translated(obj);
+    const file_for_transl = create_file_for_translators(bits);
+    const file_for_transl_no_rep = remove_repetitions(file_for_transl);
 
-writeOutputFile(output_dir, "step_1.json", bits);
-writeOutputFile(output_dir, "step_2.json", file_for_transl);
-writeOutputFile(output_dir, "step_3.json", file_for_transl_no_rep);
+    writeOutputFile(output_dir, "step_1.json", bits);
+    writeOutputFile(output_dir, "step_2.json", file_for_transl);
+    writeOutputFile(output_dir, "step_3.json", file_for_transl_no_rep);
+}
 
 /////////////////////////////////////////////////////////////////
 // functions to create files for translators
 ///////////////////////////////////////////////////////////////
 
 function writeOutputFile(outputDir, filename, data) {
-    const output_file = path.join(output_dir, filename);
+    const output_file = path.join(outputDir, filename);
     const json = JSON.stringify(data, null, 2);
     fs.writeFile(
         output_file,
@@ -282,3 +281,8 @@ function output_file_error_handler(err) {
     console.log ("without rep " + char_count)
 return new_file;
 }
+
+module.exports = {
+    index,
+    extract_bits_to_be_translated
+};
