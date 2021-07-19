@@ -26,7 +26,7 @@ describe(
                     }
                 ]
             };
-            const extraction = extract.extract_bits_to_be_translated(rpExport);
+            const extraction = extract.extractTextForTranslation(rpExport);
             const expected = {
                 flowid: "09c4ffdb-f4e4-4246-8cdb-a2fc5c481f29",
                 name: "flow_name",
@@ -89,7 +89,7 @@ describe(
                     }
                 ]
             };
-            const extraction = extract.extract_bits_to_be_translated(rpExport);
+            const extraction = extract.extractTextForTranslation(rpExport);
             const expected = {
                 flowid: "aa1c645b-c302-4d00-9843-5cdea94aa870",
                 name: "flow with router",
