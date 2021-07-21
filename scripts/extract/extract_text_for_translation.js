@@ -9,7 +9,7 @@ function index(inputFile, outputDir) {
     //obj = reorderFlowsAlphabeticallyByName(obj);
     const bits = extractTextForTranslation(obj);
     const fileForTransl = create_file_for_translators(bits);
-    const fileForTranslNoRep = remove_repetitions(fileForTransl);
+    const fileForTranslNoRep = removeRepetitions(fileForTransl);
 
     writeOutputFile(outputDir, "step_1.json", bits);
     writeOutputFile(outputDir, "step_2.json", fileForTransl);
@@ -228,41 +228,46 @@ function extractTextForTranslation(obj) {
     return new_file;
 }
 
+function removeRepetitions(obj) {
+    const BIT_TYPES = ["text", "quick_replies", "arguments"];
+    let messages = [];
+    let wordCount = 0;
+    let charCount = 0;
 
+    BIT_TYPES.forEach(type => {
+        const filteredByType = obj.filter(atom => atom.bit_type == type);
 
-///////////////////// step 3
- function remove_repetitions(obj) {
-    
-    var new_file = [];
+        const distinctText = new Set(
+            filteredByType.map(x => type == "arguments" ? x.text.toLowerCase() : x.text)
+        );
 
-    var word_count = 0;
-    var char_count = 0;
-    var bit_types = ["text", "quick_replies", "arguments"];
-    var new_bit = {};
+        distinctText.forEach(uniqueString => {
+            const firstMatch = filteredByType.find(atom => {
+                if (type == "arguments") {
+                    return atom.text.toLowerCase() == uniqueString.toLowerCase();
+                } else {
+                    return atom.text == uniqueString;
+                }
+            });
 
-    bit_types.forEach((type) => {
-        var obj_filtered = obj.filter(function (atom) { return (atom.bit_type == type) });
+            let newBit = {
+                SourceText: uniqueString,
+                text: uniqueString,
+                type,
+            };
 
-        var distinct_text = [... new Set(obj_filtered.map(x => { if (type == "arguments") { return x.text.toLowerCase() } else { return x.text } }))];
-
-        distinct_text.forEach((unique_string) => {
-            var obj_same_text = obj_filtered.filter(function (atom) {if (type == "arguments") {return (atom.text.toLowerCase() == unique_string.toLowerCase())}else{return(atom.text == unique_string)} });
-           
-            new_bit.SourceText = unique_string;
-            new_bit.text = unique_string;
-            new_bit.type = type;
-            if (obj_same_text[0].hasOwnProperty('note')) { new_bit.note = obj_same_text[0].note };
-            new_file.push(Object.assign({}, new_bit));
-            word_count = word_count + unique_string.split(" ").length;
-            char_count = char_count + unique_string.length;
-            new_bit = {};
-        })
-
+            if (firstMatch.note) {
+                newBit.note = firstMatch.note;
+            }
+            messages.push(newBit);
+            wordCount = wordCount + uniqueString.split(" ").length;
+            charCount = charCount + uniqueString.length;
+        });
     });
 
-    console.log ("without rep " + word_count)
-    console.log ("without rep " + char_count)
-return new_file;
+    console.log ("without rep " + wordCount);
+    console.log ("without rep " + charCount);
+    return messages;
 }
 
 module.exports = {
