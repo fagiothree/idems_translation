@@ -119,3 +119,46 @@ describe(
             );
         });
     });
+
+describe(
+    'Transforms translatable messages to format required by translators',
+    function() {
+        it('Converts arguments text to lower-case', function() {
+            const message = {
+                bit_type: "arguments",
+                text: "TEXT",
+                source_text: "TEXT",
+                note: "note"
+            };
+            const expected = {
+                SourceText: 'text',
+                text: 'text',
+                type: 'arguments',
+                note: 'note'
+            };
+            assert.deepEqual(
+                extract.transformToTranslationFormat(message),
+                expected
+            );
+        });
+
+        it('Maintains case for text which is not arguments', function() {
+            const message = {
+                bit_type: "text",
+                text: "Text",
+                source_text: "Text",
+                note: "note"
+            };
+            const expected = {
+                SourceText: 'Text',
+                text: 'Text',
+                type: 'text',
+                note: 'note'
+            };
+            assert.deepEqual(
+                extract.transformToTranslationFormat(message),
+                expected
+            );
+        });
+    }
+);
