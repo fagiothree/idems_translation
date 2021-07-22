@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const ex = require('./extract/extract_text_for_translation.js');
+const ex = require('./extract/extract.js');
 
 const args = process.argv.slice(2);
 const command = args[0];
