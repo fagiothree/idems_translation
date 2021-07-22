@@ -1,5 +1,5 @@
 const assert = require('assert');
-const extract = require('../extract/extract_text_for_translation.js');
+const extract = require('../extract/extract.js');
 
 
 describe(
