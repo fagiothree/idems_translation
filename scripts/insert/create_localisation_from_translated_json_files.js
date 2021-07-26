@@ -3,114 +3,94 @@ var path = require("path");
 const extract = require('../extract/extract.js');
 
 
-let input_args = process.argv.slice(2);
+function createLocalization(latest_flows, obj_transl_full, new_lang) {
+    var unused_translations = Object.assign([], obj_transl_full);
+    var duplicates = "";
+    var dupl_count = 1;
 
-// load latest version of the flows
-let input_path = input_args[0];
-var latest_flows = JSON.parse(
-    fs.readFileSync(input_path).toString()
-);
+    // initialise output variables
+    var flows_localizations = {};
+    var partially_translated_flows = {};
+    var missing_bits = [];
 
-var new_lang = input_args[2];
+    for (var fl = 0; fl < latest_flows.flows.length; fl++){
 
-var input_path_transl = input_args[1];
-var obj_transl_full = JSON.parse(
-    fs.readFileSync(input_path_transl).toString()
-);
+        // create a copy of latest_flows that contains only current flow (#fl)
+        var curr_flow_obj = Object.assign({}, latest_flows);
+        curr_flow_obj.flows = [Object.assign({}, latest_flows.flows[fl])];
 
-var unused_translations = Object.assign([], obj_transl_full);
-var duplicates = "";
-var dupl_count = 1;
+        var curr_flow_name = latest_flows.flows[fl].name;
+        var curr_flow_uuid = latest_flows.flows[fl].uuid;
 
-// initialise output variables
-var flows_localizations = {};
-var partially_translated_flows = {};
-var missing_bits = [];
+        // use this object to define the 3 steps for translation only for the current flow
+        var step_1 = extract.extractTextForTranslation(curr_flow_obj);
+        var step_2 = extract.createFileForTranslators(step_1);
 
-for (var fl = 0; fl < latest_flows.flows.length; fl++){
+        let translated_step_2 = [];
 
-    // create a copy of latest_flows that contains only current flow (#fl)
-    var curr_flow_obj = Object.assign({}, latest_flows);
-    curr_flow_obj.flows = [Object.assign({}, latest_flows.flows[fl])];
-
-    var curr_flow_name = latest_flows.flows[fl].name;
-    var curr_flow_uuid = latest_flows.flows[fl].uuid;
-
-    // use this object to define the 3 steps for translation only for the current flow
-    var step_1 = extract.extractTextForTranslation(curr_flow_obj);
-    var step_2 = extract.createFileForTranslators(step_1);
-
-    let translated_step_2 = [];
-
-    for (var bit = 0; bit < step_2.length; bit++){
-        var curr_bit_translation = obj_transl_full.filter( tr=> (tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase() == step_2[bit].text.toLowerCase() ));
-        if (curr_bit_translation.length >1){
-            var transl_1 = curr_bit_translation[0].text;
-            var same_transl = curr_bit_translation.filter(tr => (tr.text.toLowerCase().trim() == transl_1.toLowerCase().trim()));
-            if (same_transl.length == curr_bit_translation.length){
-                curr_bit_translation = [curr_bit_translation[0]];
+        for (var bit = 0; bit < step_2.length; bit++){
+            var curr_bit_translation = obj_transl_full.filter( tr=> (tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase() == step_2[bit].text.toLowerCase() ));
+            if (curr_bit_translation.length >1){
+                var transl_1 = curr_bit_translation[0].text;
+                var same_transl = curr_bit_translation.filter(tr => (tr.text.toLowerCase().trim() == transl_1.toLowerCase().trim()));
+                if (same_transl.length == curr_bit_translation.length){
+                    curr_bit_translation = [curr_bit_translation[0]];
+                }
             }
-        }
 
-        if (curr_bit_translation.length >1){
+            if (curr_bit_translation.length >1){
 
-           duplicates = duplicates + dupl_count + "-------------------------------------------" +"\n" + curr_bit_translation.length + " matches for bit " + step_2[bit].text + " in flow "+ curr_flow_name + "\n";
-           curr_bit_translation.forEach(bit => {
-                duplicates = duplicates + bit.text + "\n ---- \n";
-           });
-           let translated_bit = (Object.assign({}, step_2[bit]));
-           translated_bit.text = curr_bit_translation[0].text;
-           unused_translations = unused_translations.filter(tr => !(tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase().trim() == step_2[bit].text.toLowerCase().trim() ));
-            dupl_count++;
-        } else if (curr_bit_translation.length == 0) {
-
-            missing_bits.push((Object.assign({}, step_2[bit])));
-        } else {
+            duplicates = duplicates + dupl_count + "-------------------------------------------" +"\n" + curr_bit_translation.length + " matches for bit " + step_2[bit].text + " in flow "+ curr_flow_name + "\n";
+            curr_bit_translation.forEach(bit => {
+                    duplicates = duplicates + bit.text + "\n ---- \n";
+            });
             let translated_bit = (Object.assign({}, step_2[bit]));
             translated_bit.text = curr_bit_translation[0].text;
-            translated_step_2.push(translated_bit);
             unused_translations = unused_translations.filter(tr => !(tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase().trim() == step_2[bit].text.toLowerCase().trim() ));
+                dupl_count++;
+            } else if (curr_bit_translation.length == 0) {
+
+                missing_bits.push((Object.assign({}, step_2[bit])));
+            } else {
+                let translated_bit = (Object.assign({}, step_2[bit]));
+                translated_bit.text = curr_bit_translation[0].text;
+                translated_step_2.push(translated_bit);
+                unused_translations = unused_translations.filter(tr => !(tr.type == step_2[bit].bit_type && tr.SourceText.toLowerCase().trim() == step_2[bit].text.toLowerCase().trim() ));
+            }
+        }
+        // check if the flow is fully translated now:
+        // if not, add to the list of flows with incomplete translation, counting the missing bits to translate
+        // then proceed with reconstruction of translated step_1 (localisation)
+
+        var new_loc = {};
+        new_loc[new_lang] = translate_localization(step_1[curr_flow_uuid].localization.eng, translated_step_2,step_2);
+
+        flows_localizations[curr_flow_uuid] = JSON.parse(JSON.stringify(step_1[curr_flow_uuid]));
+        flows_localizations[curr_flow_uuid].localization = new_loc;
+
+        if (step_2.length != translated_step_2.length){
+            partially_translated_flows[latest_flows.flows[fl].name] = step_2.length - translated_step_2.length;
         }
     }
-    // check if the flow is fully translated now:
-    // if not, add to the list of flows with incomplete translation, counting the missing bits to translate
-    // then proceed with reconstruction of translated step_1 (localisation)
 
-    var new_loc = {};
-    new_loc[new_lang] = translate_localization(step_1[curr_flow_uuid].localization.eng, translated_step_2,step_2);
 
-    flows_localizations[curr_flow_uuid] = JSON.parse(JSON.stringify(step_1[curr_flow_uuid]));
-    flows_localizations[curr_flow_uuid].localization = new_loc;
+    // remove repetitions from missing bits to translate
+    var missing_bits_step_3 = extract.removeRepetitions(missing_bits).map(extract.transformToTranslationFormat);
 
-    if (step_2.length != translated_step_2.length){
-        partially_translated_flows[latest_flows.flows[fl].name] = step_2.length - translated_step_2.length;
+
+    // add localization to flows
+    for (var fl = 0; fl < latest_flows.flows.length; fl++) {
+        var flow_id = latest_flows.flows[fl].uuid;
+        if (flows_localizations.hasOwnProperty(flow_id)) {
+            latest_flows.flows[fl].localization = flows_localizations[flow_id].localization;
+        }
     }
+
+    return [
+        missing_bits_step_3,
+        latest_flows
+    ];
 }
-
-
-// remove repetitions from missing bits to translate
-var missing_bits_step_3 = extract.removeRepetitions(missing_bits).map(extract.transformToTranslationFormat);
-
-
-// add localization to flows
-for (var fl = 0; fl < latest_flows.flows.length; fl++) {
-    var flow_id = latest_flows.flows[fl].uuid;
-    if (flows_localizations.hasOwnProperty(flow_id)) {
-        latest_flows.flows[fl].localization = flows_localizations[flow_id].localization;
-    }
-}
-
-missing_bits_step_3 = JSON.stringify(missing_bits_step_3, null, 2);
-var output_path_missing = input_args[4];
-fs.writeFile(output_path_missing, missing_bits_step_3, function (err, result) {
-    if (err) console.log('error', err);
-});
-
-var flows_with_localiz = JSON.stringify(latest_flows, null, 2);
-var output_path_flows = input_args[3];
-fs.writeFile(output_path_flows, flows_with_localiz, function (err, result) {
-    if (err) console.log('error', err);
-});
 
 /////////////////////////////////////////////////////////////////
 // function to translate localisation
@@ -175,3 +155,7 @@ function translate_localization(eng_loc, transl_step_2, eng_step_2){
 
     return translated_loc;
 }
+
+module.exports = {
+    createLocalization
+};

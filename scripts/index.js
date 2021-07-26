@@ -1,31 +1,47 @@
 const fs = require('fs');
 const path = require('path');
 const ex = require('./extract/extract.js');
+const insert = require('./insert/create_localisation_from_translated_json_files.js');
 
+const COMMANDS = {
+    extract,
+    localize
+};
 const args = process.argv.slice(2);
-const command = args[0];
+const command = args.shift();
 
-if (command === 'extract') {
-    const inputFile = args[1];
-    const outputDir = args[2];
-    extract(inputFile, outputDir);
+if (COMMANDS[command]) {
+    COMMANDS[command](args);
 } else {
     console.log(`Command not recognised, command=${command}`);
 }
 
-function extract(inputFile, outputDir) {
-    const jsonString = fs.readFileSync(inputFile).toString();
-    const obj = JSON.parse(jsonString);
-
+function extract([inputFile, outputDir]) {
+    const obj = readInputFile(inputFile);
     //obj = reorderFlowsAlphabeticallyByName(obj);
     const bits = ex.extractTextForTranslation(obj);
     const fileForTransl = ex.createFileForTranslators(bits);
     const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)
           .map(ex.transformToTranslationFormat);
 
-    writeOutputFile(outputDir, "step_1.json", bits);
-    writeOutputFile(outputDir, "step_2.json", fileForTransl);
-    writeOutputFile(outputDir, "step_3.json", fileForTranslNoRep);
+    writeOutputFile(outputDir, 'step_1.json', bits);
+    writeOutputFile(outputDir, 'step_2.json', fileForTransl);
+    writeOutputFile(outputDir, 'step_3.json', fileForTranslNoRep);
+}
+
+function localize([inputFlow, translations, lang, outputDir]) {
+    const [missing, flows] = insert.createLocalization(
+        readInputFile(inputFlow),
+        readInputFile(translations),
+        lang
+    );
+
+    writeOutputFile(outputDir, 'missing.json', missing);
+    writeOutputFile(outputDir, 'flows.json', flows);
+}
+
+function readInputFile(filePath) {
+    return JSON.parse(fs.readFileSync(filePath).toString());
 }
 
 function writeOutputFile(outputDir, filename, data) {
