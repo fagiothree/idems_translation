@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const ex = require('./extract/extract.js');
-const insert = require('./insert/create_localisation_from_translated_json_files.js');
+const insert = require('./insert/create-localization.js');
 
 const COMMANDS = {
     extract,
