@@ -61,7 +61,7 @@ function createLocalization(latestFlows, translations, lang) {
         // then proceed with reconstruction of translated step_1 (localisation)
 
         let localization = {};
-        localization[lang] = translate_localization(
+        localization[lang] = translateLocalization(
             step1[flow.uuid].localization.eng,
             translatedStep2,
             step2
@@ -92,68 +92,54 @@ function createLocalization(latestFlows, translations, lang) {
     ];
 }
 
-/////////////////////////////////////////////////////////////////
-// function to translate localisation
-///////////////////////////////////////////////////////////////
+function translateLocalization(engLoc, translStep2, engStep2) {
+    const NEWLINE = '\n';
+    const BULLET = '•\t';
+    const byTypeId = (a, b) => a.type_id - b.type_id;
+    let translatedLoc = JSON.parse(JSON.stringify(engLoc));
+    let nPartiallyTranslNodes = 0;
 
-function translate_localization(eng_loc, transl_step_2, eng_step_2){
-    var nl = "\n";
-    translated_loc = JSON.parse(JSON.stringify(eng_loc));
-    var n_partially_transl_nodes = 0;
-    for (bit_id in translated_loc){
-        if (transl_step_2.filter(function (atom) { return (atom.bit_id == bit_id) }).length != eng_step_2.filter(function (atom) { return (atom.bit_id == bit_id) }).length){
-            n_partially_transl_nodes++
-            continue
+    for (let [bitId, bit] of Object.entries(translatedLoc)) {
+        const byBitId = (x) => x.bit_id == bitId;
+
+        if (translStep2.filter(byBitId).length != engStep2.filter(byBitId).length) {
+            nPartiallyTranslNodes++;
+            continue;
         }
-        var bit = translated_loc[bit_id];
+
         if (bit.hasOwnProperty('text')) {
-            translated_loc[bit_id].text[0] = "";
-            var corresp_atoms = transl_step_2.filter(function (atom) { return (atom.bit_id == bit_id && atom.bit_type == "text") });
-            corresp_atoms = corresp_atoms.sort(function (a, b) { return a.type_id - b.type_id });
-            for (tx = 0; tx < corresp_atoms.length; tx++) {
-                if (tx == 0) {
-                    if (corresp_atoms[tx].hasOwnProperty('has_bullet') && corresp_atoms[tx].has_bullet == true){
-                        translated_loc[bit_id].text[0] = translated_loc[bit_id].text[0] + "•\t" + corresp_atoms[tx].text;
-                    }
-                    else{
-                        translated_loc[bit_id].text[0] =  translated_loc[bit_id].text[0] + corresp_atoms[tx].text;
-                    }
-                }
-                else {
-                    if (corresp_atoms[tx].hasOwnProperty('has_bullet') && corresp_atoms[tx].has_bullet == true){
-                        translated_loc[bit_id].text[0] =  translated_loc[bit_id].text[0] + nl.repeat(corresp_atoms[tx].has_extraline+1) + "•\t" + corresp_atoms[tx].text;
-                    }
-                    else{
-                        translated_loc[bit_id].text[0] = translated_loc[bit_id].text[0] + nl.repeat(corresp_atoms[tx].has_extraline+1) + corresp_atoms[tx].text;
-                    }
-                }
-            }
+            bit.text[0] = translStep2
+                .filter(byBitId)
+                .filter(atom => atom.bit_type == "text")
+                .sort(byTypeId)
+                .map(atom => {
+                    const newlines = NEWLINE.repeat(atom.has_extraline);
+                    const bullet = atom.has_bullet ? BULLET : '';
+                    return newlines + bullet + atom.text;
+                })
+                .join(NEWLINE);
         }
-        if (bit.hasOwnProperty('quick_replies')) {
-            translated_loc[bit_id].quick_replies = [];
-            let corresp_atoms = transl_step_2.filter(function (atom) {
-                return (atom.bit_id == bit_id && atom.bit_type == "quick_replies");
-            });
-            corresp_atoms = corresp_atoms.sort(function (a, b) { return a.type_id - b.type_id; });
-            for (qr = 0; qr < corresp_atoms.length; qr++) {
-                translated_loc[bit_id].quick_replies.push(corresp_atoms[qr].text);
-            }
 
+        if (bit.hasOwnProperty('quick_replies')) {
+            bit.quick_replies = translStep2
+                .filter(byBitId)
+                .filter(atom => atom.bit_type == "quick_replies")
+                .sort(byTypeId)
+                .map(atom => atom.text);
         }
+
         if (bit.hasOwnProperty('arguments')) {
-            translated_loc[bit_id].arguments = [];
-            let corresp_atoms = transl_step_2.filter(function (atom) {
-                return (atom.bit_id == bit_id && atom.bit_type == "arguments");
-            });
-            if (corresp_atoms.length>0){
-                translated_loc[bit_id].arguments.push(corresp_atoms[0].text);
-            } else {
+            bit.arguments = translStep2
+                .filter(byBitId)
+                .filter(atom => atom.bit_type == "arguments")
+                .map(atom => atom.text);
+            if (bit.arguments.length == 0) {
                 console.log("no match arguments");
             }
         }
     }
 
-    return translated_loc;
+    return translatedLoc;
 }
 
 module.exports = {
