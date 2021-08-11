@@ -12,3 +12,6 @@ common_tools: scripts to handle (duplicates, best matches, etc.) json files/tran
 *needed for inserting the translation back into the system?
 For RapidPro the possible types are:text, quick_replies, arguments
 For the app the possible types are: ???
+
+test:
+node .\common_tools\index missing ".\test_files\current_translation_list.json" ".\test_files\translation_dictionary.json" ".\test_files\output"

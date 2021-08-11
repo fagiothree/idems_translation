@@ -1,0 +1,22 @@
+{
+  "name": "idems_translation",
+  "version": "1.0.0",
+  "description": "translation tools",
+  "main": ".\\common_tools\\index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fagiothree/idems_translation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fagiothree/idems_translation/issues"
+  },
+  "homepage": "https://github.com/fagiothree/idems_translation#readme",
+  "dependencies": {
+    "string-similarity": "^4.0.4"
+  }
+}
