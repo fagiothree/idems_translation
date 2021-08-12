@@ -1,0 +1,24 @@
+[
+  {
+    "missing": "What is your name?",
+    "best-match": "What's your name?",
+    "transl": "Come ti chiami?",
+    "bit": {
+      "SourceText": "What is your name?",
+      "text": "Come ti chiami?",
+      "type": "text",
+      "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+    }
+  },
+  {
+    "missing": "What's your fame?",
+    "best-match": "What's your name?",
+    "transl": "Come ti chiami?",
+    "bit": {
+      "SourceText": "What's your fame?",
+      "text": "",
+      "type": "text",
+      "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+    }
+  }
+]

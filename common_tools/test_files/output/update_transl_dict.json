@@ -1,0 +1,26 @@
+[
+  {
+    "SourceText": "Hello",
+    "text": "Ciao",
+    "type": "text",
+    "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+  },
+  {
+    "SourceText": "What's your name?",
+    "text": "Come ti chiami?",
+    "type": "text",
+    "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+  },
+  {
+    "SourceText": "Nice to meet you.",
+    "text": "Piacere di conoscerti.",
+    "type": "text",
+    "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+  },
+  {
+    "SourceText": "What is your name?",
+    "text": "Come ti chiami?",
+    "type": "text",
+    "note": "Strings like @fields.xxx and @results.yyy should not be translated. "
+  }
+]
