@@ -1,5 +1,5 @@
 const assert = require('assert');
-const extract = require('../extract/extract.js');
+const extract = require('../chatbot/extract/extract.js');
 
 
 describe(
