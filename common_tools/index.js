@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const missing = require('./find_missing_bits_to_translate.js');
+const findMissing = require('./find_missing_bits_to_translate.js');
 const inventory = require('./make_inventory.js');
 
 
@@ -22,7 +22,7 @@ function missing([inputFile_current_list, inputFile_translation_dict, outputDir]
     const curr_list = readInputFile(inputFile_current_list);
     const curr_transl = readInputFile(inputFile_translation_dict);
     
-    const missing_bits = missing.findMissing(curr_list,curr_transl);
+    const missing_bits = findMissing.findMissing(curr_list,curr_transl);
     writeOutputFile(outputDir, 'missing_bits_to_translate.json', missing_bits);
 }
 
