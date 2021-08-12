@@ -14,4 +14,9 @@ For RapidPro the possible types are:text, quick_replies, arguments
 For the app the possible types are: ???
 
 test:
-node .\common_tools\index missing ".\test_files\current_translation_list.json" ".\test_files\translation_dictionary.json" ".\test_files\output"
+cd common_tools
+node .\index missing ".\test_files\current_translation_list.json" ".\test_files\translation_dictionary.json" ".\test_files\output"
+
+node .\index match ".\test_files\output\missing_bits_to_translate.json" ".\test_files\translation_dictionary.json" ".\test_files\output"
+
+node .\index add_restored ".\test_files\output\selected_best_matches.json" ".\test_files\translation_dictionary.json" ".\test_files\output"
