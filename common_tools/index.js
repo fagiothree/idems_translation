@@ -23,6 +23,8 @@ function missing([inputFile_current_list, inputFile_translation_dict, outputDir]
     const curr_transl = readInputFile(inputFile_translation_dict);
     
     const missing_bits = findMissing.findMissing(curr_list,curr_transl);
+    const word_count = findMissing.countMissing(missing_bits);
+    console.log("missing words to translate: " + word_count)
     writeOutputFile(outputDir, 'missing_bits_to_translate.json', missing_bits);
 }
 

@@ -10,8 +10,19 @@ function findMissing(curr_list,curr_transl_dict){
     return missing_bits
 }
 
+function countMissing(missing_bits){
+    let word_count = 0;
+    missing_bits.forEach(bit =>{
+        let n_words = bit.SourceText.split(" ").length;
+        word_count = word_count + n_words;
+    })
+
+    return word_count
+}
+
 
 
 module.exports = {
-    findMissing
+    findMissing,
+    countMissing
 };
