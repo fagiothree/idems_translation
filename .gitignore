@@ -1,3 +1,5 @@
+#output files
+.\common_tools\test_files\output
 # Logs
 logs
 *.log
