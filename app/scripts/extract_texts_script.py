@@ -224,5 +224,5 @@ with open(path + '//Outputs//output.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_all, json_file, ensure_ascii=False, indent=2)
 
 reslt_all = [d['text'] for d in result_all if 'text' in d]
-print('Number of characters for translation in outputs.json: ', sum(len(str(i)) for i in reslt_all))
-print('Number of words for translation in outputs.json: ', sum(len(str(i).split()) for i in reslt_all))
+print('Number of characters for translation in output.json: ', sum(len(str(i)) for i in reslt_all))
+print('Number of words for translation in output.json: ', sum(len(str(i).split()) for i in reslt_all))
