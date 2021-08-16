@@ -13,6 +13,8 @@ common_tools: scripts to handle (duplicates, best matches, etc.) json files/tran
 For RapidPro the possible types are: text, quick_replies, arguments
 For the app the possible types are: ???
 
+run npm install
+
 test:
 cd common_tools
 node .\index missing ".\test_files\current_translation_list.json" ".\test_files\translation_dictionary.json" ".\test_files\output"
