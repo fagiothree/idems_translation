@@ -1,0 +1,22 @@
+{
+  "name": "idems_translation_chatbot",
+  "version": "1.0.0",
+  "description": "Translation tools for chatbots",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fagiothree/idems_translation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fagiothree/idems_translation/issues"
+  },
+  "homepage": "https://github.com/fagiothree/idems_translation#readme",
+  "devDependencies": {
+    "mocha": "^9.0.2"
+  }
+}
