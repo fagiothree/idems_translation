@@ -20,8 +20,33 @@ function createLocalization(latestFlows, translations, lang) {
 
         for (const bit of step2) {
             const translationMatches = translations.filter(tr =>
-                tr.type == bit.bit_type && tr.SourceText.toLowerCase() == bit.text.toLowerCase()
+                tr.type == bit.bit_type && tr.SourceText.toLowerCase().trim() == bit.text.toLowerCase().trim()
             );
+            
+            if (translationMatches.length >= 1){
+                let translatedBit = Object.assign({}, bit);
+                translatedBit.text = translationMatches[0].text;
+
+                translatedStep2.push(translatedBit);
+                unusedTranslations = unusedTranslations.filter(tr =>
+                    !(tr.type == bit.bit_type &&
+                      tr.SourceText.toLowerCase().trim() == bit.text.toLowerCase().trim())
+                );
+               
+                if (translationMatches.length >1){
+    
+                    duplicates = duplicates + duplCount + "-------------------------------------------" +"\n" + translationMatches.length + " matches for bit " + bit.text + " in flow "+ flow.name + "\n";
+                    translationMatches.forEach(translation => {
+                    duplicates = duplicates + translation.text + "\n ---- \n";
+                });
+                duplCount++;
+                }
+            } else {
+                missingBits.push(Object.assign({}, bit));
+            }
+        
+
+            /* ///// old code
             if (translationMatches.length > 1) {
                 const firstMatch = translationMatches[0];
                 const isIdentical = translationMatches.every(tr =>
@@ -55,7 +80,9 @@ function createLocalization(latestFlows, translations, lang) {
                       tr.SourceText.toLowerCase().trim() == bit.text.toLowerCase().trim())
                 );
             }
+            ///// old code */
         }
+        
         // check if the flow is fully translated now:
         // if not, add to the list of flows with incomplete translation, counting the missing bits to translate
         // then proceed with reconstruction of translated step_1 (localisation)
