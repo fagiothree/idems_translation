@@ -2,10 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const ex = require('./extract/extract.js');
 const insert = require('./insert/create-localization.js');
+const { move_quick_replies_to_message_text } = require('./insert/add_quick_replies_to_msg_text_and_localization.js');
 
 const COMMANDS = {
     extract,
-    localize
+    localize,
+    move_quick_replies
 };
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -40,16 +42,29 @@ function localize([inputFlow, translations, lang, outputDir]) {
     writeOutputFile(outputDir, 'flows.json', flows);
 }
 
+function move_quick_replies([input_file, output_dir]) {
+    const [flows, debug] = move_quick_replies_to_message_text(
+        readInputFile(input_file)
+    );
+    writeOutputFile(output_dir, 'no-qr.json', flows);
+    writeOutputFile(output_dir, 'debug.txt', debug);
+}
+
 function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());
 }
 
 function writeOutputFile(outputDir, filename, data) {
     const outputFile = path.join(outputDir, filename);
-    const json = JSON.stringify(data, null, 2);
+    let content = '';
+    if (path.extname(outputFile) === '.json') {
+        content = JSON.stringify(data, null, 2);
+    } else {
+        content = data;
+    }
     fs.writeFile(
         outputFile,
-        json,
+        content,
         outputFileErrorHandler
     );
 }

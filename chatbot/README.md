@@ -11,14 +11,19 @@ npm install
 
 ## Running the scripts
 
-To extract English-language strings from RapidPro flows, for translation.
+Extract English-language strings from RapidPro flows, for translation.
 ```
 node index extract <rapidpro-json-file> <output-dir>
 ```
 
-To merge translated strings back into original flow as a localization.
+Merge translated strings back into original flow as a localization.
 ```
 node index localize <input-rapidpro-flow-file> <translated-strings-file> <language-code> <output-dir>
+```
+
+Move quick replies to message text.
+```
+node index move_quick_replies <input-rapidpro-flow-file> <output-dir>
 ```
 
 ## Running tests
