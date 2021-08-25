@@ -31,7 +31,7 @@ function extract([inputFile, outputDir]) {
     writeOutputFile(outputDir, 'step_3.json', fileForTranslNoRep);
 }
 
-function localize([inputFlow, translations, lang, outputDir]) {
+function localize([inputFlow, translations, lang, outputName, outputDir]) {
     const [missing, flows] = insert.createLocalization(
         readInputFile(inputFlow),
         readInputFile(translations),
@@ -39,7 +39,7 @@ function localize([inputFlow, translations, lang, outputDir]) {
     );
 
     writeOutputFile(outputDir, 'missing.json', missing);
-    writeOutputFile(outputDir, 'flows.json', flows);
+    writeOutputFile(outputDir, outputName + '.json', flows);
 }
 
 function move_quick_replies([input_file, output_dir]) {
