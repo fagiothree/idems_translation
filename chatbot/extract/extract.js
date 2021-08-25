@@ -62,8 +62,8 @@ function extractTextForTranslation(obj) {
     });
 
     const average = bitsLengths.reduce((a, b) => a + b, 0) / bitsLengths.length;
-    console.log("average length " + average);
-    console.log(bitsLengths);
+    //console.log("average length " + average);
+    //console.log(bitsLengths);
     return bitsToTranslate;
 }
 
@@ -156,8 +156,8 @@ function createFileForTranslators(obj) {
             }
         }
     }
-    console.log("word count: "  + wordCount);
-    console.log("char count: "  + charCount);
+    //console.log("word count: "  + wordCount);
+    //console.log("char count: "  + charCount);
     return newFile;
 }
 
@@ -189,8 +189,8 @@ function removeRepetitions(obj) {
         });
     });
 
-    console.log ("without rep " + wordCount);
-    console.log ("without rep " + charCount);
+    console.log ("word count " + wordCount);
+    //console.log ("without rep " + charCount);
     return messages;
 }
 
