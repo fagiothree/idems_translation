@@ -1,13 +1,13 @@
-const fs = require('fs');
 const PO = require('pofile');
 
-function json_to_po(jsonFile) {
+function json_to_po(jsonFile, { isTemplate }) {
     const json = JSON.parse(jsonFile.toString());
     let po = new PO();
+    po.headers['Content-Type'] = 'text/plain; charset=utf-8';
     for (const message of json) {
         let item = new PO.Item();
         item.msgid = message.SourceText;
-        item.msgstr = message.text;
+        item.msgstr = isTemplate ? '' : message.text;
         item.extractedComments = [`type=${message.type}`];
         if (message.note) {
             item.extractedComments.push(message.note);
@@ -17,7 +17,7 @@ function json_to_po(jsonFile) {
     return po.toString();
 }
 
-function po_to_json(poFile) {
+function po_to_json(poFile, _) {
     let po = PO.parse(poFile.toString());
     let json = [];
     for (const item of po.items) {

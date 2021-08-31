@@ -36,7 +36,7 @@ node index convert <input_file> [output_file]
 ```
 
 - `input_file` (mandatory). File that will be used as input. The file extension will be used to decide on the direction of the conversion i.e. JSON to PO, or PO to JSON.
-- `output_file` (optional). File where the converted output will be saved. If omitted, the output will be printed on the console.
+- `output_file` (optional). File where the converted output will be saved. If omitted, the output will be printed on the console. If filename has a '.pot' extension, a template file will be created.
 
 Examples:
 ```

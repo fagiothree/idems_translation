@@ -49,8 +49,11 @@ function add_restored([inputFile_selected_best_matches, inputFile_translation_di
 
 function convert([input_file_path, output_file_path]) {
     const convertFn = path.extname(input_file_path) === '.json' ? json_to_po : po_to_json;
+    const options = {
+        isTemplate: output_file_path && path.extname(output_file_path) === '.pot'
+    };
     const input_file = fs.readFileSync(input_file_path);
-    let output = convertFn(input_file);
+    let output = convertFn(input_file, options);
 
     if (output_file_path) {
         fs.writeFile(output_file_path, output, outputFileErrorHandler);
