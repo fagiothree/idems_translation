@@ -8,9 +8,9 @@ function json_to_po(jsonFile, { isTemplate }) {
         let item = new PO.Item();
         item.msgid = message.SourceText;
         item.msgstr = isTemplate ? '' : message.text;
-        item.extractedComments = [`type=${message.type}`];
+        item.extractedComments.push(`type=${message.type}`);
         if (message.note) {
-            item.extractedComments.push(message.note);
+            item.extractedComments.push(...message.note.split('\n'));
         }
         po.items.push(item);
     }
@@ -25,15 +25,17 @@ function po_to_json(poFile, _) {
             SourceText: item.msgid,
             text: item.msgstr[0],
         };
+        let note = [];
         for (const comment of item.extractedComments) {
             const splitComment = comment.split('=');
             if (splitComment.length == 2) {
                 const [key, value] = splitComment;
                 message[key] = value;
             } else {
-                message.note = comment;
+                note.push(comment);
             }
         }
+        message.note = note.join('\n');
         json.push(message);
     }
 
