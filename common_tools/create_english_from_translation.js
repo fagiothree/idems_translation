@@ -8,7 +8,7 @@ const outputDir = args[1];
 
 var translObj = JSON.parse(fs.readFileSync(inputFilePath).toString());
 
-
+console.log(translObj.length)
 translObj.forEach(bit =>{
     bit.text = bit.SourceText;
 })
