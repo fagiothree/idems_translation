@@ -7,7 +7,8 @@ function json_to_po(jsonFile, { isTemplate }) {
     for (const message of json) {
         let item = new PO.Item();
         item.msgid = message.SourceText;
-        item.msgstr = isTemplate ? '' : message.text;
+        item.msgstr.push(isTemplate ? '' : message.text);
+        item.msgctxt = message.type;
         item.extractedComments.push(`type=${message.type}`);
         if (message.note) {
             item.extractedComments.push(...message.note.split('\n'));
