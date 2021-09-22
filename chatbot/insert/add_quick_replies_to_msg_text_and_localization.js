@@ -1,4 +1,4 @@
-function move_quick_replies_to_message_text(flows) {
+function move_quick_replies_to_message_text(flows, select_phrases) {
     const exceptions = [
         'no',
         'prefer not to say',
@@ -11,7 +11,9 @@ function move_quick_replies_to_message_text(flows) {
 
     let debug = '';
     let debug_lang = {};
-    debug_lang.msa = '';
+    for (const lang in curr_loc) {
+        debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+    }
 
     let select_phrase_msa = 'Sila pilih nombor bagi pilihan berikut:';
     let select_phrases = {};
