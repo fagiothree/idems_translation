@@ -42,12 +42,12 @@ function localize([inputFlow, translations, lang, outputName, outputDir]) {
     writeOutputFile(outputDir, outputName + '.json', flows);
 }
 
-function move_quick_replies([input_file, output_dir]) {
+function move_quick_replies([input_file, select_phrases, outputName, output_dir]) {
     const [flows, debug] = move_quick_replies_to_message_text(
-        readInputFile(input_file)
+        readInputFile(input_file),readInputFile(select_phrases)
     );
-    writeOutputFile(output_dir, 'no-qr.json', flows);
-    writeOutputFile(output_dir, 'debug.txt', debug);
+    writeOutputFile(outputDir, outputName + '.json', flows);
+    writeOutputFile(output_dir, 'debug_qr_' + lang + '.txt', debug);
 }
 
 function readInputFile(filePath) {
