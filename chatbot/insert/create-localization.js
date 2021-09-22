@@ -88,7 +88,7 @@ function createLocalization(latestFlows, translations, lang) {
         // then proceed with reconstruction of translated step_1 (localisation)
 
         let localization = {};
-        localization[lang] = translateLocalization(
+        localization = translateLocalization(
             step1[flow.uuid].localization.eng,
             translatedStep2,
             step2
@@ -109,7 +109,13 @@ function createLocalization(latestFlows, translations, lang) {
     // add localization to flows
     for (let flow of latestFlows.flows) {
         if (flowsLocalizations[flow.uuid]) {
-            flow.localization = flowsLocalizations[flow.uuid].localization;
+            if (flow.hasOwnProperty("localization")){
+                flow.localization[lang] = flowsLocalizations[flow.uuid].localization;
+            } else {
+                flow.localization = {};
+                flow.localization[lang] = flowsLocalizations[flow.uuid].localization;
+            }
+            
         }
     }
 
