@@ -109,13 +109,10 @@ function createLocalization(latestFlows, translations, lang) {
     // add localization to flows
     for (let flow of latestFlows.flows) {
         if (flowsLocalizations[flow.uuid]) {
-            if (flow.hasOwnProperty("localization")){
-                flow.localization[lang] = flowsLocalizations[flow.uuid].localization;
-            } else {
-                flow.localization = {};
-                flow.localization[lang] = flowsLocalizations[flow.uuid].localization;
+            if (!flow.hasOwnProperty("localization")){             
+                flow.localization = {};              
             }
-            
+            flow.localization[lang] = flowsLocalizations[flow.uuid].localization;
         }
     }
 
