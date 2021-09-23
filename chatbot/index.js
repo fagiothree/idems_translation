@@ -42,6 +42,7 @@ function localize([inputFlow, translations, lang, outputName, outputDir]) {
     writeOutputFile(outputDir, outputName + '.json', flows);
 }
 
+
 function move_quick_replies([input_file, select_phrases, outputName, outputDir]) {
     const [flows, debug, debug_lang] = move_quick_replies_to_message_text(
         readInputFile(input_file),readInputFile(select_phrases)
