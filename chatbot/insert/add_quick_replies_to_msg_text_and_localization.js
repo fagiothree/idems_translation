@@ -16,7 +16,7 @@ function move_quick_replies_to_message_text(flows, select_phrases) {
     }
  
     for (const flow of flows.flows) {
-        console.log(flow.name)
+        
         let curr_loc = flow.localization;
 
         debug += `\n\n${flow.name}*************************************\n`;
@@ -45,13 +45,13 @@ function move_quick_replies_to_message_text(flows, select_phrases) {
                 if (action.type == 'send_msg') {
                     if (action.quick_replies.length > 0) {
                         let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
-                        console.log("augmented")
+                        
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
-                        console.log("added")
+                        
                         clear_quick_replies(action, curr_loc);
-                        console.log("cleared")
+                        
                         debug = modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
-                        console.log("modified")
+                        
                     }
                 }
             }
@@ -62,7 +62,7 @@ function move_quick_replies_to_message_text(flows, select_phrases) {
 }
 
 function augment_quick_replies(curr_act, exceptions, curr_loc) {
-    console.log(curr_act)
+ 
     return curr_act.quick_replies.map((qr, i, qrs) => {
         let selector = i + 1;
         if (i == qrs.length - 1
@@ -73,6 +73,7 @@ function augment_quick_replies(curr_act, exceptions, curr_loc) {
         let translations = {};
         
         for (const [lang, messages] of Object.entries(curr_loc)) {
+        
             translations[lang] = messages[curr_act.uuid].quick_replies[i];
         }
 
