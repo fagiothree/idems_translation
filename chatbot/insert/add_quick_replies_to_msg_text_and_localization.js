@@ -1,4 +1,4 @@
-function move_quick_replies_to_message_text(flows) {
+function move_quick_replies_to_message_text(flows, select_phrases) {
     const exceptions = [
         'no',
         'prefer not to say',
@@ -11,18 +11,23 @@ function move_quick_replies_to_message_text(flows) {
 
     let debug = '';
     let debug_lang = {};
-    debug_lang.msa = '';
-
-    let select_phrase_msa = 'Sila pilih nombor bagi pilihan berikut:';
-    let select_phrases = {};
-    select_phrases.msa = select_phrase_msa;
-
+    if (!select_phrases.hasOwnProperty("eng")){
+        select_phrases["eng"] = "Please select the number for the following options:"
+    }
+ 
     for (const flow of flows.flows) {
+        
         let curr_loc = flow.localization;
 
         debug += `\n\n${flow.name}*************************************\n`;
         for (const lang in curr_loc) {
-            debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            
+            if (debug_lang.hasOwnProperty(lang)){
+                debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            }else{
+                debug_lang[lang] = `${flow.name}*************************************\n`;
+            }
+ 
         }
 
         const routers = flow.nodes
@@ -40,19 +45,24 @@ function move_quick_replies_to_message_text(flows) {
                 if (action.type == 'send_msg') {
                     if (action.quick_replies.length > 0) {
                         let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                        
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                        
                         clear_quick_replies(action, curr_loc);
-                        modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
+                        
+                        debug = modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
+                        
                     }
                 }
             }
         }
     }
 
-    return [flows, debug_lang.msa];
+    return [flows, debug, debug_lang];
 }
 
 function augment_quick_replies(curr_act, exceptions, curr_loc) {
+ 
     return curr_act.quick_replies.map((qr, i, qrs) => {
         let selector = i + 1;
         if (i == qrs.length - 1
@@ -61,7 +71,9 @@ function augment_quick_replies(curr_act, exceptions, curr_loc) {
         }
 
         let translations = {};
+        
         for (const [lang, messages] of Object.entries(curr_loc)) {
+        
             translations[lang] = messages[curr_act.uuid].quick_replies[i];
         }
 
@@ -76,7 +88,7 @@ function augment_quick_replies(curr_act, exceptions, curr_loc) {
 function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases) {
     action.text = [
         action.text,
-        '\nPlease select the number for the following options:',
+        '\n' + select_phrases["eng"],
         ...quick_replies.map((qr) => `${qr.selector}. ${qr.text}`)
     ].join('\n');
 
@@ -99,6 +111,8 @@ function clear_quick_replies(action, curr_loc) {
 function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang) {
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
+
+    // TO DO: what happens if there is a node between the send_msg node and the wfr node???
 
     debug += `\n${action.text}\n`;
     for (const lang in curr_loc) {
@@ -134,7 +148,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                 }
 
                 if (new_test == old_test) {
-                    console.log(`no match main version in flow ${flow.name}`);
+                    //console.log(`no match main version in flow ${flow.name}`);
                     debug += 'NO MATCH \n';
                 }
                 else {
@@ -174,13 +188,13 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     }
 
                     if (new_test_lang[lang] == old_test_lang[lang]) {
-                        console.log(`no match ${lang} in flow ${flow.name}`);
+                        //console.log(`no match ${lang} in flow ${flow.name}`);
                         debug_lang[lang] += 'NO MATCH \n';
                     }
 
                     const unique_selectors_lang = Array.from(matching_selectors_lang[lang]).sort().join(',');
                     if (unique_selectors != unique_selectors_lang) {
-                        console.log(` in flow ${flow.name} no matching selectors original ${matching_selectors} and ${lang} ${matching_selectors_lang[lang]}`);
+                        //console.log(` in flow ${flow.name} no matching selectors original ${matching_selectors} and ${lang} ${matching_selectors_lang[lang]}`);
                         debug_lang[lang] += 'NO MATCHING SELECTORS \n';
                     }
 
@@ -205,7 +219,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                 }
 
                 if (new_test === '') {
-                    console.log(`no match ${flow.name}`);
+                    //console.log(`no match ${flow.name}`);
                     debug += 'NO MATCH \n';
                 }
                 else {
@@ -236,12 +250,12 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     }
 
                     if (new_test_lang[lang] === '') {
-                        console.log(`no match msa ${flow.name}`);
+                        //console.log(`no match msa ${flow.name}`);
                         debug_lang[lang] += 'NO MATCH \n';
                     }
 
                     if (new_test_lang[lang] != new_test) {
-                        console.log(` in flow ${flow.name} no matching selectors`);
+                        //console.log(` in flow ${flow.name} no matching selectors`);
                         debug_lang[lang] += 'NO MATCHING SELECTORS \n';
                     }
 
@@ -263,7 +277,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                 }
 
                 if (new_test === '') {
-                    console.log(`no match ${flow.name}`);
+                    //console.log(`no match ${flow.name}`);
                     debug += 'NO MATCH \n';
                 }
                 else {
@@ -287,12 +301,12 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     }
 
                     if (new_test_lang[lang] === '') {
-                        console.log(`no match msa ${flow.name}`);
+                        //console.log(`no match msa ${flow.name}`);
                         debug_lang[lang] += 'NO MATCH \n';
                     }
 
                     if (new_test_lang[lang] != new_test) {
-                        console.log(` in flow ${flow.name} no matching selectors`);
+                        //console.log(` in flow ${flow.name} no matching selectors`);
                         debug_lang[lang] += 'NO MATCHING SELECTORS \n';
                     }
 
@@ -316,7 +330,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
 
                 if (new_test === '') {
                     debug += 'NO MATCH \n';
-                    console.log(`no match ${flow.name}`);
+                    //console.log(`no match ${flow.name}`);
                 }
                 else {
                     curr_case.arguments = [new_test];
@@ -340,12 +354,12 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     }
 
                     if (new_test_lang[lang] === '') {
-                        console.log('no match msa' + flow.name);
+                        //console.log('no match msa' + flow.name);
                         debug_lang[lang] += 'NO MATCH \n';
                     }
 
                     if (new_test_lang[lang] != new_test) {
-                        console.log(` in flow ${flow.name} no matching selectors`);
+                        //console.log(` in flow ${flow.name} no matching selectors`);
                         debug_lang[lang] += 'NO MATCHING SELECTORS \n';
                     }
 
@@ -357,6 +371,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
             curr_case.type = 'has_any_word';
         }
     }
+    return debug
 }
 
 function split_args(args) {

@@ -38,16 +38,20 @@ function localize([inputFlow, translations, lang, outputName, outputDir]) {
         lang
     );
 
-    writeOutputFile(outputDir, 'missing.json', missing);
+    writeOutputFile(outputDir, 'missing_' + lang + '.json', missing);
     writeOutputFile(outputDir, outputName + '.json', flows);
 }
 
-function move_quick_replies([input_file, outputName, outputDir]) {
-    const [flows, debug] = move_quick_replies_to_message_text(
-        readInputFile(input_file)
+
+function move_quick_replies([input_file, select_phrases, outputName, outputDir]) {
+    const [flows, debug, debug_lang] = move_quick_replies_to_message_text(
+        readInputFile(input_file),readInputFile(select_phrases)
     );
     writeOutputFile(outputDir, outputName + '.json', flows);
-    writeOutputFile(outputDir, 'debug.txt', debug);
+    writeOutputFile(outputDir, 'debug_qr.txt', debug);
+    for (lang in debug_lang){
+        writeOutputFile(outputDir, 'debug_qr_' + lang +'.txt', debug_lang[lang]);
+    }
 }
 
 function readInputFile(filePath) {
