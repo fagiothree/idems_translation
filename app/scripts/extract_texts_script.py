@@ -17,7 +17,6 @@ ignore_start = ('https', '@', 'plh_', '+@', '!@', '!!@')
 result = []
 excluded_types = ('nested_properties', 'template', 'image', 'audio', 'video', 'animated_section',
                   'display_group', 'lottie_animation')
-contain_key = ('title', 'text', 'in_text_title', 'short_title', 'tools')
 end_variable_characters = (' ', ':', ';', ',', '!', '?', '@')
 
 
@@ -69,13 +68,12 @@ def process_rows(val, result, filename):
         elif filename == 'data_list':
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 if item.get('_translatedFields') != None:
-                    for elt in contain_key:
-                        if str(elt) in item.get('_translatedFields'):
-                            value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
-                            #print(value_string, 'Ok', elt)
-                            matched_expressions = []
-                            get_matched_text(value_string, matched_expressions)
-                            result.append(add_to_result(value_string, matched_expressions, result, filename))
+                    for elt in item.get('_translatedFields'):
+                        value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
+                        #print(value_string, 'Ok', elt)
+                        matched_expressions = []
+                        get_matched_text(value_string, matched_expressions)
+                        result.append(add_to_result(value_string, matched_expressions, result, filename))
         else:
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 value_type = str(item.get('type'))
