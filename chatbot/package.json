@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/fagiothree/idems_translation#readme",
   "devDependencies": {
-    "mocha": "^9.0.2"
+    "mocha": "^9.1.3"
   }
 }

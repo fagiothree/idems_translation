@@ -18,14 +18,16 @@ if (COMMANDS[command]) {
     COMMANDS[command](args);
 } else {
     console.log(`Command not recognised, command=${command}`);
-}  
+}
 
-function has_any_words_check([inputFile, outputDir]) { 
-    const obj = readInputFile(inputFile);   
-    const [newobj, fixlog] = cleaner.fix_has_any_words(obj);
+function has_any_words_check(inputFile){
+    const obj = readInputFile(inputFile);
+    const [outputobject, fixlog] = cleaner.fix_has_any_words(obj)
+
     // Export modified JSON file and the fixlog file
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.json", newobj);
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
+    fs.writeFile("C:/Users/edmun/Code/TestFiles/plswork.json", outputobject, outputFileErrorHandler)
+    fs.writeFile("C:/Users/edmun/Code/TestFiles/plswork.txt", fixlog, outputFileErrorHandler)
+
 }
 
 function extract([inputFile, outputDir]) {
