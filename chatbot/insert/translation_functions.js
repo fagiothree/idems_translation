@@ -62,5 +62,6 @@ function arrayEquals(a, b) {
 
 module.exports = {
     CreateUniqueArguments,
+    CountIf,
     arrayEquals
 };

@@ -1,12 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const cleaner = require('./insert/check_has_any_word_args.js')
+const integrity = require('./insert/check_integrity.js')
 const ex = require('./extract/extract.js');
 const insert = require('./insert/create-localization.js');
 const { move_quick_replies_to_message_text } = require('./insert/add_quick_replies_to_msg_text_and_localization.js');
 
 const COMMANDS = {
     has_any_words_check,
+    integrity_check,
     extract,
     localize,
     move_quick_replies
@@ -26,6 +28,14 @@ function has_any_words_check([inputFile, outputDir]) {
     // Export modified JSON file and the fixlog file
     writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.json", newobj);
     writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
+}
+
+function integrity_check([inputFile, outputDir]) { 
+    const obj = readInputFile(inputFile);   
+    const [debug, debug_lang] = integrity.fix_integrity(obj);
+    // Export modified JSON file and the fixlog file
+    writeOutputFile(outputDir, path.parse(inputFile).name + "_ENGIntegrity.txt", debug);
+    writeOutputFile(outputDir, path.parse(inputFile).name + "_LANGIntegrity.txt", debug_lang); 
 }
 
 function extract([inputFile, outputDir]) {
