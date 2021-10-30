@@ -1,25 +1,19 @@
 // This script is used to look at the link between Quick Replies and arguments
 // It is important to check that all arguments have at least one connection, and that the connections are maintained after translation
+// It will look through english and other language versions, the results of each of the languages are recored separately to make the review process easier
 
 const utility = require('./translation_functions.js');
-const fs = require('fs');
+
+
+
+function check_integrity(object) {
 
 // this is the log file which looks at the original english text and prints a log of nodes with potential errors
 let debug = '';
 
 // this is the log file which looks at the translated text and checks it is consistent with the english
 let debug_lang = {};
-
-//Block of code for testing functions
-        var object = JSON.parse(fs.readFileSync("C:/Users/edmun/Code/TestFiles/translated_flows.json").toString());
-        var [out1, out2] = fix_integrity(object)
-        // export eng log files
-        fs.writeFile("C:/Users/edmun/Code/TestFiles/englog.txt", out1, outputFileErrorHandler)
-        for (const key in out2){
-            fs.writeFile(`C:/Users/edmun/Code/TestFiles/${key}log.txt`, out2[key], outputFileErrorHandler)
-        }
-
-function fix_integrity(object) {
+let languages = [];
     
     // Loop through the flows
     for (const flow of object.flows) {
@@ -29,12 +23,15 @@ function fix_integrity(object) {
 
         // Set up our log files and record the flow names 
         if(debug == ''){
-            debug += `Language: Eng\n`;
+            debug += `This file provides a log of where there are possible errors between the quick replies and the arguments\n\nLanguage: Eng\n`;
         }
 
-        for (const lang in curr_loc) {          
+        for (const lang in curr_loc) { 
+            if(languages.includes(lang.toString()) == false){
+                languages.push(lang.toString())
+            }         
             if (debug_lang.hasOwnProperty(lang) == false){
-                debug_lang[lang] = `Language: ${lang}\n`;
+                debug_lang[lang] = `This file provides a log of where there are possible errors between the quick replies and the arguments\n\nLanguage: ${lang}\n`;
             }
         }
 
@@ -63,13 +60,7 @@ function fix_integrity(object) {
         }
     }
 
-    return [debug, debug_lang];
-}
-
-function outputFileErrorHandler(err) {
-    if (err)  {
-        console.log('error', err);
-    }
+    return [debug, debug_lang, languages];
 }
 
 function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang){
@@ -158,18 +149,30 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
             
             debug_lang[lang] += `\nFlow name: ${flow.name}\n\n`
             debug_lang[lang] += `Node uuid: ${node.uuid}\n`
-            debug_lang[lang] += `Action text: ${curr_loc[lang][action.uuid].text[0]}\n`;
-            debug_lang[lang] += 'Quick replies:\n'
-            for (const row of OtherQR[lang]){
+            debug_lang[lang] += `Action text: ${action.text}\n`;
+            debug_lang[lang] += 'Eng Quick replies:\n'
+            for (const row of EngQR){
                 debug_lang[lang] += `                ${row}\n`
             }
-            debug_lang[lang] += `Arguments:\n`
+            debug_lang[lang] += `Eng Arguments:\n`
+            for (const ref in EngArg){
+                debug_lang[lang] += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`
+            }
+            debug_lang[lang] += 'Eng Links"\n'
+            for (const row of EngLinker){
+                debug_lang[lang] += `                ${row}\n`
+            }  
+            debug_lang[lang] += `${lang} Quick replies:\n`
+            for (const row of OtherQR[lang]){
+                debug_lang[lang] += `                ${row}\n`
+            }           
+            debug_lang[lang] += `${lang} Arguments:\n`
             for (const ref in OtherArg[lang]){
                 debug_lang[lang] += `                ${OtherArg[lang][ref]}  -  ${ArgTypes[ref]}\n`
             }
-            debug_lang[lang] += '\nLink: "Quick Reply","Argument"\n'
+            debug_lang[lang] += `${lang} Links:"\n`
             for (const row of OtherLinker[lang]){
-                debug_lang[lang] += `                  ${row}\n`
+                debug_lang[lang] += `                ${row}\n`
             } 
             debug_lang[lang] += '\n' 
         }
@@ -203,8 +206,7 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
             if(argument_types[k] == 'has_any_word'){
                 // for the has_any_word case we try to find any matching words between the arg and qr string
                 for (const word of argwords[k]){ 
-                    let r_exp = new RegExp(`\\b${word}\\b`, "i");
-                    // console.log(r_exp)       
+                    let r_exp = new RegExp(`\\b${word}\\b`, "i");      
                     if (r_exp.test(quick_replies[i])){
                         if (utility.CountIf(k,allmatches) ==0){
                             allmatches.push(k)                            
@@ -214,8 +216,9 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
             }
             else if(argument_types[k] == 'has_all_words'){
                 // for the has_all_words we need to check all argwords are in a particular quick reply
-                for (var n = 0; n < argwords[k].length; n++ ){        
-                    if (utility.CountIf(argwords[k][n],qrwords[i])=0){
+                for (const word of argwords[k]){ 
+                    let r_exp = new RegExp(`\\b${word}\\b`, "i");        
+                    if (r_exp.test(quick_replies[i]) == false){
                         break
                     }else if (n < argwords[k].length-1){
                         continue
@@ -299,3 +302,7 @@ function no_match_matrix(a,b){
 function split_args(args) {
     return args.split(/[\s,]+/).filter((i) => i);
 }
+
+module.exports = {
+    check_integrity
+};

@@ -32,10 +32,12 @@ function has_any_words_check([inputFile, outputDir]) {
 
 function integrity_check([inputFile, outputDir]) { 
     const obj = readInputFile(inputFile);   
-    const [debug, debug_lang] = integrity.fix_integrity(obj);
+    const [debug, debug_lang, languages] = integrity.check_integrity(obj);
     // Export modified JSON file and the fixlog file
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_ENGIntegrity.txt", debug);
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_LANGIntegrity.txt", debug_lang); 
+    writeOutputFile(outputDir, path.parse(inputFile).name + "_ENGIntegrity.txt", "JSON Processed: " + inputFile + '\n\n' + debug);
+    for (const lang of languages){
+        writeOutputFile(outputDir, path.parse(inputFile).name + "_" + lang + "Integrity.txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
+    } 
 }
 
 function extract([inputFile, outputDir]) {
