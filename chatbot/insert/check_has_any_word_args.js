@@ -91,6 +91,7 @@ function fix_has_any_words(object){
                     ModifiedNodeDetail += '        Modified Node: ' + ModifiedNodes + '\n'
                     ModifiedNodeDetail += '        Language: Eng\n'
                     ModifiedNodeDetail += '        Node ID: ' + node.uuid + '\n'
+                    ModifiedNodeDetail += '        Argument types: ' + originalargtypes + '\n'
                     ModifiedNodeDetail += '        Arguments before modification: ' + originalargs + '\n'
                     ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'
 
@@ -112,7 +113,8 @@ function fix_has_any_words(object){
                         ModifiedNodeDetail += '        Modified Node: ' + ModifiedNodes + '\n'
                         ModifiedNodeDetail += '        Language: ' + lang + '\n'
                         ModifiedNodeDetail += '        Node ID: ' + node.uuid + '\n'
-                        ModifiedNodeDetail += '        English arguments: ' + originalargs + '\n' 
+                        ModifiedNodeDetail += '        English arguments: ' + originalargs + '\n'
+                        ModifiedNodeDetail += '        Argument types: ' + originalargtypes + '\n' 
                         ModifiedNodeDetail += '        Arguments before modification: ' + otherargs[lang] + '\n'
                         ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'
 
