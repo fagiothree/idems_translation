@@ -11,6 +11,16 @@ npm install
 
 ## Running the scripts
 
+Run through RapidPro flows, identifying and fixing possible errors in 'has_any_words' arguments.
+```
+node index extract <rapidpro-json-file> <output-dir>
+```
+
+Run through RapidPro flows, log the connections between quick replies and arguments.
+```
+node index extract <rapidpro-json-file> <output-dir>
+```
+
 Extract English-language strings from RapidPro flows, for translation.
 ```
 node index extract <rapidpro-json-file> <output-dir>
@@ -18,12 +28,12 @@ node index extract <rapidpro-json-file> <output-dir>
 
 Merge translated strings back into original flow as a localization.
 ```
-node index localize <input-rapidpro-flow-file> <translated-strings-file> <language-code> <output-dir>
+node index localize <input-rapidpro-flow-file> <translated-strings-file> <language-code> <output-name> <output-dir>
 ```
 
 Move quick replies to message text.
 ```
-node index move_quick_replies <input-rapidpro-flow-file> <output-dir>
+node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir>
 ```
 
 ## Running tests
