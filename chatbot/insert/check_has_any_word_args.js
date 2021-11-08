@@ -5,55 +5,64 @@
 // it will look through and the english and the translations and output log of all changes to the same file
 
 const utility = require('./translation_functions.js');
-const fs = require('fs');        
+const fs = require('fs'); 
+
+// Code for running local tests on function - leave in place
+//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/translated_flows_tester.json"
+//let obj = JSON.parse(fs.readFileSync(filePath).toString());
+//const [a, b] = fix_has_any_words(obj);
 
 function fix_has_any_words(object){
 
+    // Find out if there are languages in this file
+    let languages = utility.findlanguages(object);
+
     // Set up variables that are used in the log file
-    fixlog = ''
     TotalFlowCount = 0
     TotalModifiedFlows = 0
-    BiggestFlow = 0
-    SmallestFlow = 100
     TotalNodeCount = 0
     TotalHasAnyWordNodes = 0
     TotalModifiedNodes = 0
+    NonTranslatedNodes = 0
+    SeriousModifiedNodes = 0
+
+    // Set up log file
+    fixlog = ''
+
+    // set up an array to store langerrors later in the process
+    let langerror = {}
+    for (const lang of languages){
+        langerror[lang] = 0
+    }
             
-    // Drill down to find the arguments
+    // Drill down to look at individual flows
     for (const flow of object.flows) {
 
-    // Pull in the translated text, note this may be blank if this is the english version
-    let curr_loc = flow.localization;
-
+        // Pull in the translated text, note this may be blank if this is the english version or if this flow has not been translated
+        let curr_loc = flow.localization;
         TotalFlowCount++
-        NodeCount = 0
-        HasAnyWordNodes = 0
-        ModifiedNodes = 0
         ModifiedNodeDetail = ''
+        TextArgumentNodes = []
 
-        for (const node of flow.nodes) {
-            // Check if there is a router in this node if so iterate through the cases
-            TotalNodeCount++
-            NodeCount++
-                
-            try {
-                for(const cases of node.router.cases){ 
-                    // First check that there is at least one 'has_any_word' argument and if so set 'assessment_required' to true
-                    assessment_required = false  
-                    if(cases.type == "has_any_word"){
-                        HasAnyWordNodes++
-                        TotalHasAnyWordNodes++
-                        assessment_required = true
-                        break
+        //Get the list of arguments that we need to check by seeing where the quick replies point us
+        for (const node of flow.nodes) {    
+            for (const action of node.actions) {
+                if (action.type == 'send_msg') {
+                    if (action.quick_replies.length > 0) {
+                        const dest_id = node.exits[0].destination_uuid;
+                        TextArgumentNodes.push(dest_id)
                     }
                 }
-            }            
-            catch(err) {
-                continue
-            }      
-                
-            if(assessment_required){
-                
+            }
+        }
+
+        for (const node of flow.nodes) {
+
+            incompletetranslation = false
+            TotalNodeCount++
+
+            //Check if this is one of the nodes we need to look at
+            if(TextArgumentNodes.includes(node.uuid) && node.hasOwnProperty('router')){
                 // collect all the arguments and their types together into an array, convert all to lower case as RapidPro is not case sensitive
                 let originalargs = []
                 let originalargtypes = []
@@ -68,100 +77,124 @@ function fix_has_any_words(object){
                 }
 
                 // collect all the translated arguments as well
-                for (const lang in curr_loc) {
+                for (const lang of languages) {
                     let helper_array = []
-                    for (let ID of originalargids){
+                    for (let ref in originalargids){
                         try{
-                            helper_array.push(curr_loc[lang][ID].arguments.toString().toLowerCase().trim());
+                            helper_array.push(curr_loc[lang][originalargids[ref]].arguments.toString().toLowerCase().trim());
                         }
                         catch(err){
-                            continue
+                            if(/[a-zA-Z]/.test(originalargs[ref])){
+                                // if there are any missing translations in a node, we consider the node as a whole 'not translated'
+                                langerror[lang]++
+                                incompletetranslation = true
+
+                                //The below line prints the text id which have an incomplete translation
+                                ModifiedNodeDetail += '        Missing Translation: ' + originalargids[ref] + '\n\n'
+                                break
+                            }
                         }                        
                     }
                     otherargs[lang] = helper_array
-                }   
+                }  
+                
+                // if one of the translations is missings then we log the node as having a translation error
+                if (incompletetranslation){
+                    NonTranslatedNodes++
+                    incompletetranslation = false
+                }
 
                 // Process argument and remove duplicate words in english
                 const UniqueArguments = utility.CreateUniqueArguments(originalargs, originalargtypes)
 
                 // If the UniqueArguments are different from the original args in english, we need to insert these back into the JSON object
                 if(utility.arrayEquals(UniqueArguments,originalargs) == false){
+
+                    let i = 0
+                    let indicator = true
+                    for(const cases of node.router.cases){               
+                        
+                        // we need to check that our code has not completely removed the arguments, if it has then we do not implement the change
+                        if(UniqueArguments[i] == ""){
+                            UniqueArguments[i] = cases.arguments[0]
+                            if(indicator){
+                                indicator = false
+                                ModifiedNodeDetail += '###### SERIOUS ISSUE, ARGUMENTS COULD NOT BE FULLY FIXED AS THIS WOULD RESULT IN NULL ARGUMENTS ######\n'
+                                SeriousModifiedNodes++
+                            }
+                        }else{
+                            cases.arguments[0] = UniqueArguments[i];                            
+                        } 
+                        i++
+                    }                      
+                    
                     TotalModifiedNodes++
-                    ModifiedNodes++                
-                    ModifiedNodeDetail += '        Modified Node: ' + ModifiedNodes + '\n'
                     ModifiedNodeDetail += '        Language: Eng\n'
                     ModifiedNodeDetail += '        Node ID: ' + node.uuid + '\n'
                     ModifiedNodeDetail += '        Argument types: ' + originalargtypes + '\n'
                     ModifiedNodeDetail += '        Arguments before modification: ' + originalargs + '\n'
-                    ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'
-
-                    i = 0
-                    for(const cases of node.router.cases){               
-                        cases.arguments[0] = UniqueArguments[i];
-                        i++      
-                    }                                                           
+                    ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'                                                                          
                 }  
                 
                 // Process argument and remove duplicate words in the translation
-                for (const lang in curr_loc) {  
+                for (const lang of languages) { 
+                        
                     const UniqueArguments = utility.CreateUniqueArguments(otherargs[lang], originalargtypes)
 
                     // If the UniqueArguments are different from the original args in translation, we need to insert these back into the JSON object
                     if(utility.arrayEquals(UniqueArguments,otherargs[lang]) == false){
-                        TotalModifiedNodes++
-                        ModifiedNodes++                
-                        ModifiedNodeDetail += '        Modified Node: ' + ModifiedNodes + '\n'
+                        
+                        let indicator = true
+                        for (const ref in originalargids){
+                            if(UniqueArguments[ref] == ""){
+                                UniqueArguments[ref] = curr_loc[lang][originalargids[ref]].arguments
+                                if(indicator){
+                                    indicator = false
+                                    ModifiedNodeDetail += '###### SERIOUS ISSUE, ARGUMENTS COULD NOT BE FULLY FIXED AS THIS WOULD RESULT IN NULL ARGUMENTS ######\n'
+                                    SeriousModifiedNodes++
+                                }
+                            }else{
+                                curr_loc[lang][originalargids[ref]].arguments = UniqueArguments[ref]
+                            }                                
+                        }           
+
+                        TotalModifiedNodes++               
                         ModifiedNodeDetail += '        Language: ' + lang + '\n'
                         ModifiedNodeDetail += '        Node ID: ' + node.uuid + '\n'
                         ModifiedNodeDetail += '        English arguments: ' + originalargs + '\n'
                         ModifiedNodeDetail += '        Argument types: ' + originalargtypes + '\n' 
                         ModifiedNodeDetail += '        Arguments before modification: ' + otherargs[lang] + '\n'
-                        ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'
-
-                        i = 0
-
-                        for (const ref in originalargids){
-                            try{
-                                curr_loc[lang][originalargids[ref]].arguments = UniqueArguments[ref]
-                            }
-                            catch(err){
-                                continue
-                            }                             
-                        }                                                    
-                    }     
-                }
+                        ModifiedNodeDetail += '        Arguments after modification:  ' + UniqueArguments + '\n\n'                                            
+                    }        
+                } 
             }                  
         }
-        if(ModifiedNodes>0){
+        if(ModifiedNodeDetail.length>0){
             TotalModifiedFlows++
-            fixlog += '    Modified Flow: ' + TotalModifiedFlows + '\n'
+            fixlog += '    Problem Flow: ' + TotalModifiedFlows + '\n'
             fixlog += '    Flow ID: ' + flow.uuid + '\n'
-            fixlog += '    Flow name: ' + flow.name + '\n'        
-            fixlog += '    Total nodes: ' + NodeCount + '\n'
-            fixlog += '    Nodes with "has any words" arguments: ' + HasAnyWordNodes + '\n'
-            fixlog += '    Nodes which have been modified due to duplication in arguments (considers different languages as different nodes): ' + ModifiedNodes + '\n\n'
+            fixlog += '    Flow name: ' + flow.name + '\n\n'        
             fixlog += ModifiedNodeDetail
         }
-
-        if(NodeCount>BiggestFlow){
-            BiggestFlow = NodeCount
-        }
-
-        if(NodeCount<SmallestFlow){
-            SmallestFlow = NodeCount
-        }
-        
     }
 
     //Add some text to start of fixlog file
-    fixlog =    'Log of changes made using the FixingArguments.js script' + '\n\n'
+
+    //Process the individual missing language erros into a single string to make it easier to understand
+    let langerrorstring = ''
+    for (const lang in langerror){
+        langerrorstring += lang + " - " + langerror[lang] + ", "
+    }
+    
+    fixlog =    'This file povides a log of changes made using the check_has_any_word_args.js script' + '\n\n'
+                + 'Languages considered: ENG, ' + languages.toString() + '\n'
                 + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
-                + 'Largest flow has: ' + BiggestFlow + ' nodes \n'
-                + 'Smallest flow has: ' + SmallestFlow + ' nodes \n'
-                + 'Average nodes per flow: ' + Math.round(TotalNodeCount/TotalFlowCount) + '\n'
-                + 'Total nodes with at least one "has_any_word" argument: ' + TotalHasAnyWordNodes + '\n'
-                + 'Total Modified Flows: ' + TotalModifiedFlows + '\n'
-                + 'Total Modified Nodes: ' + TotalModifiedNodes + '\n\n'
+                + 'Total nodes with "has_any_word" arguments: ' + TotalHasAnyWordNodes + '\n\n'
+                + 'Total "has_any_word" nodes missing at least one translation and therefore not fully processed: ' + NonTranslatedNodes + '\n'
+                + '    Breakdown by language of nodes missing translation: ' + langerrorstring + '\n\n'
+                + 'Total Problem Flows: ' + TotalModifiedFlows + '\n'
+                + 'Total Modified Nodes (translations treated as individual nodes): ' + TotalModifiedNodes + '\n'                
+                + 'Total serious errors where fix not applied as would have resulted in null arguments (translations treated as individual nodes): ' + SeriousModifiedNodes + '\n\n'
                 + 'Details of the modified flows/ nodes are summarised below:' + '\n\n'
                 + fixlog
 
@@ -171,6 +204,3 @@ function fix_has_any_words(object){
 module.exports = {
     fix_has_any_words
 };
-
-
-

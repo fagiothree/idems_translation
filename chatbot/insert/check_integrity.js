@@ -3,37 +3,53 @@
 // It will look through english and other language versions, the results of each of the languages are recored separately to make the review process easier
 
 const utility = require('./translation_functions.js');
+const fs = require('fs'); 
 
-
+// Code for running local tests on function - leave in place
+//let filePath = "C:/Users/edmun/Code/TestFiles/plh-international-flavour_expire_ABtesting_localised_afr_sot_tsn_xho_zul.json"
+//let obj = JSON.parse(fs.readFileSync(filePath).toString());
+//const [a, b] = check_integrity(obj);
 
 function check_integrity(object) {
-
-// this is the log file which looks at the original english text and prints a log of nodes with potential errors
-let debug = '';
-
-// this is the log file which looks at the translated text and checks it is consistent with the english
-let debug_lang = {};
-let languages = [];
     
+    // Find out if there are languages in this file
+    let languages = utility.findlanguages(object);
+
+    // Set up variables that are used in the log files
+    TotalFlowCount = 0
+    TotalProblemFlowsENG = 0
+    TotalNodeCount = 0
+    TotalQRNodes = 0
+    TotalProblemNodesENG = 0
+    NonTranslatedQR = 0
+    NonTranslatedArguments = 0
+    TotalProblemFlowsLANG = {};
+    TotalProblemNodesLANG = {};
+    for (const lang of languages){
+        TotalProblemFlowsLANG[lang] = 0
+        TotalProblemNodesLANG[lang] = 0
+    }
+
+    // this is the log file which looks at the original english text and prints a log of nodes with potential errors
+    let debug = '';
+
+    // this is the log file which looks at the translated text and checks it is consistent with the english
+    let debug_lang = {};
+    for (const lang of languages){
+        debug_lang[lang] = ''
+    }
+        
     // Loop through the flows
     for (const flow of object.flows) {
         
         // Pull in the translated text, note this may be blank if this is the english version
         let curr_loc = flow.localization;
 
-        // Set up our log files and record the flow names 
-        if(debug == ''){
-            debug += `This file provides a log of where there are possible errors between the quick replies and the arguments\n\nLanguage: Eng\n`;
-        }
-
-        for (const lang in curr_loc) { 
-            if(languages.includes(lang.toString()) == false){
-                languages.push(lang.toString())
-            }         
-            if (debug_lang.hasOwnProperty(lang) == false){
-                debug_lang[lang] = `This file provides a log of where there are possible errors between the quick replies and the arguments\n\nLanguage: ${lang}\n`;
-            }
-        }
+        TotalFlowCount++
+        ProblemNodes = 0
+        ProblemNodeDetail = ''
+        ProblemNodesLANG = {};
+        ProblemNodeDetailLANG = {};
 
         // Code below loops through the flow and looks for any 'arguments' storing in an object
         const routers = flow.nodes
@@ -50,9 +66,10 @@ let languages = [];
         for (const node of flow.nodes) {
             for (const action of node.actions) {
                 if (action.type == 'send_msg') {
+                    TotalQRNodes++
                     if (action.quick_replies.length > 0) {
                                                 
-                       [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang);
+                    [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang);
                         
                     }
                 }
@@ -60,10 +77,33 @@ let languages = [];
         }
     }
 
+    // Add some helper text to the top of the log files 
+    debug = 'This file provides a log of where there are possible errors between the quick replies and the arguments identified using the "check_integrity" script\n\n'
+            + 'Language: Eng\n'
+            + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
+            + 'Total nodes with "quick replies": ' + TotalQRNodes + '\n\n'
+            + 'Total quick reply nodes missing translation therefore not fully processed: ' + NonTranslatedQR + '\n'
+            + 'Total argument nodes missing translation therefore not fully processed: ' + NonTranslatedArguments + '\n\n'
+            + 'Total problem flows: ' + TotalProblemFlowsENG + '\n'
+            + 'Total problem nodes: ' + TotalProblemNodesENG + '\n\n'
+            + 'Details of the problem flows/ nodes are summarised below:\n\n'
+            + debug;
+    
+    for (const lang of languages) {     
+        debug_lang[lang] = 'This file provides a log of where there are possible errors between the quick replies and the arguments\n\n'
+                        + 'Language: ' + lang + '\n'
+                        + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
+                        + 'Total nodes with "quick replies": ' + TotalQRNodes + '\n\n'
+                        + 'Total problem flows: ' + TotalProblemFlowsLANG[lang] + '\n'
+                        + 'Total problem nodes: ' + TotalProblemNodesLANG[lang] + '\n\n'
+                        + debug_lang[lang];   
+    }
     return [debug, debug_lang, languages];
 }
 
 function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang){
+
+    incompletetranslation = false
 
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
@@ -83,15 +123,20 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     let OtherLinker = []
     let EngLooseArg = []
     let OtherLooseArg = []
-       
+    
     // record the quick replies we are looking at, convert to lowercase in the process
     for (let qr of action.quick_replies){
         EngQR.push(qr.toString().toLowerCase())
     }
     for (const lang in curr_loc) {
         let helper_array=[]
-        for (let qr of curr_loc[lang][action.uuid].quick_replies){
-            helper_array.push(qr.toString().toLowerCase())
+        try{
+            for (let qr of curr_loc[lang][action.uuid].quick_replies){
+                helper_array.push(qr.toString().toLowerCase())
+            }
+        }
+        catch{
+            NonTranslatedQR++
         }
         OtherQR[lang] = helper_array
     }   
@@ -103,19 +148,25 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
             EngArg.push(curr_case.arguments[0].toString().toLowerCase())
             ArgTypes.push(curr_case.type)
             ArgID.push(curr_case.uuid)            
-        }        
+        }
+                
         for (const lang in curr_loc) {
             let helper_array = []
-            for (let ID of ArgID){
-                helper_array.push(curr_loc[lang][ID].arguments.toString().toLowerCase())
+            try{
+                for (let ref in ArgID){
+                    helper_array.push(curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase())
+                }   
             }
-            OtherArg[lang] = helper_array
+            catch(err){
+                NonTranslatedArguments++
+            }
+            OtherArg[lang] = helper_array   
         }
     }
 
     // generate the Eng connection matrix 
     [EngLinker, EngLooseArg] = create_connection_matrix(EngArg, ArgTypes, EngQR)
-     
+    
     // generate the lang connection matrix
     for (const lang in curr_loc) {
         [OtherLinker[lang], OtherLooseArg[lang]] = create_connection_matrix(OtherArg[lang], ArgTypes, OtherQR[lang])
@@ -123,61 +174,77 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
 
     // look for where we have errors in the english and put in a log file
     if (basic_error_check(EngLinker) || EngLooseArg){
-        
-        debug += `\nFlow name: ${flow.name}\n\n`
-        debug += `Node uuid: ${node.uuid}\n`
-        debug += `Action text: ${action.text}\n`
-        debug += 'Quick replies:\n'
+
+        // only want to log the flow details once so check if we have previously logged
+        if(!debug.includes(flow.uuid)){
+            TotalProblemFlowsENG++
+            debug += `    Problem flow: ${TotalProblemFlowsENG}\n`
+            debug += `    Flow ID: ${flow.uuid}\n`
+            debug += `    Flow name: ${flow.name}\n\n`
+        }
+    
+        TotalProblemNodesENG++
+        debug += `        Node ID: ${node.uuid}\n`
+        debug += `        Action text: ${action.text.replace(/(\r\n|\n|\r)/gm, "; ")}\n`
+        debug += '        Quick replies:\n'
         for (const row of EngQR){
             debug += `                ${row}\n`
         }
-        debug += `Arguments:\n`
+        debug += `        Arguments:\n`
         for (const ref in EngArg){
             debug += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`
         }
-        debug += '\nLink: "Quick Reply","Argument"\n'
+        debug += '        Link "QR","Argument"\n'
         for (const row of EngLinker){
-        debug += `                  ${row}\n`
+        debug += `                ${row}\n`
         } 
         debug += '\n' 
     }
 
     // look for where we have errors in the translation and put in a log file   
     for (const lang in curr_loc) {
-         
+        
         if (basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || no_match_matrix(EngLinker,OtherLinker[lang])){
             
-            debug_lang[lang] += `\nFlow name: ${flow.name}\n\n`
-            debug_lang[lang] += `Node uuid: ${node.uuid}\n`
-            debug_lang[lang] += `Action text: ${action.text}\n`;
-            debug_lang[lang] += 'Eng Quick replies:\n'
+            // only want to log the flow details once so check if we have previously logged
+            if(!debug_lang[lang].includes(flow.uuid)){
+                TotalProblemFlowsLANG[lang]++
+                debug_lang[lang] += `    Problem flow: ${TotalProblemFlowsLANG[lang]}\n`
+                debug_lang[lang] += `    Flow ID: ${flow.uuid}\n`
+                debug_lang[lang] += `    Flow name: ${flow.name}\n\n`
+            }
+            
+            TotalProblemNodesLANG[lang]++
+            debug_lang[lang] += `        Node ID: ${node.uuid}\n`
+            debug_lang[lang] += `        Action text: ${action.text.replace(/(\r\n|\n|\r)/gm, "; ")}\n`;
+            debug_lang[lang] += '        Eng Quick replies:\n'
             for (const row of EngQR){
                 debug_lang[lang] += `                ${row}\n`
             }
-            debug_lang[lang] += `Eng Arguments:\n`
+            debug_lang[lang] += `        Eng Arguments:\n`
             for (const ref in EngArg){
                 debug_lang[lang] += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`
             }
-            debug_lang[lang] += 'Eng Links"\n'
+            debug_lang[lang] += '        Eng Links:\n'
             for (const row of EngLinker){
                 debug_lang[lang] += `                ${row}\n`
-            }  
-            debug_lang[lang] += `${lang} Quick replies:\n`
+            }
+            debug_lang[lang] += '        -----\n' 
+            debug_lang[lang] += `        ${lang} Quick replies:\n`
             for (const row of OtherQR[lang]){
                 debug_lang[lang] += `                ${row}\n`
             }           
-            debug_lang[lang] += `${lang} Arguments:\n`
+            debug_lang[lang] += `        ${lang} Arguments:\n`
             for (const ref in OtherArg[lang]){
                 debug_lang[lang] += `                ${OtherArg[lang][ref]}  -  ${ArgTypes[ref]}\n`
             }
-            debug_lang[lang] += `${lang} Links:"\n`
+            debug_lang[lang] += `        ${lang} Links:\n`
             for (const row of OtherLinker[lang]){
                 debug_lang[lang] += `                ${row}\n`
             } 
             debug_lang[lang] += '\n' 
         }
     }
-
     return [debug, debug_lang] 
 }
 
@@ -237,16 +304,6 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
                 // for has_only_phrase we look for a complete match
                 if (arguments[k].trim() == quick_replies[i].trim()){
                     allmatches.push(k)                    
-                }
-            }
-            else if(argument_types[k] == 'has_any_word'){
-                // for the has_any_word case we try to find any matching words between the arg and qr
-                for (var n = 0; n < argwords[k].length; n++ ){        
-                    if (utility.CountIf(argwords[k][n],qrwords[i])>0){
-                        if (utility.CountIf(k,allmatches) ==0){
-                            allmatches.push(k)                            
-                        }
-                    }
                 }
             }
         }

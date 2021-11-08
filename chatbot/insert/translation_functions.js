@@ -58,10 +58,25 @@ function arrayEquals(a, b) {
       Array.isArray(b) &&
       a.length === b.length &&
       a.every((val, index) => val === b[index]);
-  }
+}
+
+function findlanguages(obj){
+    let languages = []
+    for (const flow of obj.flows){        
+        let curr_loc = flow.localization
+        for (const lang in curr_loc){
+            if(languages.includes(lang.toString()) == false){
+                languages.push(lang.toString())
+            } 
+        } 
+    }
+    return languages
+}
+
 
 module.exports = {
     CreateUniqueArguments,
     CountIf,
-    arrayEquals
+    arrayEquals,
+    findlanguages
 };
