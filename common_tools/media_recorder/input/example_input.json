@@ -1,0 +1,22 @@
+[
+    {
+        "text": "How are you feeling today?",
+        "id": "item_1",
+        "title": "Translated title",
+        "type": "audio"
+    },
+    {
+        "text": "How are you feeling today?",
+        "id": "item_2",
+        "title": "Untranslated title",
+        "type": "audio"
+    },
+    {
+        "text": "This is the default reply if the feeling response is happy, the first option.",
+        "text_part_2": "This is the default reply if the feeling response is ok, the second option.",
+        "text_part_3":  "This is the default reply if the feeling response is sad, the third option.",
+        "id": "relax_2",
+        "title": "Translated title",
+        "type": "audio"
+    }
+]

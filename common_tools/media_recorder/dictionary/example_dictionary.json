@@ -1,0 +1,32 @@
+[
+    {
+        "SourceText": "Translated title",
+        "text": "Título traducido",
+        "type": "data_list"
+    },
+    {
+        "SourceText": "This is a text that needs to be translated",
+        "text": "Esto es un texto que necesita ser traducido",
+        "type": "template"
+    },
+    {
+        "SourceText": "How are you feeling today?",
+        "text": "¿Cómo te sientes hoy?",
+        "type": "template"
+    },
+    {
+        "SourceText": "This is the default reply if the feeling response is happy, the first option.",
+        "text": "Esta es la respuesta predeterminada si la respuesta es contento, la primera opción.",
+        "type": "template"
+    },
+    {
+        "SourceText": "This is the default reply if the feeling response is ok, the second option.",
+        "text": "Esta es la respuesta predeterminada si la respuesta es normal, la segunda opción.",
+        "type": "template"
+    },
+    {
+        "SourceText": "This is the default reply if the feeling response is sad, the third option.",
+        "text": "Esta es la respuesta predeterminada si la respuesta es triste, la tercer opción.",
+        "type": "template"
+    }
+]
