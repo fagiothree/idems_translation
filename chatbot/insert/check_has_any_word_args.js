@@ -19,7 +19,7 @@ function fix_has_any_words(object){
 
     // Set up variables that are used in the log file
     TotalFlowCount = 0
-    TotalModifiedFlows = 0
+    TotalProblemFlows = 0
     TotalNodeCount = 0
     TotalHasAnyWordNodes = 0
     TotalModifiedNodes = 0
@@ -63,6 +63,20 @@ function fix_has_any_words(object){
 
             //Check if this is one of the nodes we need to look at
             if(TextArgumentNodes.includes(node.uuid) && node.hasOwnProperty('router')){
+
+                let has_any_word_present = false
+
+                // check there is as least one has_any_word_argument
+                for (const cases of node.router.cases){
+                    if(cases.type == 'has_any_word'){
+                        has_any_word_present = true
+                        break
+                    }
+                }
+                if(has_any_word_present == false){
+                    break
+                }
+
                 // collect all the arguments and their types together into an array, convert all to lower case as RapidPro is not case sensitive
                 let originalargs = []
                 let originalargtypes = []
@@ -81,17 +95,29 @@ function fix_has_any_words(object){
                     let helper_array = []
                     for (let ref in originalargids){
                         try{
-                            helper_array.push(curr_loc[lang][originalargids[ref]].arguments.toString().toLowerCase().trim());
+                            let translation = curr_loc[lang][originalargids[ref]].arguments.toString().toLowerCase().trim()
+                            if(translation == originalargs[ref]){
+                                // This catches where the localisation is still in english
+                                langerror[lang]++
+                                incompletetranslation = true
+
+                                //The below line prints the text id which have an incomplete translation
+                                ModifiedNodeDetail += '        Localization present but is in English: ' + originalargids[ref] + '\n'
+                                ModifiedNodeDetail += '        Arguments in question: ' + translation.toString() + '\n\n'
+
+                            }else{
+                                helper_array.push(translation);
+                            }  
                         }
                         catch(err){
+                            // This will catch if there is no corresponding localisation ID
                             if(/[a-zA-Z]/.test(originalargs[ref])){
                                 // if there are any missing translations in a node, we consider the node as a whole 'not translated'
                                 langerror[lang]++
                                 incompletetranslation = true
 
                                 //The below line prints the text id which have an incomplete translation
-                                ModifiedNodeDetail += '        Missing Translation: ' + originalargids[ref] + '\n\n'
-                                break
+                                ModifiedNodeDetail += '        Missing Translation in Localization: ' + originalargids[ref] + '\n\n'
                             }
                         }                        
                     }
@@ -170,8 +196,8 @@ function fix_has_any_words(object){
             }                  
         }
         if(ModifiedNodeDetail.length>0){
-            TotalModifiedFlows++
-            fixlog += '    Problem Flow: ' + TotalModifiedFlows + '\n'
+            TotalProblemFlows++
+            fixlog += '    Problem Flow: ' + TotalProblemFlows + '\n'
             fixlog += '    Flow ID: ' + flow.uuid + '\n'
             fixlog += '    Flow name: ' + flow.name + '\n\n'        
             fixlog += ModifiedNodeDetail
@@ -190,12 +216,12 @@ function fix_has_any_words(object){
                 + 'Languages considered: ENG, ' + languages.toString() + '\n'
                 + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
                 + 'Total nodes with "has_any_word" arguments: ' + TotalHasAnyWordNodes + '\n\n'
+                + 'Total Problem Flows: ' + TotalProblemFlows + '\n'
                 + 'Total "has_any_word" nodes missing at least one translation and therefore not fully processed: ' + NonTranslatedNodes + '\n'
-                + '    Breakdown by language of nodes missing translation: ' + langerrorstring + '\n\n'
-                + 'Total Problem Flows: ' + TotalModifiedFlows + '\n'
-                + 'Total Modified Nodes (translations treated as individual nodes): ' + TotalModifiedNodes + '\n'                
+                + '    Breakdown of number of arguments missing translation by language: ' + langerrorstring + '\n'
+                + 'Total nodes with duplication in arguments which have been sucessfully modified (translations treated as individual nodes): ' + TotalModifiedNodes + '\n'                
                 + 'Total serious errors where fix not applied as would have resulted in null arguments (translations treated as individual nodes): ' + SeriousModifiedNodes + '\n\n'
-                + 'Details of the modified flows/ nodes are summarised below:' + '\n\n'
+                + 'Details of the problem flows/ nodes are summarised below:' + '\n\n'
                 + fixlog
 
     return [object, fixlog]

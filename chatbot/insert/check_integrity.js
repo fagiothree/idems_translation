@@ -6,7 +6,7 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Code/TestFiles/plh-international-flavour_expire_ABtesting_localised_afr_sot_tsn_xho_zul.json"
+//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/9-PLH-localized-afr_mod.json"
 //let obj = JSON.parse(fs.readFileSync(filePath).toString());
 //const [a, b] = check_integrity(obj);
 
@@ -21,11 +21,13 @@ function check_integrity(object) {
     TotalNodeCount = 0
     TotalQRNodes = 0
     TotalProblemNodesENG = 0
-    NonTranslatedQR = 0
-    NonTranslatedArguments = 0
+    NonTranslatedQR = {};
+    NonTranslatedArguments = {};
     TotalProblemFlowsLANG = {};
     TotalProblemNodesLANG = {};
     for (const lang of languages){
+        NonTranslatedQR[lang] = 0;
+        NonTranslatedArguments[lang] = 0;
         TotalProblemFlowsLANG[lang] = 0
         TotalProblemNodesLANG[lang] = 0
     }
@@ -82,8 +84,6 @@ function check_integrity(object) {
             + 'Language: Eng\n'
             + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
             + 'Total nodes with "quick replies": ' + TotalQRNodes + '\n\n'
-            + 'Total quick reply nodes missing translation therefore not fully processed: ' + NonTranslatedQR + '\n'
-            + 'Total argument nodes missing translation therefore not fully processed: ' + NonTranslatedArguments + '\n\n'
             + 'Total problem flows: ' + TotalProblemFlowsENG + '\n'
             + 'Total problem nodes: ' + TotalProblemNodesENG + '\n\n'
             + 'Details of the problem flows/ nodes are summarised below:\n\n'
@@ -94,6 +94,8 @@ function check_integrity(object) {
                         + 'Language: ' + lang + '\n'
                         + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
                         + 'Total nodes with "quick replies": ' + TotalQRNodes + '\n\n'
+                        + 'Total quick reply nodes missing translation: ' + NonTranslatedQR[lang] + '\n'
+                        + 'Total arguments nodes missing translation: ' + NonTranslatedArguments[lang] + '\n\n'
                         + 'Total problem flows: ' + TotalProblemFlowsLANG[lang] + '\n'
                         + 'Total problem nodes: ' + TotalProblemNodesLANG[lang] + '\n\n'
                         + debug_lang[lang];   
@@ -103,7 +105,7 @@ function check_integrity(object) {
 
 function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang){
 
-    incompletetranslation = false
+    let incompletetranslation = false
 
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
@@ -129,16 +131,28 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
         EngQR.push(qr.toString().toLowerCase())
     }
     for (const lang in curr_loc) {
+        let translation_present = true
         let helper_array=[]
         try{
-            for (let qr of curr_loc[lang][action.uuid].quick_replies){
-                helper_array.push(qr.toString().toLowerCase())
+            let translation = curr_loc[lang][action.uuid].quick_replies
+            for (let qr of translation){
+                //this checks whether the localization is translated
+                if (EngQR.includes(qr.toString().toLowerCase())){
+                    translation_present = false
+                }
+                helper_array.push(qr.toString().toLowerCase())                                
             }
         }
         catch{
-            NonTranslatedQR++
+            // this checks whether the id exists in the localization
+            translation_present = false
         }
         OtherQR[lang] = helper_array
+        if(translation_present == false){
+            NonTranslatedQR[lang]++
+            debug_lang[lang] += '##### Quick replies not fully translated\n'
+            incompletetranslation = true
+        }
     }   
 
     // record the arguments we are looking at, convert to lowercase in the process
@@ -151,16 +165,28 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
         }
                 
         for (const lang in curr_loc) {
+            let translation_present = true
             let helper_array = []
             try{
-                for (let ref in ArgID){
-                    helper_array.push(curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase())
+                for (let ref in ArgID){ 
+                    let translation = curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase()
+                    // this checks whether the localization is translated
+                    if (EngArg.includes(translation)){
+                        translation_present = false
+                    }
+                    helper_array.push(translation)                     
                 }   
             }
             catch(err){
-                NonTranslatedArguments++
+                // this checks whether the id exists in the localization
+                tanslation_present = false
             }
-            OtherArg[lang] = helper_array   
+            OtherArg[lang] = helper_array
+            if(translation_present == false){
+                NonTranslatedArguments[lang]++
+                debug_lang[lang] += '##### Arguments not fully translated\n'
+                incompletetranslation = true
+            }               
         }
     }
 
@@ -204,7 +230,7 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     // look for where we have errors in the translation and put in a log file   
     for (const lang in curr_loc) {
         
-        if (basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || no_match_matrix(EngLinker,OtherLinker[lang])){
+        if (basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || no_match_matrix(EngLinker,OtherLinker[lang]) || incompletetranslation){
             
             // only want to log the flow details once so check if we have previously logged
             if(!debug_lang[lang].includes(flow.uuid)){
@@ -347,12 +373,17 @@ function basic_error_check(arr){
 
 function no_match_matrix(a,b){
     let no_match = false
-    for (const i in a){
-        if (String(a[i][0]) != String(b[i][0])  || String(a[i][1]) != String(b[i][1])){
-            no_match = true
-            break
+    try{
+        for (const i in a){
+            if (String(a[i][0]) != String(b[i][0])  || String(a[i][1]) != String(b[i][1])){
+                no_match = true
+                break
+            }
         }
+    }catch(err){
+        no_match = true
     }
+    
     return no_match
 }
 
