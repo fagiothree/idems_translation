@@ -1,6 +1,7 @@
 // This script is used to look at arguments on the wait for response nodes
-// If we have 'has any of the words' conditions we need to check that there are is no commonality between the words
-// This is particularly likely to be a problem following translation
+// If we have duplication within the arguments then it may cause the flow to run incorrectly
+// This is particularly likely to be a problem following translation and on the nodes with 'has_any_words'
+// There are certain fixes which may need to be done manually, however we can apply some automatic fixes by removing duplication in 'has_any_word' arguments
 // This script takes in a JSON string, looks for potential clashes in the 'has_any_words' arguments, removes the error and produces a log file
 // it will look through and the english and the translations and output log of all changes to the same file
 
@@ -8,7 +9,7 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/translated_flows_tester.json"
+//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/1-PLH-Export - Copy.json"
 //let obj = JSON.parse(fs.readFileSync(filePath).toString());
 //const [a, b] = fix_has_any_words(obj);
 
@@ -20,11 +21,13 @@ function fix_has_any_words(object){
     // Set up variables that are used in the log file
     TotalFlowCount = 0
     TotalProblemFlows = 0
-    TotalNodeCount = 0
     TotalHasAnyWordNodes = 0
     TotalModifiedNodes = 0
     NonTranslatedNodes = 0
     SeriousModifiedNodes = 0
+
+    // Array of argument types that should be translated
+    TextArgTypes = ["has_any_word", "has_all_words", "has_only_phrase", "has_phrase"]
 
     // Set up log file
     fixlog = ''
@@ -44,82 +47,80 @@ function fix_has_any_words(object){
         ModifiedNodeDetail = ''
         TextArgumentNodes = []
 
-        //Get the list of arguments that we need to check by seeing where the quick replies point us
-        for (const node of flow.nodes) {    
-            for (const action of node.actions) {
-                if (action.type == 'send_msg') {
-                    if (action.quick_replies.length > 0) {
-                        const dest_id = node.exits[0].destination_uuid;
-                        TextArgumentNodes.push(dest_id)
+        //Get the list of nodes that we need to look at by finding all nodes that have at least one 'has_any_word' argument
+        for (const node of flow.nodes) {  
+            try{
+                for (const curr_case of node.router.cases) {
+                    if (curr_case.type == 'has_any_word') {
+                        TextArgumentNodes.push(node.uuid)
+                        TotalHasAnyWordNodes++
+                        break
                     }
                 }
             }
+            catch{}     
         }
 
         for (const node of flow.nodes) {
 
-            incompletetranslation = false
-            TotalNodeCount++
-
             //Check if this is one of the nodes we need to look at
-            if(TextArgumentNodes.includes(node.uuid) && node.hasOwnProperty('router')){
+            if(TextArgumentNodes.includes(node.uuid)){
 
-                let has_any_word_present = false
-
-                // check there is as least one has_any_word_argument
-                for (const cases of node.router.cases){
-                    if(cases.type == 'has_any_word'){
-                        has_any_word_present = true
-                        break
-                    }
-                }
-                if(has_any_word_present == false){
-                    break
-                }
+                incompletetranslation = false
 
                 // collect all the arguments and their types together into an array, convert all to lower case as RapidPro is not case sensitive
                 let originalargs = []
                 let originalargtypes = []
                 let originalargids = []
-                let otherargs = []
+                let otherargs = {}
 
                 // first collect the english arguments
                 for(const curr_case of node.router.cases){                    
-                    originalargs.push(curr_case.arguments[0].toString().toLowerCase().trim())
+                    originalargs.push(curr_case.arguments[0].toString().toLowerCase().trim().replace(/,/g," "))
                     originalargtypes.push(curr_case.type)
                     originalargids.push(curr_case.uuid)                                              
                 }
 
-                // collect all the translated arguments as well
+                // collect all the translated arguments as well, where we find errors in the translation we will make a log
                 for (const lang of languages) {
                     let helper_array = []
                     for (let ref in originalargids){
-                        try{
-                            let translation = curr_loc[lang][originalargids[ref]].arguments.toString().toLowerCase().trim()
-                            if(translation == originalargs[ref]){
-                                // This catches where the localisation is still in english
-                                langerror[lang]++
-                                incompletetranslation = true
-
-                                //The below line prints the text id which have an incomplete translation
-                                ModifiedNodeDetail += '        Localization present but is in English: ' + originalargids[ref] + '\n'
-                                ModifiedNodeDetail += '        Arguments in question: ' + translation.toString() + '\n\n'
-
-                            }else{
-                                helper_array.push(translation);
-                            }  
-                        }
-                        catch(err){
-                            // This will catch if there is no corresponding localisation ID
-                            if(/[a-zA-Z]/.test(originalargs[ref])){
-                                // if there are any missing translations in a node, we consider the node as a whole 'not translated'
-                                langerror[lang]++
-                                incompletetranslation = true
-
-                                //The below line prints the text id which have an incomplete translation
-                                ModifiedNodeDetail += '        Missing Translation in Localization: ' + originalargids[ref] + '\n\n'
+                        // we are only expecting certain types of args to be translated
+                        if (TextArgTypes.includes(originalargtypes[ref])){
+                            try{
+                                let translation = curr_loc[lang][originalargids[ref]].arguments.toString().toLowerCase().trim()
+                                if(translation == originalargs[ref]){
+                                    // This catches where the localisation is still in english, we want to make a note
+                                    langerror[lang]++
+                                    incompletetranslation = true
+    
+                                    //The below line prints the text id which have an incomplete translation
+                                    ModifiedNodeDetail += '        Localization present but is in English: ' + originalargids[ref] + '\n'
+                                    ModifiedNodeDetail += '        Arguments in question: ' + translation.toString() + '\n\n'
+    
+                                }
+                                //even if we have idintified that it is still in english, we still want to process it, there are certain words that are common across languages so this may not be an error
+                                helper_array.push(translation);  
                             }
-                        }                        
+                            catch(err){
+                                // This will catch if there is no corresponding localisation ID, considering how the localization code works we should not get an error but leaving in here to be safe
+                                if(/[a-zA-Z]/.test(originalargs[ref])){
+                                    // if there are any missing translations in a node, we consider the node as a whole 'not translated'
+                                    langerror[lang]++
+                                    incompletetranslation = true
+    
+                                    //The below line prints the text id which have an incomplete translation
+                                    ModifiedNodeDetail += '        Missing Translation in Localization: ' + originalargids[ref] + '\n\n'
+
+                                    //if there is a missing translation then we just cannot handle this node altogether
+                                    helper_arry = []
+                                    break
+                                }
+                            }
+                        }else{
+                            // if we are not expecting a translation, we just push the original 
+                            helper_array.push(originalargs[ref]);
+                        }                          
                     }
                     otherargs[lang] = helper_array
                 }  
@@ -142,6 +143,7 @@ function fix_has_any_words(object){
                         
                         // we need to check that our code has not completely removed the arguments, if it has then we do not implement the change
                         if(UniqueArguments[i] == ""){
+                            // in the case when our code would have removed all of the arguments, we insert the original args back into the unique arguments matrix so it is easy to understand in the log
                             UniqueArguments[i] = cases.arguments[0]
                             if(indicator){
                                 indicator = false
@@ -172,7 +174,9 @@ function fix_has_any_words(object){
                         
                         let indicator = true
                         for (const ref in originalargids){
+                            // we need to check that our code has not completely removed the arguments, if it has then we do not implement the change
                             if(UniqueArguments[ref] == ""){
+                                // in the case when our code would have removed all of the arguments, we insert the original args back into the unique arguments matrix so it is easy to understand in the log
                                 UniqueArguments[ref] = curr_loc[lang][originalargids[ref]].arguments
                                 if(indicator){
                                     indicator = false
@@ -217,7 +221,7 @@ function fix_has_any_words(object){
                 + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
                 + 'Total nodes with "has_any_word" arguments: ' + TotalHasAnyWordNodes + '\n\n'
                 + 'Total Problem Flows: ' + TotalProblemFlows + '\n'
-                + 'Total "has_any_word" nodes missing at least one translation and therefore not fully processed: ' + NonTranslatedNodes + '\n'
+                + 'Total "has_any_word" nodes missing at least one translation: ' + NonTranslatedNodes + '\n'
                 + '    Breakdown of number of arguments missing translation by language: ' + langerrorstring + '\n'
                 + 'Total nodes with duplication in arguments which have been sucessfully modified (translations treated as individual nodes): ' + TotalModifiedNodes + '\n'                
                 + 'Total serious errors where fix not applied as would have resulted in null arguments (translations treated as individual nodes): ' + SeriousModifiedNodes + '\n\n'
