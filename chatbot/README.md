@@ -36,6 +36,10 @@ Move quick replies to message text.
 node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir>
 ```
 
+Overall process visualised in flowchart linked below
+https://docs.google.com/drawings/d/1i-64dAkcYqkLWNJmCpl7no6mQqFD3DJ1vI1lnKqd12U/edit?usp=sharing
+```
+
 ## Running tests
 
 ```
