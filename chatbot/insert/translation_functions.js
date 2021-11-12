@@ -5,14 +5,13 @@
 function CreateUniqueArguments(originalargs, originalargtypes = [""]) {
     var UniqueArguments = []
     var UniqueWords = FindUniqueWords(originalargs)
-    let arrayLength = originalargs.length;
 
-    for (let i = 0 ; i < arrayLength; i++){
+    for (const i in originalargs){
         if(originalargtypes[i] == "has_any_word" || originalargtypes[0] == ""){
             let NewArgument = ""     
-            const SplitArguments = originalargs[i].split(" ");
+            const SplitArguments = split_args(originalargs[i]);
             for (const argumentword of SplitArguments){
-                if (CountIf(argumentword,UniqueWords) == 1){                
+                if (UniqueWords.includes(argumentword)){                
                     NewArgument += argumentword
                     NewArgument += " "
                 }
@@ -29,7 +28,8 @@ function FindUniqueWords(arr) {
     var AllWords = [];
     var UniqueWords = [];
     for (const argument of arr){
-        const SplitArguments = argument.split(" ")
+        const SplitArguments = split_args(argument)
+        // Remove duplicate words within an argument as this will throw off the subsequent logic
         let SplitArgumentsUnique = [...new Set(SplitArguments)]
         for (const argumentword of SplitArgumentsUnique){
             AllWords.push(argumentword)
@@ -73,10 +73,25 @@ function findlanguages(obj){
     return languages
 }
 
+function split_args(args){
+    return args.split(/[\s,]+/).filter((i) => i);
+}
+
+function array_replace(arr,find,replace){
+    let new_arr = []
+    for (const member of arr){
+        member.replace(find,replace)
+        new_arr.push(member)
+    }
+    return new_arr
+}
+
 
 module.exports = {
     CreateUniqueArguments,
     CountIf,
     arrayEquals,
-    findlanguages
+    findlanguages,
+    split_args,
+    array_replace
 };
