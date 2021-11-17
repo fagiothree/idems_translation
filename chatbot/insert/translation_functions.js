@@ -86,6 +86,70 @@ function array_replace(arr,find,replace){
     return new_arr
 }
 
+function collect_Eng_arguments(node){
+    
+    let EngArg = []
+    let ArgTypes = []
+    let ArgID = []
+
+    // first collect the english arguments
+    for(const curr_case of node.router.cases){                    
+        EngArg.push(curr_case.arguments[0].toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))
+        ArgTypes.push(curr_case.type)
+        ArgID.push(curr_case.uuid)                                              
+    }
+
+    return [EngArg, ArgTypes, ArgID]
+}
+
+function collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang){
+    let helper_array = []
+    let TranslationLog = ''
+    let MissingTranslationCount = 0
+
+    // Array of argument types that should be translated
+    TextArgTypes = ["has_any_word", "has_all_words", "has_only_phrase", "has_phrase"]
+
+    // collect all the translated arguments as well, where we find errors in the translation we will make a log
+        
+    for (let ref in ArgID){
+        // we are only expecting certain types of args to be translated
+        if (TextArgTypes.includes(ArgTypes[ref]) && /[a-zA-Z]/.test(EngArg[ref])){
+            try{
+                let translation = curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' ')
+                if(translation == EngArg[ref]){
+                    // This catches where the localisation is still in english, we want to make a note
+                    MissingTranslationCount++
+
+                    //The below line prints the text id which have an incomplete translation
+                    TranslationLog += '        Localization present but is in English: ' + ArgID[ref] + '\n'
+                    TranslationLog += '        Arguments in question: ' + translation.toString() + '\n\n'
+
+                }
+                //even if we have idintified that it is still in english, we still want to process it, there are certain words that are common across languages so this may not be an error
+                helper_array.push(translation);  
+            }
+            catch(err){
+                // This will catch if there is no corresponding localisation ID, considering how the localization code works we should not get an error but leaving in here to be safe                                
+                // if there are any missing translations in a node, we consider the node as a whole 'not translated'
+                MissingTranslationCount++
+
+                //The below line prints the text id which have an incomplete translation
+                TranslationLog += '        Missing Translation in Localization: ' + ArgID[ref] + '\n\n'
+
+                //if there is a missing translation then we just cannot handle this node altogether
+                helper_array = []
+                break
+                
+            }
+        }else{
+            // if we are not expecting a translation, we just push the original 
+            helper_array.push(EngArg[ref]);
+        }                          
+    }
+
+    return [helper_array, TranslationLog, MissingTranslationCount]
+}  
 
 module.exports = {
     CreateUniqueArguments,
@@ -93,5 +157,7 @@ module.exports = {
     arrayEquals,
     findlanguages,
     split_args,
-    array_replace
+    array_replace,
+    collect_Eng_arguments,
+    collect_Other_arguments
 };
