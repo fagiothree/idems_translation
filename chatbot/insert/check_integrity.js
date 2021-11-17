@@ -48,10 +48,6 @@ function check_integrity(object) {
         let curr_loc = flow.localization;
 
         TotalFlowCount++
-        ProblemNodes = 0
-        ProblemNodeDetail = ''
-        ProblemNodesLANG = {};
-        ProblemNodeDetailLANG = {};
 
         // Code below loops through the flow and looks for any 'arguments' storing in an object
         const routers = flow.nodes
