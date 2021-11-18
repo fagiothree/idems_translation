@@ -9,9 +9,9 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/1-PLH-Export - Copy.json"
-let obj = JSON.parse(fs.readFileSync(filePath).toString());
-const [a, b] = check_integrity(obj);
+// let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/1-PLH-Export - Copy.json"
+// let obj = JSON.parse(fs.readFileSync(filePath).toString());
+// const [a, b] = check_integrity(obj);
 
 function check_integrity(object) {
     
