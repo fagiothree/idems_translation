@@ -149,7 +149,25 @@ function collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang){
     }
 
     return [helper_array, TranslationLog, MissingTranslationCount]
-}  
+} 
+
+function retrieve_arguments(flow, string){
+    let TextArgumentNodes = []
+    let MatchNodeCount = 0
+    for (const node of flow.nodes) {  
+        try{
+            for (const curr_case of node.router.cases) {
+                if (curr_case.type == string) {
+                    TextArgumentNodes.push(node.uuid)
+                    MatchNodeCount++
+                    break
+                }
+            }
+        }
+        catch{}     
+    }
+    return [TextArgumentNodes, MatchNodeCount]
+}
 
 module.exports = {
     CreateUniqueArguments,
@@ -159,5 +177,6 @@ module.exports = {
     split_args,
     array_replace,
     collect_Eng_arguments,
-    collect_Other_arguments
+    collect_Other_arguments,
+    retrieve_arguments
 };

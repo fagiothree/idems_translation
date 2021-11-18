@@ -42,21 +42,10 @@ function fix_has_any_words(object){
         let curr_loc = flow.localization;
         TotalFlowCount++
         ModifiedNodeDetail = ''
-        TextArgumentNodes = []
 
         //Get the list of nodes that we need to look at by finding all nodes that have at least one 'has_any_word' argument
-        for (const node of flow.nodes) {  
-            try{
-                for (const curr_case of node.router.cases) {
-                    if (curr_case.type == 'has_any_word') {
-                        TextArgumentNodes.push(node.uuid)
-                        TotalHasAnyWordNodes++
-                        break
-                    }
-                }
-            }
-            catch{}     
-        }
+        let [TextArgumentNodes, MatchNodeCount] = utility.retrieve_arguments(flow, 'has_any_word') 
+        TotalHasAnyWordNodes += MatchNodeCount      
 
         for (const node of flow.nodes) {
 
@@ -175,8 +164,8 @@ function fix_has_any_words(object){
                 + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
                 + 'Total nodes with "has_any_word" arguments: ' + TotalHasAnyWordNodes + '\n\n'
                 + 'Total Problem Flows: ' + TotalProblemFlows + '\n'
-                + 'Total "has_any_word" nodes missing at least one translation: ' + NonTranslatedNodes + '\n'
-                + '    Breakdown of number of arguments missing translation by language: ' + langerrorstring + '\n'
+                //+ 'Total "has_any_word" nodes missing at least one translation: ' + NonTranslatedNodes + '\n'
+                //+ '    Breakdown of number of arguments missing translation by language: ' + langerrorstring + '\n'
                 + 'Total nodes with duplication in arguments which have been sucessfully modified (translations treated as individual nodes): ' + TotalModifiedNodes + '\n'                
                 + 'Total serious errors where fix not applied as would have resulted in null arguments (translations treated as individual nodes): ' + SeriousModifiedNodes + '\n\n'
                 + 'Details of the problem flows/ nodes are summarised below:' + '\n\n'

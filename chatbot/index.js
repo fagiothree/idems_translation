@@ -8,7 +8,7 @@ const { move_quick_replies_to_message_text } = require('./insert/add_quick_repli
 
 const COMMANDS = {
     has_any_words_check,
-    integrity_check,
+    overall_integrity_check,
     extract,
     localize,
     move_quick_replies
@@ -30,7 +30,7 @@ function has_any_words_check([inputFile, outputDir]) {
     writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
 }
 
-function integrity_check([inputFile, outputDir]) { 
+function overall_integrity_check([inputFile, outputDir]) { 
     const obj = readInputFile(inputFile);   
     const [debug, debug_lang, languages] = integrity.check_integrity(obj);
     // Export modified JSON file and the fixlog file

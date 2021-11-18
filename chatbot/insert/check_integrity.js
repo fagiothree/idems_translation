@@ -1,14 +1,17 @@
-// This script is used to look at the link between Quick Replies and arguments
-// It is important to check that all arguments have at least one connection, and that the connections are maintained after translation
+// This script is used to look for potential erros in a PLH JSON file
+// It is looking for two different types of errors    
+    // 1. where there is a possible problem in the link between Quick Replies and arguments
+        // It is important to check that all arguments have at least one connection, and that the connections are maintained after translation
+    // 2. where we have multiple argument which meet the same criteria, we run this check on its own as not all arguments have associated quick replies and so wont be found by the check above
 // It will look through english and other language versions, the results of each of the languages are recored separately to make the review process easier
 
 const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/9-PLH-localized-afr_mod.json"
-//let obj = JSON.parse(fs.readFileSync(filePath).toString());
-//const [a, b] = check_integrity(obj);
+let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/1-PLH-Export - Copy.json"
+let obj = JSON.parse(fs.readFileSync(filePath).toString());
+const [a, b] = check_integrity(obj);
 
 function check_integrity(object) {
     
@@ -18,7 +21,6 @@ function check_integrity(object) {
     // Set up variables that are used in the log files
     TotalFlowCount = 0
     TotalProblemFlowsENG = 0
-    TotalNodeCount = 0
     TotalQRNodes = 0
     TotalProblemNodesENG = 0
     NonTranslatedQR = {};
@@ -59,20 +61,20 @@ function check_integrity(object) {
                 },
                 {}
             );
-        
+
         // Loop through the nodes looking for ones with quick replies, if we find quick replies we will check there is link to the arguments
         for (const node of flow.nodes) {
             for (const action of node.actions) {
-                if (action.type == 'send_msg') {
-                    TotalQRNodes++
+                if (action.type == 'send_msg') {                    
                     if (action.quick_replies.length > 0) {
-                                                
-                    [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang);
-                        
+                        TotalQRNodes++                                                
+                        [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang);                        
                     }
                 }
             }
-        }
+            // Loop through all the arguments and make a log of any that are fundamentally broken. This will test all arguments rather than just those with associated QR as captured above
+            [debug, debug_lang] = assess_all_arguments(flow, curr_loc, node, debug, debug_lang)
+        }        
     }
 
     // Add some helper text to the top of the log files 
@@ -101,7 +103,8 @@ function check_integrity(object) {
 
 function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang){
 
-    let incompletetranslation = false
+    let incompleteQRtranslation = [] 
+    let incompleteargumenttranslation = []   
 
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
@@ -109,12 +112,6 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     // setting up variables to store  quick replies
     let EngQR = [];
     let OtherQR = [];
-
-    // setting up a variables to store arguments
-    let ArgTypes = [];
-    let ArgID = [];
-    let EngArg = [];
-    let OtherArg = [];
 
     // setting up variables to store 'linker' matrix, connecting arguments to QR
     let EngLinker = []
@@ -124,65 +121,50 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     
     // record the quick replies we are looking at, convert to lowercase in the process
     for (let qr of action.quick_replies){
-        EngQR.push(qr.toString().toLowerCase())
+        EngQR.push(qr.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))
     }
     for (const lang in curr_loc) {
-        let translation_present = true
         let helper_array=[]
+        incompleteQRtranslation[lang] = false
         try{
             let translation = curr_loc[lang][action.uuid].quick_replies
             for (let qr of translation){
                 //this checks whether the localization is translated
-                if (EngQR.includes(qr.toString().toLowerCase())){
-                    translation_present = false
+                if (EngQR.includes(qr.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))){
+                    incompleteQRtranslation[lang] = true
                 }
-                helper_array.push(qr.toString().toLowerCase())                                
+                helper_array.push(qr.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))                                
             }
         }
         catch{
             // this checks whether the id exists in the localization
-            translation_present = false
+            incompleteQRtranslation[lang] = true
         }
         OtherQR[lang] = helper_array
-        if(translation_present == false){
+
+        if(incompleteQRtranslation[lang]){
             NonTranslatedQR[lang]++
-            debug_lang[lang] += '##### Quick replies not fully translated\n'
-            incompletetranslation = true
         }
     }   
 
     // record the arguments we are looking at, convert to lowercase in the process
-    let router = routers[dest_id];
-    if (router) {        
-        for (let curr_case of router.router.cases) {     
-            EngArg.push(curr_case.arguments[0].toString().toLowerCase())
-            ArgTypes.push(curr_case.type)
-            ArgID.push(curr_case.uuid)            
-        }
-                
+    let refnode = routers[dest_id];
+    if (refnode) {  
+        
+        // collect english arguments and their types together into an array              
+        var [EngArg, ArgTypes, ArgID] = utility.collect_Eng_arguments(refnode)
+
+        // collect all the translated arguments as well, where we find errors in the translation we will make a log
+        var OtherArg = {}
         for (const lang in curr_loc) {
-            let translation_present = true
-            let helper_array = []
-            try{
-                for (let ref in ArgID){ 
-                    let translation = curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase()
-                    // this checks whether the localization is translated
-                    if (EngArg.includes(translation)){
-                        translation_present = false
-                    }
-                    helper_array.push(translation)                     
-                }   
-            }
-            catch(err){
-                // this checks whether the id exists in the localization
-                tanslation_present = false
-            }
+            incompleteargumenttranslation[lang] = false
+            let [helper_array, TranslationLog, MissingTranslationCount] = utility.collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang)
             OtherArg[lang] = helper_array
-            if(translation_present == false){
+             
+            if(MissingTranslationCount>0){
                 NonTranslatedArguments[lang]++
-                debug_lang[lang] += '##### Arguments not fully translated\n'
-                incompletetranslation = true
-            }               
+                incompleteargumenttranslation[lang] = true
+            }
         }
     }
 
@@ -206,7 +188,8 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
         }
     
         TotalProblemNodesENG++
-        debug += `        Node ID: ${node.uuid}\n`
+        debug += `        QR Node ID: ${node.uuid}\n`
+        debug += `        Arg Node ID: ${dest_id}\n`
         debug += `        Action text: ${action.text.replace(/(\r\n|\n|\r)/gm, "; ")}\n`
         debug += '        Quick replies:\n'
         for (const row of EngQR){
@@ -226,7 +209,15 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     // look for where we have errors in the translation and put in a log file   
     for (const lang in curr_loc) {
         
-        if (basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || no_match_matrix(EngLinker,OtherLinker[lang]) || incompletetranslation){
+        if (basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || no_match_matrix(EngLinker,OtherLinker[lang])){
+
+            if(incompleteQRtranslation[lang]){
+                debug_lang[lang] += '##### Quick replies not fully translated\n'
+            }
+
+            if(incompleteargumenttranslation[lang]){
+                debug_lang[lang] += '##### Arguments not fully translated\n'
+            }
             
             // only want to log the flow details once so check if we have previously logged
             if(!debug_lang[lang].includes(flow.uuid)){
@@ -237,7 +228,8 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
             }
             
             TotalProblemNodesLANG[lang]++
-            debug_lang[lang] += `        Node ID: ${node.uuid}\n`
+            debug_lang[lang] += `        QR Node ID: ${node.uuid}\n`
+            debug_lang[lang] += `        Arg Node ID: ${dest_id}\n`
             debug_lang[lang] += `        Action text: ${action.text.replace(/(\r\n|\n|\r)/gm, "; ")}\n`;
             debug_lang[lang] += '        Eng Quick replies:\n'
             for (const row of EngQR){
@@ -270,7 +262,84 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     return [debug, debug_lang] 
 }
 
+function assess_all_arguments(flow, curr_loc, node, debug, debug_lang){
+
+    try{
+        if(node.router.operand == '@input.text'){
+            
+            // record the arguments we are looking at, convert to lowercase in the process
+            
+            // collect english arguments and their types together into an array              
+            var [EngArg, ArgTypes, ArgID] = utility.collect_Eng_arguments(node)
+
+            // collect all the translated arguments as well, 
+            var OtherArg = {}
+            for (const lang in curr_loc) {
+                let [helper_array, TranslationLog, MissingTranslationCount] = utility.collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang)
+                OtherArg[lang] = helper_array
+            }
+
+            // look for where we have errors in the english and put in a log file
+            if (core_argument_check(EngArg, ArgTypes)){
+
+                // only want to log the flow details once so check if we have previously logged
+                if(!debug.includes(flow.uuid)){
+                    TotalProblemFlowsENG++
+                    debug += `    Problem flow: ${TotalProblemFlowsENG}\n`
+                    debug += `    Flow ID: ${flow.uuid}\n`
+                    debug += `    Flow name: ${flow.name}\n\n`
+                }
+            
+                // only want to log the node details once so check if we have previously logged
+                if(!debug.includes(node.uuid)){
+                    TotalProblemNodesENG++
+                    debug += `        Node ID: ${node.uuid}\n`
+                    debug += `        Fundamental conflict in arguments\n`
+                    debug += `        Arguments:\n`
+                    for (const ref in EngArg){
+                        debug += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`
+                    }
+                    debug += `\n`
+                } 
+            }
+
+            // look for where we have errors in the translation and put in a log file   
+            for (const lang in curr_loc) {
+                
+                if (core_argument_check(OtherArg[lang], ArgTypes)){
+                    
+                    // only want to log the flow details once so check if we have previously logged
+                    if(!debug_lang[lang].includes(flow.uuid)){
+                        TotalProblemFlowsLANG[lang]++
+                        debug_lang[lang] += `    Problem flow: ${TotalProblemFlowsLANG[lang]}\n`
+                        debug_lang[lang] += `    Flow ID: ${flow.uuid}\n`
+                        debug_lang[lang] += `    Flow name: ${flow.name}\n\n`
+                    }
+                    
+                    // only want to log the node details once so check if we have previously logged
+                    if(!debug_lang[lang].includes(node.uuid)){
+                        TotalProblemNodesLANG[lang]++
+                        debug_lang[lang] += `        Node ID: ${node.uuid}\n`
+                        debug_lang[lang] += `        Fundamental conflict in arguments\n` 
+                        debug_lang[lang] += `        ${lang} Arguments:\n`
+                        for (const ref in OtherArg[lang]){
+                            debug_lang[lang] += `                ${OtherArg[lang][ref]}  -  ${ArgTypes[ref]}\n`
+                        } 
+                        debug_lang[lang] += `\n`
+                    }
+                }
+            }
+        }
+    }
+    catch{} 
+    return [debug, debug_lang] 
+}
+
 function create_connection_matrix(arguments,argument_types,quick_replies){
+    
+    // Array of argument types that should be linked
+    let TextArgTypes = ["has_any_word", "has_all_words", "has_only_phrase", "has_phrase"]
+    
     let connection_matrix = [];
     let argwords = [];
     let qrwords = []
@@ -287,9 +356,9 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
 
     // look through the quick replies looking for matches with the arguments
     for (var i = 0; i < quick_replies.length; i++){
-
-        let allmatches = []
         
+        let allmatches = []
+    
         for (var k = 0; k < arguments.length; k++){
             
             if(argument_types[k] == 'has_any_word'){
@@ -305,7 +374,9 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
             }
             else if(argument_types[k] == 'has_all_words'){
                 // for the has_all_words we need to check all argwords are in a particular quick reply
+                n = 0
                 for (const word of argwords[k]){ 
+                    n++
                     let r_exp = new RegExp(`\\b${word}\\b`, "i");        
                     if (r_exp.test(quick_replies[i]) == false){
                         break
@@ -328,9 +399,12 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
                     allmatches.push(k)                    
                 }
             }
+            
         }
 
         connection_matrix[i] = [i, allmatches]
+
+            
     }
 
     //we have now gone through all the quick replies checking if they have a link to an argument
@@ -353,6 +427,75 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
     }
 
     return [connection_matrix, loose_arg]
+
+}  
+
+function core_argument_check(arguments,argument_types){
+    let problemspresnt = false
+    
+    let argwords = [];
+
+    // set up an array with the arguments stored as arrays of words
+    for (const index in arguments){
+        argwords[index] = split_args(arguments[index])
+    }
+
+    // look through the arguments looking for self matches
+    for (const i in arguments){
+        
+        let countmatches = 0
+    
+        for (const k in arguments){
+            
+            if(argument_types[k] == 'has_any_word'){
+                // for the has_any_word case we try to find any matching words between the arg and qr string
+                let matchfound = false
+                for (const word of argwords[k]){ 
+                    let r_exp = new RegExp(`\\b${word}\\b`, "i");      
+                    if (r_exp.test(arguments[i])){                        
+                        matchfound = true                           
+                    }                    
+                }
+                if(matchfound){
+                    countmatches++ 
+                }
+            }
+            else if(argument_types[k] == 'has_all_words'){
+                n = 0
+                // for the has_all_words we need to check all argwords are in a particular quick reply
+                for (const word of argwords[k]){ 
+                    n++
+                    let r_exp = new RegExp(`\\b${word}\\b`, "i");        
+                    if (r_exp.test(arguments[i]) == false){
+                        break
+                    }else if (n < argwords[k].length-1){
+                        continue
+                    }else {
+                        countmatches++                                                
+                    }
+                }
+            }
+            else if(argument_types[k] == 'has_phrase'){
+                // for has phrase we look for a string within a string
+                if (new RegExp(arguments[k], 'i').test(arguments[i])) {
+                    countmatches++                    
+                }
+            }
+            else if(argument_types[k] == 'has_only_phrase'){
+                // for has_only_phrase we look for a complete match
+                if (arguments[k].trim() == arguments[i].trim()){
+                    countmatches++                    
+                }
+            }
+            
+        }
+
+        if(countmatches>1){
+            problemspresnt = true
+        }            
+    }
+
+    return problemspresnt
 
 }  
 

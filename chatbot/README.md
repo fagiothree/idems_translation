@@ -16,9 +16,9 @@ Run through RapidPro flows, identifying and fixing possible errors in 'has_any_w
 node index has_any_words_check <rapidpro-json-file> <output-dir>
 ```
 
-Run through RapidPro flows, log the connections between quick replies and arguments.
+Run through RapidPro flows, look for errors in arguments and in the link between QR and Arguments 
 ```
-node index integrity_check <rapidpro-json-file> <output-dir>
+node index overall_integrity_check <rapidpro-json-file> <output-dir>
 ```
 
 Extract English-language strings from RapidPro flows, for translation.
