@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const cleaner = require('./insert/check_has_any_word_args.js')
 const integrity = require('./insert/check_integrity.js')
+const fixer = require('./insert/fix_arg_qr_translation.js')
 const ex = require('./extract/extract.js');
 const insert = require('./insert/create-localization.js');
 const { move_quick_replies_to_message_text } = require('./insert/add_quick_replies_to_msg_text_and_localization.js');
@@ -9,6 +10,7 @@ const { move_quick_replies_to_message_text } = require('./insert/add_quick_repli
 const COMMANDS = {
     has_any_words_check,
     overall_integrity_check,
+    fix_arg_qr_translation,
     extract,
     localize,
     move_quick_replies
@@ -38,6 +40,16 @@ function overall_integrity_check([inputFile, outputDir]) {
     for (const lang of languages){
         writeOutputFile(outputDir, path.parse(inputFile).name + "_" + lang + "Integrity.txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
     } 
+}
+
+function fix_arg_qr_translation([inputFile, outputDir]) { 
+    const obj = readInputFile(inputFile);   
+    const [newobj, debug_lang, languages] = fixer.fix_arg_qr_translation(obj);
+    // Export modified JSON file and the fixlog file
+    for (const lang of languages){
+        writeOutputFile(outputDir, path.parse(inputFile).name + "_" + lang + "_ArgAutoFixed.txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
+    }
+    writeOutputFile(outputDir, path.parse(inputFile).name + "_ArgAutoFixed.json", newobj); 
 }
 
 function extract([inputFile, outputDir]) {
