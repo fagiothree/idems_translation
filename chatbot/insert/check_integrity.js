@@ -9,9 +9,9 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-// let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/1-PLH-Export - Copy.json"
-// let obj = JSON.parse(fs.readFileSync(filePath).toString());
-// const [a, b] = check_integrity(obj);
+//let filePath = "C:/Users/edmun/Code/TestFiles/Test Area A/translated_flows.json"
+//let obj = JSON.parse(fs.readFileSync(filePath).toString());
+//const [a, b] = check_integrity(obj);
 
 function check_integrity(object) {
     
@@ -27,6 +27,7 @@ function check_integrity(object) {
     NonTranslatedArguments = {};
     TotalProblemFlowsLANG = {};
     TotalProblemNodesLANG = {};
+    
     for (const lang of languages){
         NonTranslatedQR[lang] = 0;
         NonTranslatedArguments[lang] = 0;
@@ -92,8 +93,8 @@ function check_integrity(object) {
                         + 'Language: ' + lang + '\n'
                         + 'Total flows in JSON file: ' + TotalFlowCount + '\n'
                         + 'Total nodes with "quick replies": ' + TotalQRNodes + '\n\n'
-                        + 'Total quick reply nodes missing translation: ' + NonTranslatedQR[lang] + '\n'
-                        + 'Total arguments nodes missing translation: ' + NonTranslatedArguments[lang] + '\n\n'
+                        //+ 'Total quick reply nodes missing translation: ' + NonTranslatedQR[lang] + '\n'
+                        //+ 'Total arguments nodes missing translation: ' + NonTranslatedArguments[lang] + '\n\n'
                         + 'Total problem flows: ' + TotalProblemFlowsLANG[lang] + '\n'
                         + 'Total problem nodes: ' + TotalProblemNodesLANG[lang] + '\n\n'
                         + debug_lang[lang];   
@@ -127,7 +128,7 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
 
         if(MissingTranslationCount>0){
             NonTranslatedQR[lang]++
-            incompleteargumenttranslation[lang] = true
+            incompleteQRtranslation[lang] = true
         }        
     }   
 
@@ -196,11 +197,11 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
         if (utility.basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || utility.no_match_matrix(EngLinker,OtherLinker[lang])){
 
             if(incompleteQRtranslation[lang]){
-                debug_lang[lang] += '##### Quick replies not fully translated\n'
+                debug_lang[lang] += '##### Translated quick replies contain some english words\n'
             }
 
             if(incompleteargumenttranslation[lang]){
-                debug_lang[lang] += '##### Arguments not fully translated\n'
+                debug_lang[lang] += '##### Translated arguments contain some english words\n'
             }
             
             // only want to log the flow details once so check if we have previously logged
