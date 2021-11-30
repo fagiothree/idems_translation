@@ -31,6 +31,11 @@ Merge translated strings back into original flow as a localization.
 node index localize <input-rapidpro-flow-file> <translated-strings-file> <language-code> <output-name> <output-dir>
 ```
 
+Run through RapidPro flows, look for errors in the link between QR and Arguments that have been introduced during translation and apply an auto-fix 
+```
+node index overall_integrity_check <rapidpro-json-file> <output-dir>
+```
+
 Move quick replies to message text.
 ```
 node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir>
