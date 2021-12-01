@@ -22,34 +22,34 @@ if (COMMANDS[command]) {
     COMMANDS[command](args);
 } else {
     console.log(`Command not recognised, command=${command}`);
-}  
+}
 
-function has_any_words_check([inputFile, outputDir]) { 
+function has_any_words_check([inputFile, outputDir, FileOutputName, LogOutputName]) { 
     const obj = readInputFile(inputFile);   
     const [newobj, fixlog] = cleaner.fix_has_any_words(obj);
     // Export modified JSON file and the fixlog file
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.json", newobj);
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_mod.txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
+    writeOutputFile(outputDir, FileOutputName + ".json", newobj);
+    writeOutputFile(outputDir, LogOutputName + ".txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
 }
 
-function overall_integrity_check([inputFile, outputDir]) { 
+function overall_integrity_check([inputFile, outputDir, LogOutputName]) { 
     const obj = readInputFile(inputFile);   
     const [debug, debug_lang, languages] = integrity.check_integrity(obj);
     // Export modified JSON file and the fixlog file
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_ENGIntegrity.txt", "JSON Processed: " + inputFile + '\n\n' + debug);
+    writeOutputFile(outputDir, LogOutputName + "_Original.txt", "JSON Processed: " + inputFile + '\n\n' + debug);
     for (const lang of languages){
-        writeOutputFile(outputDir, path.parse(inputFile).name + "_" + lang + "Integrity.txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
+        writeOutputFile(outputDir, LogOutputName + "_" + lang + ".txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
     } 
 }
 
-function fix_arg_qr_translation([inputFile, outputDir]) { 
+function fix_arg_qr_translation([inputFile, outputDir, FileOutputName, LogOutputName]) { 
     const obj = readInputFile(inputFile);   
     const [newobj, debug_lang, languages] = fixer.fix_arg_qr_translation(obj);
     // Export modified JSON file and the fixlog file
     for (const lang of languages){
-        writeOutputFile(outputDir, path.parse(inputFile).name + "_" + lang + "_ArgAutoFixed.txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
+        writeOutputFile(outputDir, LogOutputName + "_" + lang + ".txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
     }
-    writeOutputFile(outputDir, path.parse(inputFile).name + "_ArgAutoFixed.json", newobj); 
+    writeOutputFile(outputDir,FileOutputName + ".json", newobj); 
 }
 
 function extract([inputFile, outputDir]) {
@@ -112,3 +112,12 @@ function outputFileErrorHandler(err) {
         console.log('error', err);
     }
 }
+
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+      if ((new Date().getTime() - start) > milliseconds){
+        break;
+      }
+    }
+  }

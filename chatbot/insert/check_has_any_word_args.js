@@ -9,9 +9,9 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-// let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/translated_flows_tester.json"
-// let obj = JSON.parse(fs.readFileSync(filePath).toString());
-// const [a, b] = fix_has_any_words(obj);
+//let filePath = "C:/Users/edmun/Google Drive - EEM Engineering Ltd/Translation Checking/Malay 30.11.21/7 - PLH with MSA.json"
+//let obj = JSON.parse(fs.readFileSync(filePath).toString());
+//const [a, b] = fix_has_any_words(obj);
 
 function fix_has_any_words(object){
 
@@ -110,7 +110,7 @@ function fix_has_any_words(object){
                 // Process argument and remove duplicate words in the translation
                 for (const lang of languages) { 
                         
-                    const UniqueArguments = utility.CreateUniqueArguments(OtherArg[lang], ArgTypes, OtherQR[lang])
+                    const UniqueArguments = utility.CreateUniqueArguments(OtherArg[lang], ArgTypes)
 
                     // If the UniqueArguments are different from the original args in translation, we need to insert these back into the JSON object
                     if(utility.arrayEquals(UniqueArguments,OtherArg[lang]) == false){
