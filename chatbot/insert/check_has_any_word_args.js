@@ -128,7 +128,7 @@ function fix_has_any_words(object){
                                 }
                             }else{
                                 try{
-                                    curr_loc[lang][ArgID[ref]].arguments = UniqueArguments[ref]
+                                    curr_loc[lang][ArgID[ref]].arguments = [UniqueArguments[ref]]
                                 }catch{
 
                                 }                                
