@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const excel = require('excel4node');
 const cleaner = require('./insert/check_has_any_word_args.js')
 const integrity = require('./insert/check_integrity.js')
 const fixer = require('./insert/fix_arg_qr_translation.js')
@@ -32,11 +33,12 @@ function has_any_words_check([inputFile, outputDir, FileOutputName, LogOutputNam
     writeOutputFile(outputDir, LogOutputName + ".txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
 }
 
-function overall_integrity_check([inputFile, outputDir, LogOutputName]) { 
+function overall_integrity_check([inputFile, outputDir, LogOutputName, ExcelOutputName]) { 
     const obj = readInputFile(inputFile);   
-    const [debug, debug_lang, languages] = integrity.check_integrity(obj);
+    const [debug, debug_lang, languages, ExcelLog] = integrity.check_integrity(obj);
     // Export modified JSON file and the fixlog file
     writeOutputFile(outputDir, LogOutputName + "_Original.txt", "JSON Processed: " + inputFile + '\n\n' + debug);
+    log_to_excel(ExcelLog, outputDir, ExcelOutputName + ".xlsx")
     for (const lang of languages){
         writeOutputFile(outputDir, LogOutputName + "_" + lang + ".txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
     } 
@@ -113,11 +115,50 @@ function outputFileErrorHandler(err) {
     }
 }
 
-function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-      if ((new Date().getTime() - start) > milliseconds){
-        break;
-      }
+function log_to_excel(arr,outputdir, outputname){
+    // Create a new instance of a Workbook class
+    var workbook = new excel.Workbook();
+
+    // Add a worksheets to the workbook
+    var worksheet = workbook.addWorksheet('QR_Arg_Warning_Log');
+
+
+    // Create the headers at the top of the page
+    worksheet.cell(1,1).string('QR_ID').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,2).string('Raw Quick Replies').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,3).string('Raw Arguments').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,4).string('Raw Arg Types').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,5).string('Processed Quick Replies').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,6).string('Processed Arguments').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,7).string('Processed Arg Types').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,8).string('Linker Matrix').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,9).string('Accept Error').style({font: {size: 10, bold: true}})
+
+    // Transfer our error data into the excel sheet
+    let rowref = 2
+    for (const row of arr){
+        colref = 1
+        for (const item of row){
+            
+            worksheet.cell(rowref,colref).string(item).style({font: {size: 12}}).style({alignment: {wrapText: true, vertical: 'top'}})
+            
+            
+            colref++
+        }
+        rowref++
     }
-  }
+
+    worksheet.column(1).setWidth(40)
+    worksheet.column(2).setWidth(0)
+    worksheet.column(3).setWidth(0)
+    worksheet.column(4).setWidth(0)
+    worksheet.column(5).setWidth(30)
+    worksheet.column(6).setWidth(30)
+    worksheet.column(7).setWidth(20)
+    worksheet.column(8).setWidth(10)
+    worksheet.column(9).setWidth(10)
+
+    filepath = path.join(outputdir,outputname) 
+    workbook.write(filepath);
+
+}

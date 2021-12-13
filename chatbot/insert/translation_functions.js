@@ -418,6 +418,27 @@ function basic_error_check(arr){
     return error
 }
 
+function multi_match_arguments(arr){
+    let error = false
+    let argumentrefs = []
+    // Form an array of all the arguments refs in the linker matrix
+    for(const member of arr){
+        for(const item of member[1]){
+            argumentrefs.push(item)
+        }        
+    }
+
+    // Now check if there are any duplicates in the argument refs
+    // Process the refs to remove duplicated
+    let argumentrefsunique = [...new Set(argumentrefs)]
+
+    //If their were duplicates we can find out by comparing the lengths of the matrices
+    if(argumentrefs.length != argumentrefsunique.length){
+        error = true
+    }
+    return error
+}
+
 function no_match_matrix(a,b){
     let no_match = false
     try{
@@ -433,6 +454,8 @@ function no_match_matrix(a,b){
     
     return no_match
 }
+
+
 
 function split_string(string) {
     if(/[a-zA-Z]/.test(string)){
@@ -457,5 +480,6 @@ module.exports = {
     create_connection_matrix,
     core_argument_check,
     basic_error_check,
-    no_match_matrix
+    no_match_matrix,
+    multi_match_arguments
 };

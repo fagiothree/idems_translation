@@ -9,7 +9,7 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Code/TestFiles/Test Area A/translated_flows.json"
+//let filePath = "C:/Users/edmun/Google Drive - EEM Engineering Ltd/Translation Checking/SA 13.12.21/7 - PLH_with_afr_sot_tsn_xho_zul.json"
 //let obj = JSON.parse(fs.readFileSync(filePath).toString());
 //const [a, b] = check_integrity(obj);
 
@@ -27,6 +27,7 @@ function check_integrity(object) {
     NonTranslatedArguments = {};
     TotalProblemFlowsLANG = {};
     TotalProblemNodesLANG = {};
+    ExcelLog = [];
     
     for (const lang of languages){
         NonTranslatedQR[lang] = 0;
@@ -99,7 +100,7 @@ function check_integrity(object) {
                         + 'Total problem nodes: ' + TotalProblemNodesLANG[lang] + '\n\n'
                         + debug_lang[lang];   
     }
-    return [debug, debug_lang, languages];
+    return [debug, debug_lang, languages, ExcelLog];
 }
 
 function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang){
@@ -162,7 +163,12 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
     }
 
     // look for where we have errors in the english and put in a log file
-    if (utility.basic_error_check(EngLinker) || EngLooseArg){
+    if (utility.basic_error_check(EngLinker) || EngLooseArg || utility.multi_match_arguments(EngLinker)){
+
+        let localQR = ''
+        let localarguments = ''
+        let localargtypes = ''
+        let locallinker = ''
 
         // only want to log the flow details once so check if we have previously logged
         if(!debug.includes(flow.uuid)){
@@ -179,22 +185,31 @@ function log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang)
         debug += '        Quick replies:\n'
         for (const row of EngQR){
             debug += `                ${row}\n`
+            localQR += `${row}\n`
+            
         }
         debug += `        Arguments:\n`
         for (const ref in EngArg){
-            debug += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`
+            debug += `                ${EngArg[ref]}  -  ${ArgTypes[ref]}\n`            
+            localarguments += `${EngArg[ref]}\n`
+            localargtypes += `${ArgTypes[ref]}\n`
+                       
         }
         debug += '        Link "QR","Argument"\n'
         for (const row of EngLinker){
         debug += `                ${row}\n`
+        locallinker += `${String(row)} \n`
         } 
         debug += '\n' 
+
+        let ExcelLogRow = [node.uuid, EngQR, EngArg, ArgTypes, localQR, localarguments, localargtypes, locallinker, 'N']
+        ExcelLog.push(ExcelLogRow)
     }
 
-    // look for where we have errors in the translation and put in a log file   
+    // look for where we have errors in the translation and put in a log file, we only log an error if it does not match the english   
     for (const lang in curr_loc) {
         
-        if (utility.basic_error_check(OtherLinker[lang]) || OtherLooseArg[lang] || utility.no_match_matrix(EngLinker,OtherLinker[lang])){
+        if (utility.no_match_matrix(EngLinker,OtherLinker[lang])){
 
             if(incompleteQRtranslation[lang]){
                 debug_lang[lang] += '##### Translated quick replies contain some english words\n'

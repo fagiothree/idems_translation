@@ -7,7 +7,7 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Code/TestFiles/Complete Process Check/9-PLH-localized-afr_mod.json"
+//let filePath = "C:/Users/edmun/Google Drive - EEM Engineering Ltd/Translation Checking/SA 13.12.21/7 - PLH_with_afr_sot_tsn_xho_zul.json"
 //let obj = JSON.parse(fs.readFileSync(filePath).toString());
 //const [a, b] = fix_arg_qr_translation(obj);
 
@@ -174,17 +174,24 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
                 debug_lang[lang] += '##### Arguments not fully translated\n'
             }
 
-            for(const row in EngLinker){
+            for(const row in EngLinker){                
                 if(/\d/.test(EngLinker[row][0])){
                     //pull in the associated argument that we should be looking at 
                     let CorrectArgRef = parseInt(EngLinker[row][1]) 
                     let LangArgRef = OtherLinker[lang][row][1] 
 
                     // check if the Eng argument link matches the translated argument link
-                    if(String(CorrectArgRef) != String(LangArgRef)){
+                    if(String(CorrectArgRef) != String(LangArgRef)){                                                                 
+
+                        let CorrectArgType = ArgTypes[CorrectArgRef]
                         
-                        // Something is broken, so we just want to insert the QR as the argument into the argument list
-                        OtherArg[lang][CorrectArgRef] = OtherQR[lang][row].toString()                   
+                        //if the argument is 'has_any_word' we need to handle the fix in  a specific way
+                        if (CorrectArgType == 'has_any_word'){
+                            OtherArg[lang][CorrectArgRef] += " " + OtherQR[lang][row].toString()
+                        }else{
+                            //for the other arg types the fix is more simple, we just replace with the entine QR
+                            OtherArg[lang][CorrectArgRef] = OtherQR[lang][row].toString()
+                        }                                                               
                     }
                 }                
             }
