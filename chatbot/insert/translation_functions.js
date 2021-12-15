@@ -2,10 +2,13 @@
 
 //Function takes a set of arguments and attempts to produce a set with no common words. If you provide argtypes it will only replace the "has_any_word" arguments,
 // if you do not provide argtypes it will remove duplication wherever it finds it
-function CreateUniqueArguments(originalargs, originalargtypes = [""], associatedQR = [""]) {
-    let UniqueArguments = []
-    let UniqueWords = FindUniqueWords(originalargs)
-    let DuplicateWordsQR = FindDuplicateWords(associatedQR)
+function CreateUniqueArguments(originalargs, originalargtypes = [""], associatedQR = [""], linkermatrix = [""]) {
+    let UniqueArguments = []    
+    let DuplicateWordsQR = FindDuplicateWords(associatedQR, linkermatrix)
+    let UniqueWords = FindUniqueWords(originalargs)        
+    
+
+    
 
     for (const i in originalargs){
         if(originalargtypes[i] == "has_any_word" || originalargtypes[0] == ""){
@@ -53,14 +56,35 @@ function FindUniqueWords(arr) {
     return UniqueWords
 }
 
-function FindDuplicateWords(arr) {
+function FindDuplicateWords(arr, linkermatrix = "") {
     let AllWords = [];
     let DuplicateWords = [];
-    for (const member of arr){
+    let NewArr = [];
+
+    if (linkermatrix == ""){
+        NewArr = arr
+    }else{
+        // we may have quick replies pointing to the same argument in which case duplication is allowed. We therefore form a simplified list of quick replies based on matching arguments
+        for (const row in linkermatrix){
+            if(arr[row] == "tumatangging sumunod"){
+                let aaa = "help"
+            }
+            if(/\d/.test(linkermatrix[row][0])){
+                //pull in the associated argument that we should be looking at 
+                let CorrectArgRef = parseInt(linkermatrix[row][1])
+                if(typeof NewArr[CorrectArgRef] === 'undefined'){
+                    NewArr[CorrectArgRef] = arr[row]
+                }else{
+                    NewArr[CorrectArgRef] += " " + arr[row] 
+                }                
+            }
+        }
+    }
+    for (const member of NewArr){
         const SplitMembers = split_string(member)
         // Remove duplicate words within an argument as this will throw off the subsequent logic
-        let SplitArgumentsUnique = [...new Set(SplitMembers)]
-        for (const argumentword of SplitArgumentsUnique){
+        let SplitPhraseUnique = [...new Set(SplitMembers)]
+        for (const argumentword of SplitPhraseUnique){
             AllWords.push(argumentword)
         }
     }
@@ -268,8 +292,7 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
             if(argument_types[k] == 'has_any_word'){
                 // for the has_any_word case we try to find any matching words between the arg and qr string
                 for (const word of argwords[k]){
-                    let regex = '\\b' + escapeRegExp(word) + '\\b'
-                    if(new RegExp(regex, "i").test(quick_replies[i])){                    
+                    if(qrwords[i].includes(word)){                   
                         if (CountIf(k,allmatches) ==0){
                             allmatches.push(k)                            
                         }
@@ -281,8 +304,7 @@ function create_connection_matrix(arguments,argument_types,quick_replies){
                 n = 0
                 for (const word of argwords[k]){ 
                     n++
-                    let regex = '\\b' + escapeRegExp(word) + '\\b'
-                    if(new RegExp(regex, "i").test(quick_replies[i]) == false){
+                    if(qrwords[i].includes(word) == false){
                         break
                     }else if (n < argwords[k].length-1){
                         continue
@@ -345,7 +367,7 @@ function core_argument_check(arguments,argument_types){
 
     // set up an array with the arguments stored as arrays of words
     for (const index in arguments){
-        argwords[index] = split_args(arguments[index])
+        argwords[index] = split_string(arguments[index])
     }
 
     // look through the arguments looking for self matches
@@ -356,11 +378,10 @@ function core_argument_check(arguments,argument_types){
         for (const k in arguments){
             
             if(argument_types[k] == 'has_any_word'){
-                // for the has_any_word case we try to find any matching words between the arg and qr string
+                // for the has_any_word case we try to find any matching words between the arg and other args
                 let matchfound = false
                 for (const word of argwords[k]){ 
-                    let r_exp = new RegExp(`\\b${word}\\b`, "i");      
-                    if (r_exp.test(arguments[i])){                        
+                    if(argwords[i].includes(word)){                        
                         matchfound = true                           
                     }                    
                 }
@@ -373,8 +394,7 @@ function core_argument_check(arguments,argument_types){
                 // for the has_all_words we need to check all argwords are in a particular quick reply
                 for (const word of argwords[k]){ 
                     n++
-                    let r_exp = new RegExp(`\\b${word}\\b`, "i");        
-                    if (r_exp.test(arguments[i]) == false){
+                    if(argwords[i].includes(word) == false){
                         break
                     }else if (n < argwords[k].length-1){
                         continue
@@ -458,10 +478,14 @@ function no_match_matrix(a,b){
 
 
 function split_string(string) {
-    if(/[a-zA-Z]/.test(string)){
-        return string.split(/[\s,'\-\/()!.]+/).filter((i) => i);
-    }else{
-        return string.split(/[\s,'\/()!.]+/).filter((i) => i);
+    try{
+        if(/[a-zA-Z]/.test(string)){
+            return string.split(/[\s,\-\\/()!.:;]+/).filter((i) => i);
+        }else{
+            return string.split(/[\s,\\/()!.:;]+/).filter((i) => i);
+        }  
+    }catch{
+        return []
     }    
 }
 

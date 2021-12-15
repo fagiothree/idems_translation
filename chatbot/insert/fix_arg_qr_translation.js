@@ -25,11 +25,14 @@ function fix_arg_qr_translation(object) {
     NonTranslatedArguments = {};
     TotalProblemFlowsLANG = {};
     TotalProblemNodesLANG = {};
+    FaultyFix = {};
+    FailedFix = {}
     for (const lang of languages){
         NonTranslatedQR[lang] = 0;
         NonTranslatedArguments[lang] = 0;
         TotalProblemFlowsLANG[lang] = 0
         TotalProblemNodesLANG[lang] = 0
+        FaultyFix[lang] = 0
     }
 
     // this is the log file in which we will track any modifications that we make to the translation
@@ -66,7 +69,8 @@ function fix_arg_qr_translation(object) {
                         [debug_lang, modified_arguments, modified_argument_IDs, modified_argument_lang] = fix_translated_arguments(flow, node, action, curr_loc, routers, debug_lang);
                         
                         //We need to take our modified arguments and insert them back into the main object so we can export a fixed version
-                        for(const row in modified_arguments){
+                        //console.log(modified_argument_IDs)
+                        for(const row in modified_arguments){                            
                             curr_loc[modified_argument_lang[row]][modified_argument_IDs[row]].arguments[0] = modified_arguments[row]
                         }
                     }
@@ -83,7 +87,9 @@ function fix_arg_qr_translation(object) {
                         + 'Total quick reply nodes missing some translation: ' + NonTranslatedQR[lang] + '\n'
                         + 'Total arguments nodes missing some translation: ' + NonTranslatedArguments[lang] + '\n\n'
                         + 'Total modified flows: ' + TotalProblemFlowsLANG[lang] + '\n'
-                        + 'Total modified nodes: ' + TotalProblemNodesLANG[lang] + '\n\n'
+                        + 'Total modified nodes: ' + TotalProblemNodesLANG[lang] + '\n'
+                        + 'Total nodes not successfully fixed: ' + FaultyFix[lang] + '\n'
+                        + 'ID of failed nodes: ' + FailedFix[lang] + '\n\n'
                         + debug_lang[lang];   
     }
     return [object, debug_lang, languages];
@@ -175,23 +181,38 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
             }
 
             for(const row in EngLinker){                
-                if(/\d/.test(EngLinker[row][0])){
+                if(/\d/.test(EngLinker[row][0]) && /\d/.test(EngLinker[row][1])){
                     //pull in the associated argument that we should be looking at 
                     let CorrectArgRef = parseInt(EngLinker[row][1]) 
                     let LangArgRef = OtherLinker[lang][row][1] 
+                    let CorrectArgType = ArgTypes[CorrectArgRef]
 
-                    // check if the Eng argument link matches the translated argument link
-                    if(String(CorrectArgRef) != String(LangArgRef)){                                                                 
+                    if (CorrectArgType == 'has_any_word'){
+                        // If we have an error we will replace all 'has_any_word' arguments with the QR as this gives the best chance of a fix working
+                        OtherArg[lang][CorrectArgRef] += " " + OtherQR[lang][row].toString()
 
-                        let CorrectArgType = ArgTypes[CorrectArgRef]
-                        
-                        //if the argument is 'has_any_word' we need to handle the fix in  a specific way
-                        if (CorrectArgType == 'has_any_word'){
-                            OtherArg[lang][CorrectArgRef] += " " + OtherQR[lang][row].toString()
-                        }else{
-                            //for the other arg types the fix is more simple, we just replace with the entine QR
-                            OtherArg[lang][CorrectArgRef] = OtherQR[lang][row].toString()
-                        }                                                               
+                        if(String(CorrectArgRef) != String(LangArgRef) && String(LangArgRef) != ""){
+                            // this situation occurs if the translated argument is now matching with the wrong QR, we want to clear the words that are causing problems
+                            let dangerwords = utility.split_string(OtherQR[lang][row])
+                            // run though the referenced arguments clearing problematic words
+                            for (const item of LangArgRef){
+                                if(String(CorrectArgRef) != String(item)){
+                                    let newargument = ''
+                                    let argumentwords = utility.split_string(OtherArg[lang][item])
+                                    for (const word of argumentwords){
+                                        if (!dangerwords.includes(word)){
+                                            newargument += word + " "
+                                        }
+                                    }
+                                    OtherArg[lang][item] = newargument
+                                }                                                            
+                            }                       
+                        }                     
+                                               
+                    }else if(String(CorrectArgRef) != String(LangArgRef)){
+                        //for the other arg types the fix is more simple, we just replace with the entine QR
+                        OtherArg[lang][CorrectArgRef] = OtherQR[lang][row].toString()                                                          
+                                                                                       
                     }
                 }                
             }
@@ -199,7 +220,7 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
             // We have now replaced the possibly faulty arguments with the QR, however there is no guarnetee that the QR words themselves do no cause conflict, we therefore run the has_any_words check to try and improve the arguments
             let FixedArguments = []
             let i = 0
-            for(const member of utility.CreateUniqueArguments(OtherArg[lang], ArgTypes, OtherQR[lang])){
+            for(const member of utility.CreateUniqueArguments(OtherArg[lang], ArgTypes, OtherQR[lang], EngLinker)){
                 //Form an array of the final arguments which we can then print in the log file
                 FixedArguments.push(member)
                 
@@ -208,10 +229,12 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
                 modified_argument_IDs.push(ArgIDs[i])                
                 modified_arguments.push(member)  
                 i++                          
-            }            
+            }
 
             // Generate a new linker for our file
             [OtherNewLinker[lang], OtherNewLooseArg[lang]] = utility.create_connection_matrix(FixedArguments, ArgTypes, OtherQR[lang])
+
+            
                        
             // only want to log the flow details once so check if we have previously logged
             if(!debug_lang[lang].includes(flow.uuid)){
@@ -219,6 +242,17 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
                 debug_lang[lang] += `    Problem flow: ${TotalProblemFlowsLANG[lang]}\n`
                 debug_lang[lang] += `    Flow ID: ${flow.uuid}\n`
                 debug_lang[lang] += `    Flow name: ${flow.name}\n\n`
+            }
+
+            // Check if the fix has been successful
+            if (utility.no_match_matrix(EngLinker,OtherNewLinker[lang])){
+                FaultyFix[lang]++
+                debug_lang[lang] += `#### Fix has been attempted but is not successful, requires manual review ####\n`
+                if(typeof FailedFix[lang] == 'undefined'){
+                    FailedFix[lang] = node.uuid
+                }else{
+                    FailedFix[lang] += ', ' + node.uuid
+                }
             }
             
             TotalProblemNodesLANG[lang]++
