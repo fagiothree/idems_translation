@@ -1,5 +1,8 @@
 // Area to start breaking down translation process into a set of reusable functions
 
+// Requiring the module
+const reader = require('xlsx')
+
 //Function takes a set of arguments and attempts to produce a set with no common words. If you provide argtypes it will only replace the "has_any_word" arguments,
 // if you do not provide argtypes it will remove duplication wherever it finds it
 function CreateUniqueArguments(originalargs, originalargtypes = [""], associatedQR = [""], linkermatrix = [""]) {
@@ -489,6 +492,58 @@ function split_string(string) {
     }    
 }
 
+function load_excel_log(ExcelLogLocation){
+    // Read in the excel file
+    try{
+        const workbook = reader.readFile(ExcelLogLocation)
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+
+        let IDCol = 'A'
+        let QRCol = 'B'
+        let ArgCol = 'C'
+        let ArgTCol = 'D'
+        let ResponseCol = 'I'
+        let row = 2
+        let ExceptionsArray = []
+
+        let datapresent = true
+
+        while (datapresent){
+            let ID = (worksheet[IDCol+row] ? worksheet[IDCol+row].v : undefined);
+            let QR = (worksheet[QRCol+row] ? worksheet[QRCol+row].v : undefined);
+            let Arg = (worksheet[ArgCol+row] ? worksheet[ArgCol+row].v : undefined);
+            let ArgT = (worksheet[ArgTCol+row] ? worksheet[ArgTCol+row].v : undefined);
+            let Response = (worksheet[ResponseCol+row] ? worksheet[ResponseCol+row].v : undefined);
+            
+            if(typeof ID  == 'undefined'){
+                datapresent = false
+            }else{
+                let array_row = [ID, QR, Arg, ArgT, Response]
+                ExceptionsArray.push(array_row)
+            }           
+            
+            row++
+        }
+
+        return ExceptionsArray
+    }catch{
+        return ['','','','','']
+    }      
+           
+}
+
+function skip_node(OldExcelLog, ID, EngQR, EngArg, ArgTypes){      
+    
+    for(const row of OldExcelLog){
+        let aaa = String(EngQR)
+        if(String(row[0]) == String(ID) && String(row[1]) == String(EngQR) && String(row[2]) == String(EngArg) && String(row[3]) == String(ArgTypes) && String(row[4]) == 'Y'){
+            return true
+        }
+    }
+    return false
+    
+}
+
 module.exports = {
     CreateUniqueArguments,
     CountIf,
@@ -505,5 +560,7 @@ module.exports = {
     core_argument_check,
     basic_error_check,
     no_match_matrix,
-    multi_match_arguments
+    multi_match_arguments,
+    load_excel_log,
+    skip_node
 };

@@ -33,12 +33,12 @@ function has_any_words_check([inputFile, outputDir, FileOutputName, LogOutputNam
     writeOutputFile(outputDir, LogOutputName + ".txt", "JSON Processed: " + inputFile + '\n\n' +fixlog); 
 }
 
-function overall_integrity_check([inputFile, outputDir, LogOutputName, ExcelOutputName]) { 
+function overall_integrity_check([inputFile, outputDir, LogOutputName, ExcelLogName]) { 
     const obj = readInputFile(inputFile);   
-    const [debug, debug_lang, languages, ExcelLog] = integrity.check_integrity(obj);
+    const [debug, debug_lang, languages, ExcelLog] = integrity.check_integrity(obj, ExcelLogName);
     // Export modified JSON file and the fixlog file
     writeOutputFile(outputDir, LogOutputName + "_Original.txt", "JSON Processed: " + inputFile + '\n\n' + debug);
-    log_to_excel(ExcelLog, outputDir, ExcelOutputName + ".xlsx")
+    log_to_excel(ExcelLog, ExcelLogName)
     for (const lang of languages){
         writeOutputFile(outputDir, LogOutputName + "_" + lang + ".txt", "JSON Processed: " + inputFile + '\n\n' + debug_lang[lang]);
     } 
@@ -115,7 +115,7 @@ function outputFileErrorHandler(err) {
     }
 }
 
-function log_to_excel(arr,outputdir, outputname){
+function log_to_excel(arr, outputpath){
     // Create a new instance of a Workbook class
     var workbook = new excel.Workbook();
 
@@ -132,7 +132,7 @@ function log_to_excel(arr,outputdir, outputname){
     worksheet.cell(1,6).string('Processed Arguments').style({font: {size: 10, bold: true}})
     worksheet.cell(1,7).string('Processed Arg Types').style({font: {size: 10, bold: true}})
     worksheet.cell(1,8).string('Linker Matrix').style({font: {size: 10, bold: true}})
-    worksheet.cell(1,9).string('Accept Error').style({font: {size: 10, bold: true}})
+    worksheet.cell(1,9).string('Node Acceptable?').style({font: {size: 10, bold: true}})
 
     // Transfer our error data into the excel sheet
     let rowref = 2
@@ -158,7 +158,7 @@ function log_to_excel(arr,outputdir, outputname){
     worksheet.column(8).setWidth(10)
     worksheet.column(9).setWidth(10)
 
-    filepath = path.join(outputdir,outputname) 
-    workbook.write(filepath);
+     
+    workbook.write(outputpath);
 
 }
