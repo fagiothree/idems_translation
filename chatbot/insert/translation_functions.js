@@ -146,7 +146,7 @@ function collect_Eng_arguments(node){
 
     // first collect the english arguments
     for(const curr_case of node.router.cases){                    
-        EngArg.push(curr_case.arguments[0].toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))
+        EngArg.push(curr_case.arguments[0].toString().toLowerCase().trim())//.replace(/,/g," ").replace(/\s\s+/g, ' '))
         ArgTypes.push(curr_case.type)
         ArgID.push(curr_case.uuid)                                              
     }
@@ -168,7 +168,7 @@ function collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang){
         // we are only expecting certain types of args to be translated
         if (TextArgTypes.includes(ArgTypes[ref]) && /[a-zA-Z]/.test(EngArg[ref])){
             try{
-                let translation = curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' ')
+                let translation = curr_loc[lang][ArgID[ref]].arguments.toString().toLowerCase().trim()//.replace(/,/g," ").replace(/\s\s+/g, ' ')
                 if(translation == EngArg[ref]){
                     // This catches where the localisation is still in english, we want to make a note
                     MissingTranslationCount++
@@ -206,7 +206,7 @@ function collect_Other_arguments(ArgID, ArgTypes, EngArg, curr_loc, lang){
 function collect_Eng_qr(action){
     let EngQR = []
     for (let qr of action.quick_replies){
-        EngQR.push(qr.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' '))
+        EngQR.push(qr.toString().toLowerCase().trim())//.replace(/,/g," ").replace(/\s\s+/g, ' '))
     }
     return EngQR
 }
@@ -219,7 +219,7 @@ function collect_Other_qr(EngQR, action, curr_loc, lang){
     try{
         let translation = curr_loc[lang][action.uuid].quick_replies
         for (let qr of translation){            
-            let processedQR = qr.toString().toLowerCase().trim().replace(/,/g," ").replace(/\s\s+/g, ' ')
+            let processedQR = qr.toString().toLowerCase().trim()//.replace(/,/g," ").replace(/\s\s+/g, ' ')
             //this checks whether the localization is translated
             if (EngQR.includes(processedQR)){
                 // This catches where the localisation is still in english, we want to make a note
