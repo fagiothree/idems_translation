@@ -3,21 +3,20 @@ import os
 
 path = os.getcwd().replace('\\', '//')
 json_decode_template = json.load(
-    open(path + "//Inputs//input_template.json", encoding='utf-8'))
+    open(path + "//input//input_template.json", encoding='utf-8'))
 json_decode_global = json.load(
-    open(path + "//inputs//input_global.json", encoding='utf-8'))
+    open(path + "//input//input_global.json", encoding='utf-8'))
 json_decode_tour = json.load(
-    open(path + "//Inputs//input_tour.json", encoding='utf-8'))
+    open(path + "//input//input_tour.json", encoding='utf-8'))
 
 json_decode_data_list = json.load(
-    open(path + "//Inputs//input_data_list.json", encoding='utf-8'))
+    open(path + "//input//input_data_list.json", encoding='utf-8'))
 
 ignore_end = ('.json', '.png', '.svg', '.mp3', '.mp4')
 ignore_start = ('https', '@', 'plh_', '+@', '!@', '!!@')
 result = []
 excluded_types = ('nested_properties', 'template', 'image', 'audio', 'video', 'animated_section',
                   'display_group', 'lottie_animation')
-contain_key = ('title', 'text', 'in_text_title', 'short_title', 'tools')
 end_variable_characters = (' ', ':', ';', ',', '!', '?', '@')
 
 
@@ -69,13 +68,12 @@ def process_rows(val, result, filename):
         elif filename == 'data_list':
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 if item.get('_translatedFields') != None:
-                    for elt in contain_key:
-                        if str(elt) in item.get('_translatedFields'):
-                            value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
-                            #print(value_string, 'Ok', elt)
-                            matched_expressions = []
-                            get_matched_text(value_string, matched_expressions)
-                            result.append(add_to_result(value_string, matched_expressions, result, filename))
+                    for elt in item.get('_translatedFields'):
+                        value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
+                        #print(value_string, 'Ok', elt)
+                        matched_expressions = []
+                        get_matched_text(value_string, matched_expressions)
+                        result.append(add_to_result(value_string, matched_expressions, result, filename))
         else:
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 value_type = str(item.get('type'))
@@ -186,16 +184,16 @@ result_data_list = [i for n, i in enumerate(result_data_list) if i not in result
 print(len(result_data_list))
 # ---------------------------------------------------------------------------------------
 
-with open(path + '//Outputs//output_template.json', 'w', encoding='utf-8') as json_file:
+with open(path + '//output//output_template.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_temp, json_file, ensure_ascii=False, indent=2)
 
-with open(path + '//Outputs//output_global.json', 'w', encoding='utf-8') as json_file:
+with open(path + '//output//output_global.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_glob, json_file, ensure_ascii=False, indent=2)
 
-with open(path + '//Outputs//output_tour.json', 'w', encoding='utf-8') as json_file:
+with open(path + '//output//output_tour.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_tour, json_file, ensure_ascii=False, indent=2)
 
-with open(path + '//Outputs//output_data_list.json', 'w', encoding='utf-8') as json_file:
+with open(path + '//output//output_data_list.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_data_list, json_file, ensure_ascii=False, indent=2)
 # ----------------------------------------------------------------------------------------
 reslt_temp = [d['text'] for d in result_temp if 'text' in d]
@@ -220,7 +218,7 @@ result_all = result_temp + result_glob + result_tour + result_data_list
 result_all = [i for n, i in enumerate(result_all) if i not in result_all[n + 1:]]
 #print(len(result_all))
 
-with open(path + '//Outputs//output.json', 'w', encoding='utf-8') as json_file:
+with open(path + '//output//output.json', 'w', encoding='utf-8') as json_file:
     json.dump(result_all, json_file, ensure_ascii=False, indent=2)
 
 reslt_all = [d['text'] for d in result_all if 'text' in d]

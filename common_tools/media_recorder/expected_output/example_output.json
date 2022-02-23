@@ -1,0 +1,20 @@
+[
+    {
+        "text": "\u00bfC\u00f3mo te sientes hoy?",
+        "id": "item_1",
+        "title": "T\u00edtulo traducido",
+        "type": "audio"
+    },
+    {
+        "text": "\u00bfC\u00f3mo te sientes hoy?",
+        "id": "item_2",
+        "title": "Untranslated title",
+        "type": "audio"
+    },
+    {
+        "text": "Esta es la respuesta predeterminada si la respuesta es contento, la primera opci\u00f3n.\n\nEsta es la respuesta predeterminada si la respuesta es normal, la segunda opci\u00f3n.\n\nEsta es la respuesta predeterminada si la respuesta es triste, la tercer opci\u00f3n.",
+        "id": "relax_2",
+        "title": "T\u00edtulo traducido",
+        "type": "audio"
+    }
+]
