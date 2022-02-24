@@ -18,5 +18,8 @@
   "homepage": "https://github.com/fagiothree/idems_translation#readme",
   "devDependencies": {
     "mocha": "^9.1.3"
+  },
+  "dependencies": {
+    "excel4node": "^1.7.2"
   }
 }
