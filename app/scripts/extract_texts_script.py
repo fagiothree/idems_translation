@@ -1,5 +1,6 @@
 import json
 import os
+import re           # for doing regex search
 
 path = os.getcwd().replace('\\', '//')
 json_decode_template = json.load(
@@ -95,7 +96,9 @@ def add_to_result(value_string, matched_expressions, result, filename):
             not value_string == 'true' and not value_string == 'false' and \
             value_string != 'None' and value_string!="" and \
             not value_string.isnumeric() and \
-            not (value_string.startswith(ignore_start) and (" " not in value_string)):
+            # the following line excludes all strings that contain only word-characters but are not words (e.g. "example_3")
+            not ((not value_string.isalpha()) and len(re.findall("\w", value_string)) == len(value_string)) and \ 
+            not (value_string.startswith(ignore_start) and (" " not in value_string)): 
         result_item = {}
         result_item['SourceText'] = value_string
         result_item['text'] = value_string
