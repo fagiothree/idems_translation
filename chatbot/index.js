@@ -68,13 +68,14 @@ function extract([inputFile, outputDir]) {
 }
 
 function localize([inputFlow, translations, lang, outputName, outputDir]) {
-    const [missing, flows] = insert.createLocalization(
+    const [missing, partiallyTranslated, flows] = insert.createLocalization(
         readInputFile(inputFlow),
         readInputFile(translations),
         lang
     );
 
     writeOutputFile(outputDir, 'missing_' + lang + '.json', missing);
+    writeOutputFile(outputDir, 'partially_transl_' + lang + '.json', partiallyTranslated);
     writeOutputFile(outputDir, outputName + '.json', flows);
 }
 

@@ -5,6 +5,19 @@ function createLocalization(latestFlows, translations, lang) {
     let unusedTranslations = Object.assign([], translations);
     let duplicates = "";
     let duplCount = 1;
+    let translSpaces = [{
+        "SourceText": "  ",
+        "text": "  ",
+        "type": "text"
+      },
+      {
+        "SourceText": " ",
+        "text": " ",
+        "type": "text"
+      }
+     ]
+    translations = translations.concat(translSpaces)
+    
 
     // initialise output variables
     let flowsLocalizations = {};
@@ -118,6 +131,7 @@ function createLocalization(latestFlows, translations, lang) {
 
     return [
         missingBitsStep3,
+        partiallyTranslatedFlows,
         latestFlows
     ];
 }
