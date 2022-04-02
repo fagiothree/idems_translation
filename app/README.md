@@ -11,3 +11,9 @@ Generate jsons for translation:
 ```
 python scripts/extract_texts_script.py
 ```
+
+## Running the tests
+
+```
+python -m unittest scripts.tests
+```
