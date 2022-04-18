@@ -96,8 +96,8 @@ def add_to_result(value_string, matched_expressions, result, filename):
             not value_string == 'true' and not value_string == 'false' and \
             value_string != 'None' and value_string!="" and \
             not value_string.isnumeric() and \
-            # the following line excludes all strings that contain only word-characters but are not words (e.g. "example_3")
-            not ((not value_string.isalpha()) and len(re.findall("\w", value_string)) == len(value_string)) and \ 
+            not ((not value_string.isalpha()) and len(re.findall("\w", value_string)) == len(value_string)) and \
+            not (("@" in value_string) and (" " not in value_string)) and \
             not (value_string.startswith(ignore_start) and (" " not in value_string)): 
         result_item = {}
         result_item['SourceText'] = value_string
