@@ -9,7 +9,6 @@ json_decode_global = json.load(
     open(path + "//input//input_global.json", encoding='utf-8'))
 json_decode_tour = json.load(
     open(path + "//input//input_tour.json", encoding='utf-8'))
-
 json_decode_data_list = json.load(
     open(path + "//input//input_data_list.json", encoding='utf-8'))
 
