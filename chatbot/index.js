@@ -59,7 +59,7 @@ function extract([inputFile, outputDir]) {
     //obj = reorderFlowsAlphabeticallyByName(obj);
     const bits = ex.extractTextForTranslation(obj);
     const fileForTransl = ex.createFileForTranslators(bits);
-    const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)
+    const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)[0]
           .map(ex.transformToTranslationFormat);
 
     writeOutputFile(outputDir, 'step_1.json', bits);

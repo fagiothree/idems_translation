@@ -116,7 +116,7 @@ function createLocalization(latestFlows, translations, lang) {
     }
 
     // remove repetitions from missing bits to translate
-    const missingBitsStep3 = extract.removeRepetitions(missingBits)
+    const missingBitsStep3 = extract.removeRepetitions(missingBits)[0]
           .map(extract.transformToTranslationFormat);
 
     // add localization to flows

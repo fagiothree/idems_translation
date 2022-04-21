@@ -189,9 +189,9 @@ function removeRepetitions(obj) {
         });
     });
 
-    console.log ("word count " + wordCount);
+    console.log ("word count: " + wordCount);
     //console.log ("without rep " + charCount);
-    return messages;
+    return [messages, wordCount];
 }
 
 function transformToTranslationFormat(message) {
