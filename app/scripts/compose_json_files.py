@@ -2,11 +2,9 @@ import json
 import os
 
 
-
-
 def create_list(input_name, subfolders = []):
     input_list = []
-    dirpath = dirpath = app_path + input_name + '/'
+    dirpath = app_path + input_name + '/'
     for file_name in os.listdir(dirpath):
         if os.path.isfile(os.path.join(dirpath, file_name)):
             json_file = json.load(open(dirpath + file_name, encoding='utf-8'))
