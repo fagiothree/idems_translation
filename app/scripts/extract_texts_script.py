@@ -157,6 +157,12 @@ def set_filename(filename, result):
 
 
 if __name__ == '__main__':
+
+    output_folder = './output'
+    
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
     path = os.getcwd().replace('\\', '//')
     json_decode_template = json.load(
         open(path + "//input//input_template.json", encoding='utf-8'))
