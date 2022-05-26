@@ -1,22 +1,59 @@
 import json
 import os
 import re           # for doing regex search
+from pathlib import Path
 
 
-result = []
-excluded_types = (
-    'nested_properties',
-    'template',
-    'image',
-    'audio',
-    'video',
-    'animated_section',
-    'display_group',
-    'lottie_animation'
-)
-end_variable_characters = (' ', ':', ';', ',', '!', '?', '@')
+def extract_texts():
+    srcs = [
+        'template',
+        'global',
+        'tour',
+        'data_list',
+    ]
+    results_all = []
+
+    for src in srcs:
+        results = process_file(src)
+        save_results(src, results)
+        print_report(src, results)
+        results_all += results
+
+    # Result from all files
+    print(f"Processing 'all'")
+    print(f'Length: {len(results_all)}')
+    save_results('all', dedupe(results_all))
+    print_report('all', results_all)
+
+def process_file(src):
+    print(f"Processing '{src}'")
+
+    input_file_path = Path(os.getcwd()) / 'input' / f'input_{src}.json'
+    with open(input_file_path, 'r', encoding='utf-8') as input_file:
+        contents = json.load(input_file)
+
+    results = []
+
+    for object in contents:
+        rows = object.get('rows', [])
+        process_rows(rows, results, src)
+
+    print(f'Length: {len(results)}')
+
+    return dedupe(remove_empty(results))
 
 def process_rows(val, result, filename):
+    excluded_types = (
+        'nested_properties',
+        'template',
+        'image',
+        'audio',
+        'video',
+        'animated_section',
+        'display_group',
+        'lottie_animation'
+    )
+
     for item in val:
         if filename == 'template' or filename == 'global':
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
@@ -133,128 +170,30 @@ def get_matched_text(value_string, matched_expressions):
             if '@' in txt:
                 matched_expressions.append(txt)
 
-def set_filename(filename, result):
-    if filename == 'template':
-        for i in range(0, len(json_decode_template)):
-            val = json_decode_template[i]['rows']
-            filename = filename
-            process_rows(val, result, filename)
-    elif filename == 'global':
-        for i in range(0, len(json_decode_global)):
-            val = json_decode_global[i]['rows']
-            filename = filename
-            process_rows(val, result, filename)
-    elif filename == 'tour':
-        for i in range(0, len(json_decode_tour)):
-            val = json_decode_tour[i]['rows']
-            filename = filename
-            process_rows(val, result, filename)
-    elif filename == 'data_list':
-        for i in range(0, len(json_decode_data_list)):
-            val = json_decode_data_list[i]['rows']
-            filename = filename
-            process_rows(val, result, filename)
+def remove_empty(results):
+    tmp = [i for i in results if i]
+    print(f'Length after removing empties: {len(results)}')
+    return tmp
+
+def dedupe(results):
+    tmp = [i for n, i in enumerate(results) if i not in results[n + 1:]]
+    print(f'Length after removing duplicates: {len(results)}')
+    return tmp
+
+def save_results(src, results):
+    out_dir = Path(os.getcwd()) / 'output'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    file_name = 'output.json' if src == 'all' else f'output_{src}.json'
+    results_file_path = out_dir / file_name
+    with open(results_file_path, 'w', encoding='utf-8') as results_file:
+        json.dump(results, results_file, ensure_ascii=False, indent=2)
+
+def print_report(src, results):
+    texts = [str(d.get('text', '')) for d in results]
+    print(f'Number of characters for translation in {src}.json: ', sum(len(i) for i in texts))
+    print(f'Number of words for translation in {src}.json: ', sum(len(i.split()) for i in texts))
+    print('----------------------------------------------------------')
 
 
 if __name__ == '__main__':
-
-    output_folder = './output'
-    
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    path = os.getcwd().replace('\\', '//')
-    json_decode_template = json.load(
-        open(path + "//input//input_template.json", encoding='utf-8'))
-    json_decode_global = json.load(
-        open(path + "//input//input_global.json", encoding='utf-8'))
-    json_decode_tour = json.load(
-        open(path + "//input//input_tour.json", encoding='utf-8'))
-    json_decode_data_list = json.load(
-        open(path + "//input//input_data_list.json", encoding='utf-8'))
-
-    result_glob = []
-    result_temp = []
-    result_tour = []
-    result_data_list = []
-
-    template_src = 'template'
-    global_src = 'global'
-    tour_src = 'tour'
-    data_list_src = 'data_list'
-    set_filename(template_src, result_temp)
-    set_filename(global_src, result_glob)
-    set_filename(tour_src, result_tour)
-    set_filename(data_list_src, result_data_list)
-    # --------------------------------------------------------------------------------------
-    # Result from Template file
-    print(len(result_temp))
-    result_temp = list(filter(({}).__ne__, result_temp))
-    print(len(result_temp))
-    result_temp = [i for n, i in enumerate(result_temp) if i not in result_temp[n + 1:]]
-    print(len(result_temp))
-
-    # Result from Global file
-    print(len(result_glob))
-    result_glob = list(filter(({}).__ne__, result_glob))
-    print(len(result_glob))
-    result_glob = [i for n, i in enumerate(result_glob) if i not in result_glob[n + 1:]]
-    print(len(result_glob))
-    # ---------------------------------------------------------------------------------------
-
-    # Result from Tour file
-    # print(len(result_tour))
-    # result_tour = list(filter(({}).__ne__, result_tour))
-    # print(len(result_tour))
-    result_tour = [i for i in result_tour if i]
-    result_tour = [i for n, i in enumerate(result_tour) if i not in result_tour[n + 1:]]
-    print(len(result_tour))
-    # ---------------------------------------------------------------------------------------
-
-    # Result from Data list file
-    #print(len(result_data_list))
-    result_data_list = [i for i in result_data_list if i]
-    result_data_list = [i for n, i in enumerate(result_data_list) if i not in result_data_list[n + 1:]]
-    print(len(result_data_list))
-    # ---------------------------------------------------------------------------------------
-
-    with open(path + '//output//output_template.json', 'w', encoding='utf-8') as json_file:
-        json.dump(result_temp, json_file, ensure_ascii=False, indent=2)
-
-    with open(path + '//output//output_global.json', 'w', encoding='utf-8') as json_file:
-        json.dump(result_glob, json_file, ensure_ascii=False, indent=2)
-
-    with open(path + '//output//output_tour.json', 'w', encoding='utf-8') as json_file:
-        json.dump(result_tour, json_file, ensure_ascii=False, indent=2)
-
-    with open(path + '//output//output_data_list.json', 'w', encoding='utf-8') as json_file:
-        json.dump(result_data_list, json_file, ensure_ascii=False, indent=2)
-    # ----------------------------------------------------------------------------------------
-    reslt_temp = [d['text'] for d in result_temp if 'text' in d]
-    print('Number of characters for translation in template.json: ', sum(len(str(i)) for i in reslt_temp))
-    print('Number of words for translation in template.json: ', sum(len(str(i).split()) for i in reslt_temp))
-    print('----------------------------------------------------------')
-    reslt_glob = [d['text'] for d in result_glob if 'text' in d]
-    print('Number of characters for translation in global.json: ', sum(len(str(i)) for i in reslt_glob))
-    print('Number of words for translation in global.json: ', sum(len(str(i).split()) for i in reslt_glob))
-    print('----------------------------------------------------------')
-    reslt_tour = [d['text'] for d in result_tour if 'text' in d]
-    print('Number of characters for translation in tour.json: ', sum(len(str(i)) for i in reslt_tour))
-    print('Number of words for translation in tour.json: ', sum(len(str(i).split()) for i in reslt_tour))
-    print('----------------------------------------------------------')
-    reslt_data = [d['text'] for d in result_data_list if 'text' in d]
-    print('Number of characters for translation in data_list.json: ', sum(len(str(i)) for i in reslt_data))
-    print('Number of words for translation in data_list.json: ', sum(len(str(i).split()) for i in reslt_data))
-    print('----------------------------------------------------------')
-    # Result from all files
-    result_all = result_temp + result_glob + result_tour + result_data_list
-    #print(len(result_all))
-    result_all = [i for n, i in enumerate(result_all) if i not in result_all[n + 1:]]
-    #print(len(result_all))
-
-    with open(path + '//output//output.json', 'w', encoding='utf-8') as json_file:
-        json.dump(result_all, json_file, ensure_ascii=False, indent=2)
-
-    reslt_all = [d['text'] for d in result_all if 'text' in d]
-    print('Number of characters for translation in output.json: ', sum(len(str(i)) for i in reslt_all))
-    print('Number of words for translation in output.json: ', sum(len(str(i).split()) for i in reslt_all))
+    extract_texts()
