@@ -80,9 +80,9 @@ function localize([inputFlow, translations, lang, outputName, outputDir]) {
 }
 
 
-function move_quick_replies([input_file, select_phrases, outputName, outputDir]) {
+function move_quick_replies([input_file, select_phrases, outputName, outputDir,add_selectors = false]) {
     const [flows, debug, debug_lang] = move_quick_replies_to_message_text(
-        readInputFile(input_file),readInputFile(select_phrases)
+        readInputFile(input_file),readInputFile(select_phrases),add_selectors
     );
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);

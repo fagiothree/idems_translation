@@ -1,4 +1,4 @@
-function move_quick_replies_to_message_text(flows, select_phrases) {
+function move_quick_replies_to_message_text(flows, select_phrases,add_selectors) {
     const exceptions = [
         'no',
         'prefer not to say',
@@ -6,7 +6,8 @@ function move_quick_replies_to_message_text(flows, select_phrases) {
         'prefer not to tell',
         'i prefer not to tell',
         'does not apply',
-        'go back to the previous options'
+        'go back to the previous options',
+        'i am not interested'
     ];
 
     let debug = '';
@@ -48,7 +49,7 @@ function move_quick_replies_to_message_text(flows, select_phrases) {
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(action, curr_loc);
+                        clear_quick_replies(action, curr_loc, quick_replies,add_selectors);
                         
                         debug = modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
                         
@@ -101,10 +102,18 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function clear_quick_replies(action, curr_loc) {
+function clear_quick_replies(action, curr_loc, quick_replies, add_selectors) {
     action.quick_replies = [];
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
+    }
+    if (add_selectors){
+        quick_replies.forEach(qr => {
+            action.quick_replies.push(String(qr.selector));
+            for (const lang in curr_loc) {
+                curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
+            }
+        });
     }
 }
 
