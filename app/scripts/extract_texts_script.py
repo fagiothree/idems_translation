@@ -29,6 +29,11 @@ def process_file(src):
     print(f"Processing '{src}'")
 
     input_file_path = Path(os.getcwd()) / 'input' / f'input_{src}.json'
+
+    if not input_file_path.exists():
+        print(f'File not found, file={input_file_path}')
+        return []
+
     with open(input_file_path, 'r', encoding='utf-8') as input_file:
         contents = json.load(input_file)
 
