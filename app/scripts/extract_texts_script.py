@@ -94,8 +94,6 @@ def process_rows(val, result, filename):
                                                 matched_expressions.append(matched_expression.get('matchedExpression'))
                                     i=i+1
                                 add_to_result(value_string,matched_expressions, result, filename)
-                            if not 'text:' in str(list_item):
-                                print("Unexpected list element" + str(list_item))
                 if item.get('rows')!=None :
                     process_rows(item.get('rows'), result, filename)
         elif filename == 'data_list':
