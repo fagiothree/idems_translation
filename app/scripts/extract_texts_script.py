@@ -181,15 +181,15 @@ def dedupe(results):
 def save_results(src, results):
     out_dir = Path(os.getcwd()) / 'output'
     out_dir.mkdir(parents=True, exist_ok=True)
-    file_name = 'output.json' if src == 'all' else f'output_{src}.json'
+    file_name = f'output_{src}.json'
     results_file_path = out_dir / file_name
     with open(results_file_path, 'w', encoding='utf-8') as results_file:
         json.dump(results, results_file, ensure_ascii=False, indent=2)
 
 def print_report(src, results):
     texts = [str(d.get('text', '')) for d in results]
-    print(f'Number of characters for translation in {src}.json: ', sum(len(i) for i in texts))
-    print(f'Number of words for translation in {src}.json: ', sum(len(i.split()) for i in texts))
+    print(f'Number of characters for translation in output_{src}.json: ', sum(len(i) for i in texts))
+    print(f'Number of words for translation in output_{src}.json: ', sum(len(i.split()) for i in texts))
     print('----------------------------------------------------------')
 
 
