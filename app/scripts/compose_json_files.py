@@ -31,6 +31,9 @@ def create_list(in_dir, group_name, subfolders):
 def accumulate_json_files(dir_path):
     acc = []
 
+    if not dir_path.exists():
+        return acc
+
     for file_name in os.listdir(dir_path):
         file_path = dir_path / file_name
         if file_path.is_file():
