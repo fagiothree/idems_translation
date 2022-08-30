@@ -62,20 +62,25 @@ function fix_arg_qr_translation(object) {
 
         // Loop through the nodes looking for ones with quick replies, if we find quick replies we will check the link to the arguments and potentially fix the translation if it does not match the english
         for (const node of flow.nodes) {
+            
             for (const action of node.actions) {
                 if (action.type == 'send_msg') {                    
                     if (action.quick_replies.length > 0) {
-                        TotalQRNodes++                                                
-                        [debug_lang, modified_arguments, modified_argument_IDs, modified_argument_lang] = fix_translated_arguments(flow, node, action, curr_loc, routers, debug_lang);
-                        
-                        //We need to take our modified arguments and insert them back into the main object so we can export a fixed version
-                        //console.log(modified_argument_IDs)
-                        for(const row in modified_arguments){                            
-                            curr_loc[modified_argument_lang[row]][modified_argument_IDs[row]].arguments[0] = modified_arguments[row]
+                        TotalQRNodes++     
+                        //Before we start checking if there are problems with the translation we first check if there is an associated wait for response node with arguments
+                        if(routers[node.exits[0].destination_uuid]){                                           
+                            [debug_lang, modified_arguments, modified_argument_IDs, modified_argument_lang] = fix_translated_arguments(flow, node, action, curr_loc, routers, debug_lang);
+                            
+                            //We need to take our modified arguments and insert them back into the main object so we can export a fixed version
+                            //console.log(modified_argument_IDs)
+                            for(const row in modified_arguments){                            
+                                curr_loc[modified_argument_lang[row]][modified_argument_IDs[row]].arguments[0] = modified_arguments[row]
+                            }
                         }
                     }
                 }
             }
+            
         }        
     }
     

@@ -70,8 +70,24 @@ function check_integrity(object, ExcelLogPath = "") {
             for (const action of node.actions) {
                 if (action.type == 'send_msg') {                    
                     if (action.quick_replies.length > 0) {
-                        TotalQRNodes++                                                
-                        [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang, ExcelLogPath);                        
+                        TotalQRNodes++ 
+                        //Before we start checking if there are problems with the translation we first check if there is an associated wait for response node with arguments
+                        if(routers[node.exits[0].destination_uuid]){                                               
+                            [debug, debug_lang] = log_integrity(flow, node, action, curr_loc, routers, debug, debug_lang, ExcelLogPath);                        
+                        }
+                        else{
+                            if(!debug.includes(flow.uuid)){
+                                TotalProblemFlowsENG++
+                                debug += `    Problem flow: ${TotalProblemFlowsENG}\n`
+                                debug += `    Flow ID: ${flow.uuid}\n`
+                                debug += `    Flow name: ${flow.name}\n\n`
+                            }
+                        
+                            TotalProblemNodesENG++
+                            debug += `        QR Node ID: ${node.uuid}\n`
+                            debug += `        Action text: ${action.text.replace(/(\r\n|\n|\r)/gm, "; ")}\n`
+                            debug += '        NO ASSOCIATED ARGUMENT NODE\n\n'
+                        }
                     }
                 }
             }
