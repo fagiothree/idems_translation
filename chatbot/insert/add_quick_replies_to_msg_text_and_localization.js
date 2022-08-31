@@ -107,7 +107,7 @@ function clear_quick_replies(action, curr_loc, quick_replies, add_selectors) {
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
     }
-    if (add_selectors){
+    if (add_selectors == "yes"){
         quick_replies.forEach(qr => {
             action.quick_replies.push(String(qr.selector));
             for (const lang in curr_loc) {
