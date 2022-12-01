@@ -7,7 +7,8 @@ function move_quick_replies_to_message_text(flows, select_phrases,add_selectors)
         'i prefer not to tell',
         'does not apply',
         'go back to the previous options',
-        'i am not interested'
+        'i am not interested',
+        'no i do not agree'
     ];
 
     let debug = '';
