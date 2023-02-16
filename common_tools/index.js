@@ -3,13 +3,16 @@ const path = require('path');
 const findMissing = require('./find_missing_bits_to_translate.js');
 const inventory = require('./make_inventory.js');
 const { json_to_po, po_to_json } = require('./converter.js');
+const jsonConcat = require("json-concat")
+
 
 
 const COMMANDS = {
     missing,
     match,
     add_restored,
-    convert
+    convert,
+    concatenate_json
 };
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -60,6 +63,24 @@ function convert([input_file_path, output_file_path]) {
     } else {
         console.log(output);
     }
+}
+
+function concatenate_json([file_containing_json, destination_file]) {
+    // an array of filenames to concat
+    const files = [];
+
+    filenames = fs.readdirSync(file_containing_json)
+    filenames.forEach((file) => {
+        files.push(path.join(file_containing_json,file));
+    })
+
+    // pass the "files" to json concat    
+    jsonConcat({
+        src: files,
+        dest: destination_file+"/result.json"
+    }, function (json){
+        console.log(json);
+    })
 }
 
 function readInputFile(filePath) {

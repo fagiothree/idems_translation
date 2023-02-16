@@ -8,23 +8,41 @@ def main():
     in_dir = Path(sys.argv[1])
     out_dir = Path(sys.argv[2])
     out_dir.mkdir(parents=True, exist_ok=True)
+    split_groups = sys.argv[3]
 
-    groups = [
-        ('data_list', ['campaign_rows']),
+    core_groups = [
+        ('data_list', ['campaign_rows', 'campaign_schedule', 'campaign_rows_debug']),
         ('global', []),
         ('template', []),
         ('tour', []),
     ]
+    
+    compose(in_dir, out_dir, core_groups, split_groups)
 
-    for (name, sub_dirs) in groups:
-        contents = create_list(in_dir, name, sub_dirs)
-        write_json(out_dir, name, contents)
+def compose(in_dir, out_dir, core_groups, split_groups):
 
-def create_list(in_dir, group_name, subfolders):
+    split_groups = split_groups.split()
+
+    all_contents = []
+
+    #loop through all files in groups and join into a single list
+    for (name, sub_dirs) in core_groups:
+        contents = create_list(in_dir, name, sub_dirs, split_groups, out_dir)
+        all_contents += contents
+
+    #export the main list to JSON
+    write_json(out_dir, "main", all_contents)
+
+def create_list(in_dir, group_name, subfolders, split_groups, out_dir):
     input_list = accumulate_json_files(in_dir / group_name)
 
     for folder in subfolders:
-        input_list += accumulate_json_files(in_dir / group_name / folder)
+        if (folder in split_groups):
+            #if this is one of specified files then we don't want to add to the main list, we want to just export it as its own JSON
+            split_output = accumulate_json_files(in_dir / group_name / folder)
+            write_json(out_dir, folder, split_output)
+        else:
+            input_list += accumulate_json_files(in_dir / group_name / folder)
 
     return input_list
 
@@ -46,7 +64,7 @@ def read_json(file_path):
         return json.load(json_file)
 
 def write_json(out_dir, group_name, contents):
-    file_path = out_dir / f'input_{group_name}.json'
+    file_path = out_dir / f'{group_name}.json'
     with open(file_path, 'w', encoding='utf-8') as json_file:
         json.dump(contents, json_file, ensure_ascii=False, indent=2)
 

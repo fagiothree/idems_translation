@@ -1,34 +1,29 @@
 import json
 import os
+import sys
 import re           # for doing regex search
 from pathlib import Path
 
 
-def extract_texts():
-    srcs = [
-        'template',
-        'global',
-        'tour',
-        'data_list',
-    ]
-    results_all = []
+def main():
+    in_dir = Path(sys.argv[1])
+    out_dir = Path(sys.argv[2])
+
+    extract_texts(in_dir, out_dir)
+
+def extract_texts(in_dir, out_dir):
+    #get a list of all the files in our input directory
+    srcs = os.listdir(in_dir)
 
     for src in srcs:
-        results = process_file(src)
-        save_results(src, results)
+        results = process_file(src, in_dir)
+        save_results(src, results, out_dir)
         print_report(src, results)
-        results_all += results
 
-    # Result from all files
-    print(f"Processing 'all'")
-    print(f'Length: {len(results_all)}')
-    save_results('all', dedupe(results_all))
-    print_report('all', results_all)
-
-def process_file(src):
+def process_file(src, in_dir):
     print(f"Processing '{src}'")
 
-    input_file_path = Path(os.getcwd()) / 'input' / f'input_{src}.json'
+    input_file_path = in_dir / src
 
     if not input_file_path.exists():
         print(f'File not found, file={input_file_path}')
@@ -39,15 +34,17 @@ def process_file(src):
 
     results = []
 
+    #loop through all the flows in our file
     for object in contents:
+        flow_type = object.get('flow_type')
         rows = object.get('rows', [])
-        process_rows(rows, results, src)
+        process_rows(rows, results, flow_type)
 
     print(f'Length: {len(results)}')
 
     return dedupe(remove_empty(results))
 
-def process_rows(val, result, filename):
+def process_rows(val, result, flow_type):
     excluded_types = (
         'nested_properties',
         'template',
@@ -60,7 +57,7 @@ def process_rows(val, result, filename):
     )
 
     for item in val:
-        if filename == 'template' or filename == 'global':
+        if flow_type == 'template' or flow_type == 'global':
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 item_value = item.get('value')
                 value_type = str(item.get('type'))
@@ -68,14 +65,14 @@ def process_rows(val, result, filename):
                     if isinstance(item_value, str):
                         value_string = str(item_value).strip()
                         matched_expressions=[]
-                        if filename =='template':
+                        if flow_type =='template':
                             if item.get('_dynamicFields')!=None and item.get('_dynamicFields').get('value') != None:
                                 for matched_expression in item.get('_dynamicFields').get('value'):
                                     if matched_expression.get('matchedExpression')!= None:
                                         matched_expressions.append(matched_expression.get('matchedExpression'))
-                        elif filename =='global':
+                        elif flow_type =='global':
                             get_matched_text(value_string, matched_expressions)
-                        add_to_result(value_string, matched_expressions, result, filename)
+                        add_to_result(value_string, matched_expressions, result, flow_type)
                     if isinstance(item_value, list):
                         i=-1
                         matched_expressions=[]
@@ -98,10 +95,10 @@ def process_rows(val, result, filename):
                                             if matched_expression.get('matchedExpression')!= None:
                                                 matched_expressions.append(matched_expression.get('matchedExpression'))
                                     i=i+1
-                                add_to_result(value_string,matched_expressions, result, filename)
+                                add_to_result(value_string,matched_expressions, result, flow_type)
                 if item.get('rows')!=None :
-                    process_rows(item.get('rows'), result, filename)
-        elif filename == 'data_list':
+                    process_rows(item.get('rows'), result, flow_type)
+        elif flow_type == 'data_list':
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 if item.get('_translatedFields') != None:
                     for elt in item.get('_translatedFields'):
@@ -109,7 +106,7 @@ def process_rows(val, result, filename):
                         #print(value_string, 'Ok', elt)
                         matched_expressions = []
                         get_matched_text(value_string, matched_expressions)
-                        result.append(add_to_result(value_string, matched_expressions, result, filename))
+                        result.append(add_to_result(value_string, matched_expressions, result, flow_type))
         else:
             if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
                 value_type = str(item.get('type'))
@@ -118,13 +115,13 @@ def process_rows(val, result, filename):
                     value_title_string = str(item_value_title).strip()
                     matched_expressions=[]
                     get_matched_text(value_title_string, matched_expressions)
-                    result.append(add_to_result(value_title_string, matched_expressions, result, filename))
+                    result.append(add_to_result(value_title_string, matched_expressions, result, flow_type))
                 if 'message_text' in item and not value_type in excluded_types:
                     item_value_message = item.get('message_text')
                     value_message_string = str(item_value_message).strip()
                     matched_expressions=[]
                     get_matched_text(value_message_string, matched_expressions)
-                    result.append(add_to_result(value_message_string, matched_expressions, result, filename))
+                    result.append(add_to_result(value_message_string, matched_expressions, result, flow_type))
 
 def add_to_result(value_string, matched_expressions, result, filename):
     if is_valid_value_string(value_string):
@@ -183,10 +180,10 @@ def dedupe(results):
     print(f'Length after removing duplicates: {len(results)}')
     return tmp
 
-def save_results(src, results):
-    out_dir = Path(os.getcwd()) / 'output'
+def save_results(src, results, out_dir):
+    out_dir = out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
-    file_name = f'output_{src}.json'
+    file_name = src
     results_file_path = out_dir / file_name
     with open(results_file_path, 'w', encoding='utf-8') as results_file:
         json.dump(results, results_file, ensure_ascii=False, indent=2)
@@ -199,4 +196,4 @@ def print_report(src, results):
 
 
 if __name__ == '__main__':
-    extract_texts()
+    main()
