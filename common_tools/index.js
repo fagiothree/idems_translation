@@ -65,7 +65,7 @@ function convert([input_file_path, output_file_path]) {
     }
 }
 
-function concatenate_json([file_containing_json, destination_file]) {
+function concatenate_json([file_containing_json, destination_file, file_name]) {
     // an array of filenames to concat
     const files = [];
 
@@ -77,7 +77,7 @@ function concatenate_json([file_containing_json, destination_file]) {
     // pass the "files" to json concat    
     jsonConcat({
         src: files,
-        dest: destination_file+"/result.json"
+        dest: destination_file+"/"+file_name+".json"
     }, function (json){
         console.log(json);
     })

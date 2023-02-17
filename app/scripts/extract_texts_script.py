@@ -6,8 +6,12 @@ from pathlib import Path
 
 
 def main():
-    in_dir = Path(sys.argv[1])
-    out_dir = Path(sys.argv[2])
+    ConfigPath = Path(sys.argv[1])
+    with open(ConfigPath) as config_file:
+        data = json.load(config_file)
+
+        in_dir = Path(data['ComposeResult'])
+        out_dir = Path(data['ExtractResult'])
 
     extract_texts(in_dir, out_dir)
 
