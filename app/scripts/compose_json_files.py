@@ -5,9 +5,9 @@ from pathlib import Path
 
 
 def main():
-    ConfigPath = Path(sys.argv[1])
+    config_path = Path(sys.argv[1])
 
-    with open(ConfigPath) as config_file:
+    with open(config_path) as config_file:
         data = json.load(config_file)
 
         in_dir = Path(data['CoreFiles'])
