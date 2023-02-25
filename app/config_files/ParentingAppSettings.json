@@ -1,11 +1,11 @@
 {
-    "CoreFiles": "C:/Users/edmun/Code/parenting-app-ui/packages/app-data/sheets",
-    "ComposeResult": "C:/Users/edmun/Code/idems_translation-1/app/1_compose_result",
-    "CoreGroups": [["data_list", ["campaign_rows", "campaign_schedule", "campaign_rows_debug"]],["global", [""]],["template", [""]],["tour", [""]]],
-    "SplitGroups": [["main", "parent_app"], ["campaign_rows_debug", "parent_app"] ,["campaign_rows", "common"]],
-    "ExtractResult": "C:/Users/edmun/Code/idems_translation-1/app/2_extract_result",
-    "ReadyForTranslation": "C:/Users/edmun/Code/idems_translation-1/app/3_ready_for_translators",
-    "PostTranslation": "C:/Users/edmun/Code/PLH-Digital-Content/translations",
-    "PostTranslationJSONs": "C:/Users/edmun/Code/idems_translation-1/app/4_result_from_translators",
-    "FinalDictionaries": "C:/Users/edmun/Code/idems_translation-1/app/5_completed_dictionaries"
+    "CoreFiles": "../parenting-app-ui/packages/app-data/sheets",
+    "ComposeResult": "app/1_compose_result",
+    "CoreGroups": [["data_list", ["campaign_rows", "campaign_schedule"]],["global", [""]],["template", ["common_with_parent_text","legal_terms"]],["tour", [""]]],
+    "SplitGroups": [["main", "parent_app"], ["legal_terms", "parent_app"] ,["common_with_parent_text", "common"]],
+    "ExtractResult": "app/2_extract_result",
+    "ReadyForTranslation": "app/3_ready_for_translators",
+    "PostTranslation": "../PLH-Digital-Content/translations",
+    "PostTranslationJSONs": "app/4_result_from_translators",
+    "FinalDictionaries": "app/5_completed_dictionaries"
 }

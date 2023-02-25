@@ -1,4 +1,4 @@
-$ConfigPath = "C:/Users/edmun/Code/idems_translation-1/app/config_files/ParentingAppSettings.json"
+$ConfigPath = "app/config_files/ParentingAppSettings.json"
 $ConfigObject = Get-Content $ConfigPath | ConvertFrom-Json
 $SplitGroups = $ConfigObject.SplitGroups
 $PostTranslation = $ConfigObject.PostTranslation

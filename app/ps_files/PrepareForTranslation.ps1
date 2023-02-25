@@ -1,11 +1,11 @@
-$ConfigPath = "C:/Users/edmun/Code/idems_translation-1/app/config_files/ParentingAppSettings.json"
+$ConfigPath = "app/config_files/ParentingAppSettings.json"
 $ConfigObject = Get-Content $ConfigPath | ConvertFrom-Json
 $SplitGroups = $ConfigObject.SplitGroups
 $ExtractResult = $ConfigObject.ExtractResult
 $ReadyForTranslation = $ConfigObject.ReadyForTranslation
 
-python C:/Users/edmun/Code/idems_translation-1/app/scripts/compose_json_files.py $ConfigPath
-python C:/Users/edmun/Code/idems_translation-1/app/scripts/extract_texts_script.py $ConfigPath
+python app/scripts/compose_json_files.py $ConfigPath
+python app/scripts/extract_texts_script.py $ConfigPath
 
 
 foreach ($GroupInfo in $SplitGroups){
