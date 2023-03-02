@@ -1,4 +1,4 @@
-function move_quick_replies_to_message_text(flows, select_phrases,add_selectors) {
+function move_quick_replies_to_message_text(flows, select_phrases, special_words, add_selectors) {
     const exceptions = [
         'no',
         'prefer not to say',
@@ -50,7 +50,7 @@ function move_quick_replies_to_message_text(flows, select_phrases,add_selectors)
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(action, curr_loc, quick_replies,add_selectors);
+                        clear_quick_replies(action, curr_loc, quick_replies, special_words, add_selectors);
                         
                         debug = modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
                         
@@ -103,17 +103,21 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function clear_quick_replies(action, curr_loc, quick_replies, add_selectors) {
+function clear_quick_replies(action, curr_loc, quick_replies, special_words, add_selectors) {
     action.quick_replies = [];
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
     }
-    if (add_selectors == "yes"){
+    if (add_selectors){
         quick_replies.forEach(qr => {
-            action.quick_replies.push(String(qr.selector));
-            for (const lang in curr_loc) {
-                curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
-            }
+            if (special_words.includes(qr.text)){
+                action.quick_replies.push(String(qr.text));
+            } else {
+                action.quick_replies.push(String(qr.selector));
+                for (const lang in curr_loc) {
+                    curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
+                }                
+            }            
         });
     }
 }
