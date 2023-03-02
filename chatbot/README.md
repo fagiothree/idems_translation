@@ -41,7 +41,7 @@ Move quick replies to message text.
 node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <special_words> <add_selectors>
 
 'add_selectors' expects a boolean, if you want to add the numerical quick replies back in, example input: true
-'special_words' expects a list of words that will be re-inserted in full as part of the add_selectors process, example input "['back','close']
+'special_words' expects a list of words that will be re-inserted in full as part of the add_selectors process, example input "['back','close']"
 ```
 
 Overall process visualised in flowchart linked below
