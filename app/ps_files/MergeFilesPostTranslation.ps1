@@ -1,4 +1,4 @@
-$ConfigPath = "app/config_files/ParentingAppSettings.json"
+$ConfigPath = "app/config_files/parent_app_settings.json"
 $ConfigObject = Get-Content $ConfigPath | ConvertFrom-Json
 $SplitGroups = $ConfigObject.SplitGroups
 $PostTranslation = $ConfigObject.PostTranslation
