@@ -1,0 +1,316 @@
+{
+  "version": "13",
+  "site": "https://rapidpro.idems.international",
+  "flows": [
+    {
+      "_ui": {
+        "nodes": {
+          "b1951ffc-5e2b-4733-a6b0-5164e59b03bd": {
+            "position": {
+              "left": 760,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "1f9c5010-3128-4966-a395-dd48e4f4bcca": {
+            "position": {
+              "left": 760,
+              "top": 120
+            },
+            "type": "execute_actions"
+          },
+          "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 760,
+              "top": 300
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "69389aa8-74b9-4f45-90ea-626fdf6e9c11": {
+            "position": {
+              "left": 520,
+              "top": 480
+            },
+            "type": "execute_actions"
+          },
+          "b3431955-027a-4dd3-bb0b-816bed68f8c8": {
+            "position": {
+              "left": 960,
+              "top": 560
+            },
+            "type": "execute_actions"
+          },
+          "80597d8d-0da3-4249-9b05-ae13326ccb10": {
+            "position": {
+              "left": 660,
+              "top": 580
+            },
+            "type": "execute_actions"
+          },
+          "8fefbc39-c795-4df8-a24f-2f10079513b9": {
+            "position": {
+              "left": 800,
+              "top": 700
+            },
+            "type": "execute_actions"
+          },
+          "315611ca-bbe4-4afe-bb16-24c4f0ed5feb": {
+            "position": {
+              "left": 1180,
+              "top": 240
+            },
+            "type": "execute_actions"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "revision": 1
+      },
+      "name": "Converting Quick Replies Test",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Hello welcome to this survey",
+              "type": "send_msg",
+              "uuid": "b7ec3486-3456-4881-952a-22f1f8c5e9d0"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "1f9c5010-3128-4966-a395-dd48e4f4bcca",
+              "uuid": "1dc18d3f-296c-4430-8e02-9f3e0c81acd2"
+            }
+          ],
+          "uuid": "b1951ffc-5e2b-4733-a6b0-5164e59b03bd"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "text": "What would you like for dinner?",
+              "type": "send_msg",
+              "all_urns": false,
+              "quick_replies": [
+                "chicken",
+                "fish",
+                "steak",
+                "back"
+              ],
+              "uuid": "023b7a6c-ed4b-4320-bfaf-561ee28aaa2c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127",
+              "uuid": "e11ddaca-1de6-4145-b9fa-83a385455de1"
+            }
+          ],
+          "uuid": "1f9c5010-3128-4966-a395-dd48e4f4bcca"
+        },
+        {
+          "uuid": "315611ca-bbe4-4afe-bb16-24c4f0ed5feb",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "Let's go back somewhere",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "36d9cda2-5051-4711-87f8-1e84aa762d9c"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "39c0d6ca-d7a0-409d-b69f-b4c0a6ad4b34",
+              "destination_uuid": null
+            }
+          ]
+        },
+        {
+          "uuid": "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "2e8ba568-c847-4b4b-b89d-e9a09ddfc8f5",
+            "cases": [
+              {
+                "arguments": [
+                  "chicken"
+                ],
+                "type": "has_any_word",
+                "uuid": "976b844f-8ca1-4fe4-b9cd-1201171cc3c5",
+                "category_uuid": "453ea73e-82e6-4129-92a8-c43cec290a9b"
+              },
+              {
+                "arguments": [
+                  "fish"
+                ],
+                "type": "has_any_word",
+                "uuid": "86e3e6e8-07c1-4e43-a63c-fe12341b307e",
+                "category_uuid": "4a36b252-6cb5-4c5e-8859-b9fe3ee311c6"
+              },
+              {
+                "arguments": [
+                  "steak"
+                ],
+                "type": "has_any_word",
+                "uuid": "8b7dd677-3c38-474d-a3bf-d07f577682ef",
+                "category_uuid": "ae29e862-7f5c-44be-96ec-61493ffa6de3"
+              },
+              {
+                "arguments": [
+                  "back"
+                ],
+                "type": "has_any_word",
+                "uuid": "d70234f9-1377-4a62-909d-8a6482238e76",
+                "category_uuid": "6b9b104c-565d-4f30-900f-7d203aae6245"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "40c6c767-3d87-4292-9158-022bce2edfa1",
+                "name": "Chicken",
+                "uuid": "453ea73e-82e6-4129-92a8-c43cec290a9b"
+              },
+              {
+                "exit_uuid": "008616b3-ef6b-425e-9912-dd91bfa56c0e",
+                "name": "Fish",
+                "uuid": "4a36b252-6cb5-4c5e-8859-b9fe3ee311c6"
+              },
+              {
+                "exit_uuid": "5f7d8bd7-2db8-4833-b762-890e74caa850",
+                "name": "Steak",
+                "uuid": "ae29e862-7f5c-44be-96ec-61493ffa6de3"
+              },
+              {
+                "uuid": "6b9b104c-565d-4f30-900f-7d203aae6245",
+                "name": "Back",
+                "exit_uuid": "7ffd7ebf-fdcc-4e98-b779-124425bb65ff"
+              },
+              {
+                "exit_uuid": "837fcd17-4f45-42e0-b28f-9b180ffce90d",
+                "name": "Other",
+                "uuid": "2e8ba568-c847-4b4b-b89d-e9a09ddfc8f5"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 1"
+          },
+          "exits": [
+            {
+              "destination_uuid": "69389aa8-74b9-4f45-90ea-626fdf6e9c11",
+              "uuid": "40c6c767-3d87-4292-9158-022bce2edfa1"
+            },
+            {
+              "destination_uuid": "80597d8d-0da3-4249-9b05-ae13326ccb10",
+              "uuid": "008616b3-ef6b-425e-9912-dd91bfa56c0e"
+            },
+            {
+              "destination_uuid": "8fefbc39-c795-4df8-a24f-2f10079513b9",
+              "uuid": "5f7d8bd7-2db8-4833-b762-890e74caa850"
+            },
+            {
+              "uuid": "7ffd7ebf-fdcc-4e98-b779-124425bb65ff",
+              "destination_uuid": "315611ca-bbe4-4afe-bb16-24c4f0ed5feb"
+            },
+            {
+              "destination_uuid": "b3431955-027a-4dd3-bb0b-816bed68f8c8",
+              "uuid": "837fcd17-4f45-42e0-b28f-9b180ffce90d"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Chicken is great",
+              "type": "send_msg",
+              "uuid": "3c511110-fdc2-4524-892e-e4b2c85f4888"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "9e716a23-a221-4d56-9377-450d5f4b9f62"
+            }
+          ],
+          "uuid": "69389aa8-74b9-4f45-90ea-626fdf6e9c11"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Thanks for your response",
+              "type": "send_msg",
+              "uuid": "2df7398e-d066-480e-882e-abfd1e6d7aca"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "e23e8ffa-1770-441f-8175-45fe8026ea66"
+            }
+          ],
+          "uuid": "b3431955-027a-4dd3-bb0b-816bed68f8c8"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Fish is great",
+              "type": "send_msg",
+              "uuid": "d6a71b4d-ac0e-4445-a2da-fe60776f9649"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "14908f89-01ff-49eb-b996-a3b1d078ded4"
+            }
+          ],
+          "uuid": "80597d8d-0da3-4249-9b05-ae13326ccb10"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Steak is great",
+              "type": "send_msg",
+              "uuid": "42f9f773-fa4e-49f1-a235-db739fc6a476"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "d81ee140-2caa-4844-8e2f-fff523c38389"
+            }
+          ],
+          "uuid": "8fefbc39-c795-4df8-a24f-2f10079513b9"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "44da2ecc-4589-4f6c-9551-af092a0073e5",
+      "revision": 4
+    }
+  ],
+  "campaigns": [],
+  "triggers": [],
+  "fields": [],
+  "groups": []
+}
