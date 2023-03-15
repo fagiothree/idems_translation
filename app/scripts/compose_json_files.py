@@ -1,11 +1,8 @@
 import json
 import os
-import sys
 from pathlib import Path
 
-
-def main():
-    config_path = Path(sys.argv[1])
+def compose_files(config_path):
 
     with open(config_path) as config_file:
         data = json.load(config_file)
@@ -69,5 +66,4 @@ def write_json(out_dir, group_name, contents):
         json.dump(contents, json_file, ensure_ascii=False, indent=2)
 
 
-if __name__ == '__main__':
-    main()
+

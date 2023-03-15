@@ -5,7 +5,7 @@ import re           # for doing regex search
 from pathlib import Path
 
 
-def main():
+def extract_all_text(config_path):
     config_path = Path(sys.argv[1])
     with open(config_path) as config_file:
         data = json.load(config_file)
@@ -199,5 +199,3 @@ def print_report(src, results):
     print('----------------------------------------------------------')
 
 
-if __name__ == '__main__':
-    main()
