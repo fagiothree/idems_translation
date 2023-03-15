@@ -9,12 +9,14 @@ The translation process involves 2 key stages.
 
 Each stage is completed with a specific master function as outlined below. However, both of these functions require a `config` file as an input. The config file contains the various file paths that are used in the process, and a number of lists which specify the particular folders to be considered. The two key lists which should be provided in the `config` file are the `CoreGroups` and `SplitGroups`.
 
+### CoreGroups
 `CoreGroups` is a list of where to look for json files that may need to be translated (given that we have provided a base file path as another argument in the config file). It allows a list within the list to be more specific about where to look. For example if we used:
 
 `"CoreGroups": [["folder_A", ["sub_folder_1", "sub_folder_2"]],["folder_B", [""]]]`
 
 Then the script would look for any `.json` files in `folder_A` and `folder_B`, as well as `.json` files in `sub_folder_1` and `sub_folder_2` which are within `folder_A`
 
+### SplitGroups
 `SplitGroups` is how we specify how the files are organised before they are sent off to the translators. We may wish to divide the text into specific chunks so they can be sent to specialised translators. An example of the `SplitGroups` list would be something like:
 
 `"SplitGroups": [["main", "group_1"], ["sub_folder_1", "group_1"], ["sub_folder_2", "group_2"]]`
