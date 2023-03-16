@@ -2,8 +2,8 @@ import json
 import os
 from pathlib import Path
 
-def compose_files(config_path):
 
+def compose_files(config_path):
     with open(config_path) as config_file:
         data = json.load(config_file)
 
@@ -13,35 +13,37 @@ def compose_files(config_path):
         core_groups = data['CoreGroups']
         split_groups_full = data['SplitGroups']
         split_groups = [row[0] for row in split_groups_full]
-    
+
     compose(in_dir, out_dir, core_groups, split_groups)
 
-def compose(in_dir, out_dir, core_groups, split_groups):
 
-    #We want to separate the 'main' content from the 'split_groups', set up a dictionary here to store the different content
+def compose(in_dir, out_dir, core_groups, split_groups):
+    # We want to separate the 'main' content from the 'split_groups', set up a dictionary here to store the different content
     contents = {}
-    for (folder) in split_groups:
+    for folder in split_groups:
         contents[folder] = []
 
-    #loop through all files in groups to collect the contents into the correct group
-    for (name, sub_dirs) in core_groups:
+    # loop through all files in groups to collect the contents into the correct group
+    for name, sub_dirs in core_groups:
         contents = create_list(in_dir, name, sub_dirs, split_groups, contents)
-        
-    #export the lists to JSON
-    for (folder) in split_groups:
+
+    # export the lists to JSON
+    for folder in split_groups:
         write_json(out_dir, folder, contents[folder])
+
 
 def create_list(in_dir, group_name, subfolders, split_groups, contents):
     contents["main"] += accumulate_json_files(in_dir / group_name)
 
     for folder in subfolders:
-        if (folder in split_groups):
-            #if this is one of specified files then we don't want to add to the main list, we want to add it to the correct list
+        if folder in split_groups:
+            # if this is one of specified files then we don't want to add to the main list, we want to add it to the correct list
             contents[folder] += accumulate_json_files(in_dir / group_name / folder)
         else:
             contents["main"] += accumulate_json_files(in_dir / group_name / folder)
 
     return contents
+
 
 def accumulate_json_files(dir_path):
     acc = []
@@ -56,14 +58,13 @@ def accumulate_json_files(dir_path):
 
     return acc
 
+
 def read_json(file_path):
     with open(file_path, encoding='utf-8') as json_file:
         return json.load(json_file)
+
 
 def write_json(out_dir, group_name, contents):
     file_path = out_dir / f'{group_name}.json'
     with open(file_path, 'w', encoding='utf-8') as json_file:
         json.dump(contents, json_file, ensure_ascii=False, indent=2)
-
-
-
