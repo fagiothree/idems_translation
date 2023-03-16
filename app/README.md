@@ -34,14 +34,14 @@ The actual functions are then as follows
 ### Prepare for translation
 
 ```
-python app/scripts/prepare_for_translation.py <config_file.json>
+python app/scripts/prepare_for_translation.py <relative path to config_file.json>
 ```
 
 
 ### Merge files post translation
 
 ```
-python app/scripts/merge_files_post_translation.py <config_file.json>
+python app/scripts/merge_files_post_translation.py <relative path to config_file.json>
 ```
 
 
