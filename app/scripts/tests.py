@@ -1,5 +1,8 @@
 from unittest import TestCase
-from .extract_texts_script import is_valid_value_string
+import os
+from .extract_texts_script import is_valid_value_string, process_file
+import json
+from pathlib import Path
 
 class TestValidValueString(TestCase):
 
@@ -48,3 +51,27 @@ class TestValidValueString(TestCase):
         # self.not_ok('comple><ity')
         self.ok('example')
         self.ok('self-starter')
+
+class TestJSONFiles(TestCase):
+
+    def files_are_equal(self, file, ref_json):
+        with open(file, 'r', encoding='utf-8') as f1:
+            data1 = json.load(f1)
+            data2 = ref_json
+        self.assertEqual(data1, data2)
+
+    def test_data_list_output(self):
+        ref_json = process_file(Path("input_data_list.json"), Path("./input"))
+        self.files_are_equal('./expected_output/output_data_list.json', ref_json)
+        
+    def test_global_output(self):    
+        ref_json = process_file(Path("input_global.json"), Path("./input"))
+        self.files_are_equal('./expected_output/output_global.json', ref_json)
+        
+    def test_template_output(self):
+        ref_json = process_file(Path("input_template.json"), Path("./input"))
+        self.files_are_equal('./expected_output/output_template.json', ref_json)
+        
+    def test_tour_output(self):
+        ref_json = process_file(Path("input_tour.json"), Path("./input"))
+        self.files_are_equal('./expected_output/output_tour.json', ref_json)
