@@ -61,17 +61,17 @@ class TestJSONFiles(TestCase):
         self.assertEqual(data1, data2)
 
     def test_data_list_output(self):
-        ref_json = process_file(Path("input_data_list.json"), Path("./input"))
-        self.files_are_equal('./expected_output/output_data_list.json', ref_json)
+        ref_json = process_file(Path("input_data_list.json"), Path("./app/input"))
+        self.files_are_equal('./app/expected_output/output_data_list.json', ref_json)
         
     def test_global_output(self):    
-        ref_json = process_file(Path("input_global.json"), Path("./input"))
-        self.files_are_equal('./expected_output/output_global.json', ref_json)
+        ref_json = process_file(Path("input_global.json"), Path("./app/input"))
+        self.files_are_equal('./app/expected_output/output_global.json', ref_json)
         
     def test_template_output(self):
-        ref_json = process_file(Path("input_template.json"), Path("./input"))
-        self.files_are_equal('./expected_output/output_template.json', ref_json)
+        ref_json = process_file(Path("input_template.json"), Path("./app/input"))
+        self.files_are_equal('./app/expected_output/output_template.json', ref_json)
         
     def test_tour_output(self):
-        ref_json = process_file(Path("input_tour.json"), Path("./input"))
-        self.files_are_equal('./expected_output/output_tour.json', ref_json)
+        ref_json = process_file(Path("input_tour.json"), Path("./app/input"))
+        self.files_are_equal('./app/expected_output/output_tour.json', ref_json)
