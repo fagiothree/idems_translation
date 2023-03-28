@@ -38,10 +38,10 @@ node index fix_arg_qr_translation <rapidpro-json-file> <output-dir>
 
 Move quick replies to message text.
 ```
-node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <special_words> <add_selectors>
+node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <add_selectors>
 
 'add_selectors' expects a boolean, if you want to add the numerical quick replies back in, example input: true
-'special_words' expects a list of words that will be re-inserted in full as part of the add_selectors process, example input "['back','close']"
+This function also has the option to specify 'special_words' which will be reinstated as full quick replies as opposed to numbers. Specify the 'special_words' as shown below: node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <add_selectors> --special_words "word1" --special_words "word2"
 ```
 
 Overall process visualised in flowchart linked below
