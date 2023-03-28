@@ -129,24 +129,29 @@ def is_valid_value_string(value_string):
     ignore_start = ('https', '@', 'plh_', '+@', '!@', '!!@')
     ignore_end = ('.json', '.png', '.svg', '.mp3', '.mp4')
 
-    return not value_string.endswith(ignore_end) and \
-        not value_string == 'true' and \
-        not value_string == 'false' and \
-        value_string != 'None' and \
-        value_string != "" and \
-        not value_string.isnumeric() and \
+    result = False
+
+    #split the string into a number of words. If we find any readable words in the string (based on criteria below) then the string is valid
+
+    value_strings = value_string.split()
+
+    for word in value_strings:
+
+        if not word.endswith(ignore_end) and \
+        not word.startswith(ignore_start) and \
+        not word == 'true' and \
+        not word == 'false' and \
+        word != 'None' and \
+        word != "" and \
+        not word.isnumeric() and \
         not (
             (not value_string.isalpha()) and \
             len(re.findall(r"\w", value_string)) == len(value_string)
         ) and \
-        not (
-            ("@" in value_string) and \
-            (" " not in value_string)
-        ) and \
-        not (
-            value_string.startswith(ignore_start) and \
-            (" " not in value_string)
-        )
+        not "@" in word:
+            result = True 
+
+    return result        
 
 def get_matched_text(item, value_string, flow_type, type = "string", i = 0):
     matched_expressions = []
@@ -192,5 +197,8 @@ def print_report(src, results):
     print(f'Number of characters for translation in output_{src}.json: ', sum(len(i) for i in texts))
     print(f'Number of words for translation in output_{src}.json: ', sum(len(i.split()) for i in texts))
     print('----------------------------------------------------------')
+
+if __name__ == "__main__":
+    extract_texts(Path("./app/test_files_in"), Path("./app/test_files_out"))
 
 
