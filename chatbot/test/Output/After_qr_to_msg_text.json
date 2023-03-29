@@ -72,7 +72,7 @@
       "metadata": {
         "revision": 1
       },
-      "name": "Converting Quick Replies Test Response",
+      "name": "Converting Quick Replies Test",
       "nodes": [
         {
           "actions": [
@@ -305,7 +305,7 @@
       ],
       "spec_version": "13.1.0",
       "type": "messaging",
-      "uuid": "44da2ecc-4589-4f6c-9551-af092a0073e9",
+      "uuid": "44da2ecc-4589-4f6c-9551-af092a0073e5",
       "revision": 4
     }
   ],
