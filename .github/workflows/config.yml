@@ -1,4 +1,5 @@
-name: python tests
+name: test
+
 on:
   push:
     branches:
@@ -6,34 +7,29 @@ on:
   pull_request:
     branches:
       - master
+
 jobs:
-  python:
+  test:
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.17.6]
+
     steps:
       - uses: actions/checkout@v2
-      - run: python -m unittest app.scripts.tests
 
-# name: node tests
-# on:
-#   push:
-#     branches:
-#       - master
-#   pull_request:
-#     branches:
-#       - master
-# jobs:
-#   node:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         node-version: [14.17.6]
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Use Node.js ${{ matrix.node-version }}
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: ${{ matrix.node-version }}
-#     - name: Install dependencies
-#       run: cd ./chatbot/ && npm ci
-#     - name: Run tests
-#       run: cd ./chatbot/ && npm test
+      - name: Run Python tests
+        run: python -m unittest app.scripts.tests
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: cd ./chatbot/ && npm ci
+
+      - name: Run Node.js tests
+        run: cd ./chatbot/ && npm test
