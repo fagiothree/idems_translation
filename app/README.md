@@ -36,7 +36,7 @@ The actual functions are then as follows
 ```
 python app/scripts/prepare_for_translation.py <relative path to config_file.json>
 ```
-
+Note this process uses the python 'Match' function which requires python 3.10 and above
 
 ### Merge files post translation
 
@@ -48,5 +48,6 @@ python app/scripts/merge_files_post_translation.py <relative path to config_file
 ## Running the tests
 
 ```
-python -m unittest scripts.tests
+python -m unittest app.scripts.tests
 ```
+Run from idems_translation top directory
