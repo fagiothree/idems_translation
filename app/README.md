@@ -36,7 +36,7 @@ The actual functions are then as follows
 ```
 python app/scripts/prepare_for_translation.py <relative path to config_file.json>
 ```
-
+Note this process uses the python 'Match' function which requires python 3.10 and above
 
 ### Merge files post translation
 
