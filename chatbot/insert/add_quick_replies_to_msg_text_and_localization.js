@@ -1,4 +1,5 @@
-function move_quick_replies_to_message_text(flows, select_phrases, special_words, add_selectors) {
+function move_quick_replies_to_message_text(flows, select_phrases, special_words_full, add_selectors) {
+    special_words = special_words_full.words
     const exceptions = [
         'no',
         'prefer not to say',

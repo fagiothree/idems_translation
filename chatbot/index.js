@@ -7,7 +7,6 @@ const fixer = require('./insert/fix_arg_qr_translation.js')
 const ex = require('./extract/extract.js');
 const insert = require('./insert/create-localization.js');
 const { move_quick_replies_to_message_text } = require('./insert/add_quick_replies_to_msg_text_and_localization.js');
-const yargs = require('yargs');
 
 const COMMANDS = {
     has_any_words_check,
@@ -81,15 +80,10 @@ function localize([inputFlow, translations, lang, outputName, outputDir]) {
 }
 
 
-function move_quick_replies([input_file, select_phrases, outputName, outputDir, add_selectors = false]) {
-    const argv = yargs
-        .array('special_words')
-        .default('special_words', [])
-        .argv;
-    const special_words = argv.special_words;
+function move_quick_replies([input_file, select_phrases, outputName, outputDir, special_words, add_selectors = false]) {
 
     const [flows, debug, debug_lang] = move_quick_replies_to_message_text(
-        readInputFile(input_file),readInputFile(select_phrases), special_words, add_selectors
+        readInputFile(input_file),readInputFile(select_phrases), readInputFile(special_words), add_selectors
     );
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);
