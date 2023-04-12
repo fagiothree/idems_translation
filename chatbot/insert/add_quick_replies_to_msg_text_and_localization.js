@@ -1,5 +1,5 @@
-function move_quick_replies_to_message_text(flows, select_phrases, special_words_full, add_selectors) {
-    special_words = special_words_full.words
+function move_quick_replies_to_message_text(flows, select_phrases, special_words, add_selectors) {
+    
     const exceptions = [
         'no',
         'prefer not to say',
@@ -111,13 +111,18 @@ function clear_quick_replies(action, curr_loc, quick_replies, special_words, add
     }
     if (add_selectors){
         quick_replies.forEach(qr => {
-            if (special_words.includes(qr.text)){
+            
+            if (special_words.eng.includes(qr.text)){
                 action.quick_replies.push(String(qr.text));
             } else {
-                action.quick_replies.push(String(qr.selector));
-                for (const lang in curr_loc) {
-                    curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
-                }                
+                action.quick_replies.push(String(qr.selector));                
+            }
+            for (const lang in curr_loc) {
+                if (special_words[lang].includes(qr.translations[lang])){
+                    curr_loc[lang][action.uuid].quick_replies.push(String(qr.translations[lang]));
+                } else {
+                    curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));                
+                }
             }            
         });
     }
