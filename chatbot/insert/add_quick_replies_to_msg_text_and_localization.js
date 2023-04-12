@@ -118,7 +118,7 @@ function clear_quick_replies(action, curr_loc, quick_replies, special_words, add
                 action.quick_replies.push(String(qr.selector));                
             }
             for (const lang in curr_loc) {
-                if (special_words[lang].includes(qr.translations[lang])){
+                if (special_words[lang] && special_words[lang].includes(qr.translations[lang])){
                     curr_loc[lang][action.uuid].quick_replies.push(String(qr.translations[lang]));
                 } else {
                     curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));                
@@ -200,7 +200,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                        
                         debug_lang[lang] += `arg: ${arg}\n`;
                         
-                        let r_exp = new RegExp(`\\b${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+                        let r_exp = new RegExp(`(?:^|\\W)${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|\\W)`, 'iu');
                         
 
                         for (let quick_reply of quick_replies) {
@@ -258,7 +258,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
 
                 debug += `arg list: ${arg_list}\n`;
 
-                for (const [lang, messages] in Object.entries(curr_loc)) {
+                for (const [lang, messages] of Object.entries(curr_loc)) {
                     arg_list_lang[lang] = split_args(messages[case_id].arguments[0]);
                     new_test_lang[lang] = '';
 
@@ -325,7 +325,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     // find matching quick reply in localization
                     for (const quick_reply of quick_replies) {
                         //if (new RegExp(arg, 'i').test(quick_reply.translations[lang])) {
-                        if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])) {
+                        if (new RegExp(arg_lang[lang].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])) {
                             new_test_lang[lang] += quick_reply.selector + ',';
                         }
                     }
@@ -378,7 +378,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
 
                     // find matching quick reply in localization
                     for (const quick_reply of quick_replies) {
-                        if (quick_reply.translations[lang].toLowerCase().trim() == arg_lang[lang].toLowerCase().trim()) {
+                        if (quick_reply.translations[lang] && quick_reply.translations[lang].toLowerCase().trim() == arg_lang[lang].toLowerCase().trim()) {
                             new_test_lang[lang] += quick_reply.selector + ',';
                             debug_lang[lang] += new_test_lang[lang] + '\n';
                         }
