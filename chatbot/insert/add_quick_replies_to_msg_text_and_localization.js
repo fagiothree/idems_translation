@@ -158,7 +158,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     
                     debug += `arg: ${arg}\n`;
                     //let r_exp = new RegExp(`\\b${arg}\\b`, "i");
-                    let r_exp = new RegExp(`\\b${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, "i");
+                    let r_exp = new RegExp(`(?:^|\\W)${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|\\W)`, 'iu');
 
                     for (let quick_reply of quick_replies) {
                         if (r_exp.test(quick_reply.text)) {
@@ -235,7 +235,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                 // find matching qr
                 for (const quick_reply of quick_replies) {
                     const match_all = arg_list.every(
-                        (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.text)
+                        (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(quick_reply.text)
                         //word) => new RegExp(word, 'i').test(quick_reply.text)
                     );
 
@@ -267,7 +267,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     // find matching quick reply in localization
                     for (const quick_reply of quick_replies) {
                         const match_all = arg_list_lang[lang].every(                           
-                            (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])
+                            (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(quick_reply.translations[lang])
                             //(word) => new RegExp(word, 'i').test(quick_reply.translations[lang])
                         );
 
@@ -299,7 +299,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                 // find matching qr
                 for (const quick_reply of quick_replies) {
                     //if (new RegExp(arg, 'i').test(quick_reply.text)) {
-                    if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.text)) {
+                    if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(quick_reply.text)) {
                         new_test += quick_reply.selector + ',';
                     }
 
@@ -325,7 +325,7 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
                     // find matching quick reply in localization
                     for (const quick_reply of quick_replies) {
                         //if (new RegExp(arg, 'i').test(quick_reply.translations[lang])) {
-                        if (new RegExp(arg_lang[lang].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])) {
+                        if (new RegExp(arg_lang[lang].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(quick_reply.translations[lang])) {
                             new_test_lang[lang] += quick_reply.selector + ',';
                         }
                     }
