@@ -5,62 +5,62 @@
     {
       "_ui": {
         "nodes": {
-          "b1951ffc-5e2b-4733-a6b0-5164e59b03bd": {
+          "e447625f-347a-4017-a772-41a0490e9428": {
             "position": {
               "left": 760,
               "top": 0
             },
             "type": "execute_actions"
           },
-          "1f9c5010-3128-4966-a395-dd48e4f4bcca": {
+          "53a9b0db-1c7f-4e53-bc98-2acb1b4a97d6": {
             "position": {
               "left": 760,
               "top": 120
             },
             "type": "execute_actions"
           },
-          "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127": {
-            "type": "wait_for_response",
+          "0681b401-7b3a-4251-98b5-758c67998380": {
+            "config": {
+              "cases": {}
+            },
             "position": {
               "left": 760,
               "top": 300
             },
-            "config": {
-              "cases": {}
-            }
+            "type": "wait_for_response"
           },
-          "69389aa8-74b9-4f45-90ea-626fdf6e9c11": {
+          "c510ebf9-23e0-4660-813b-7931c80886bd": {
             "position": {
               "left": 520,
               "top": 480
             },
             "type": "execute_actions"
           },
-          "b3431955-027a-4dd3-bb0b-816bed68f8c8": {
+          "eeb42d7d-1c18-4c4f-a09f-72055ee9b141": {
             "position": {
-              "left": 960,
+              "left": 1200,
+              "top": 480
+            },
+            "type": "execute_actions"
+          },
+          "e8fae396-215a-48b5-bb98-a8323a3a2470": {
+            "position": {
+              "left": 980,
               "top": 560
             },
             "type": "execute_actions"
           },
-          "80597d8d-0da3-4249-9b05-ae13326ccb10": {
+          "ef08cd12-6ef7-4763-be33-8a4a726c6255": {
             "position": {
               "left": 660,
               "top": 580
             },
             "type": "execute_actions"
           },
-          "8fefbc39-c795-4df8-a24f-2f10079513b9": {
+          "c5f4f151-26a0-456b-aab8-f4ccfd4c6bc7": {
             "position": {
               "left": 800,
               "top": 700
-            },
-            "type": "execute_actions"
-          },
-          "315611ca-bbe4-4afe-bb16-24c4f0ed5feb": {
-            "position": {
-              "left": 1180,
-              "top": 240
             },
             "type": "execute_actions"
           }
@@ -68,9 +68,158 @@
       },
       "expire_after_minutes": 10080,
       "language": "base",
-      "localization": {},
+      "localization": {
+        "ell": {
+          "2dfd9143-f96b-4193-bdc1-563286cea20e": {
+            "arguments": [
+              "\u03c0\u03af\u03c3\u03c9"
+            ]
+          },
+          "614bcc84-3402-4f10-9efd-ba31ac9b4856": {
+            "arguments": [
+              "\u03ba\u03bf\u03c4\u03cc\u03c0\u03bf\u03c5\u03bb\u03bf"
+            ]
+          },
+          "616e0e6f-831a-4f9f-8cde-c53a98de3ed1": {
+            "text": [
+              "\u03b7 \u03c3\u03b1\u03bb\u03ac\u03c4\u03b1 \u03b5\u03af\u03bd\u03b1\u03b9 \u03ba\u03b1\u03bb\u03ae"
+            ]
+          },
+          "70ab14a4-5bf4-4b0d-b3c6-cce5bf473d91": {
+            "arguments": [
+              "\u03c0\u03af\u03c4\u03b1 \u03c8\u03b1\u03c1\u03b9\u03bf\u03cd"
+            ]
+          },
+          "79d839e9-0a00-48e0-ac84-fb5a9a63e3e0": {
+            "text": [
+              "\u03a0\u03ae\u03b3\u03b1\u03b9\u03bd\u03b5 \u03ba\u03ac\u03c0\u03bf\u03c5 \u03b1\u03bb\u03bb\u03bf\u03cd"
+            ]
+          },
+          "82f70000-3d2b-4c0a-aca8-0e9243d5f993": {
+            "text": [
+              "\u03c4\u03bf \u03c8\u03ac\u03c1\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9 \u03c5\u03c0\u03ad\u03c1\u03bf\u03c7\u03bf"
+            ]
+          },
+          "85e0e02c-1e3c-4dc5-b634-f90eb7d75a9a": {
+            "text": [
+              "\u03c4\u03bf \u03ba\u03bf\u03c4\u03cc\u03c0\u03bf\u03c5\u03bb\u03bf \u03b5\u03af\u03bd\u03b1\u03b9 \u03c5\u03c0\u03ad\u03c1\u03bf\u03c7\u03bf"
+            ]
+          },
+          "b2fccb02-5ac3-465c-9887-b7a63f24a21b": {
+            "arguments": [
+              "\u03c3\u03b1\u03bb\u03ac\u03c4\u03b1 \u03bb\u03b1\u03c7\u03b1\u03bd\u03b9\u03ba\u03ce\u03bd"
+            ]
+          },
+          "ce60693c-13aa-4f83-9fd0-4076c09272d0": {
+            "arguments": [
+              "\u03c3\u03ac\u03bd\u03c4\u03bf\u03c5\u03b9\u03c4\u03c2 \u03bc\u03b5 \u03bc\u03c0\u03c1\u03b9\u03b6\u03cc\u03bb\u03b1"
+            ]
+          },
+          "d55c7584-840b-4a23-af93-baeb1419c330": {
+            "text": [
+              "\u03b3\u03b5\u03b9\u03b1 \u03c3\u03b1\u03c2 \u03ba\u03b1\u03bb\u03c9\u03c3\u03bf\u03c1\u03af\u03c3\u03b1\u03c4\u03b5 \u03c3\u03b5 \u03b1\u03c5\u03c4\u03ae \u03c4\u03b7\u03bd \u03ad\u03c1\u03b5\u03c5\u03bd\u03b1"
+            ]
+          },
+          "f1b6476f-6b2d-4a70-9ff4-81d8f7024b27": {
+            "quick_replies": [
+              "\u03ba\u03bf\u03c4\u03cc\u03c0\u03bf\u03c5\u03bb\u03bf \u03bc\u03b5 \u03ba\u03ac\u03c1\u03c5",
+              "\u03c6\u03c1\u03ad\u03c3\u03ba\u03b9\u03b1 \u03c0\u03af\u03c4\u03b1 \u03c8\u03b1\u03c1\u03b9\u03bf\u03cd",
+              "\u03bc\u03b5\u03b3\u03ac\u03bb\u03bf \u03c3\u03ac\u03bd\u03c4\u03bf\u03c5\u03b9\u03c4\u03c2 \u03bc\u03b5 \u03bc\u03c0\u03c1\u03b9\u03b6\u03cc\u03bb\u03b1",
+              "\u03c3\u03b1\u03bb\u03ac\u03c4\u03b1 \u03bb\u03b1\u03c7\u03b1\u03bd\u03b9\u03ba\u03ce\u03bd",
+              "\u03c0\u03af\u03c3\u03c9"
+            ],
+            "text": [
+              "\u03a4\u03b9 \u03b8\u03b1 \u03ae\u03b8\u03b5\u03bb\u03b5\u03c2 \u03b3\u03b9\u03b1 \u03b2\u03c1\u03b1\u03b4\u03b9\u03bd\u03cc"
+            ]
+          },
+          "fdb14735-c22b-4272-9477-cbb3f61d662f": {
+            "text": [
+              "\u03b7 \u03bc\u03c0\u03c1\u03b9\u03b6\u03cc\u03bb\u03b1 \u03b5\u03af\u03bd\u03b1\u03b9 \u03c5\u03c0\u03ad\u03c1\u03bf\u03c7\u03b7"
+            ]
+          }
+        },
+        "por": {
+          "1c4ead06-430d-4056-87ac-95de3d09060d": {
+            "text": [
+              "obrigado pela sua resposta"
+            ]
+          },
+          "2dfd9143-f96b-4193-bdc1-563286cea20e": {
+            "arguments": [
+              "voltar"
+            ]
+          },
+          "5b88a2a2-dd67-4af7-87ac-4ab3f374bcaa": {
+            "text": [
+              "Obrigado pela sua resposta"
+            ]
+          },
+          "614bcc84-3402-4f10-9efd-ba31ac9b4856": {
+            "arguments": [
+              "frango"
+            ]
+          },
+          "616e0e6f-831a-4f9f-8cde-c53a98de3ed1": {
+            "text": [
+              "salada \u00e9 boa"
+            ]
+          },
+          "70ab14a4-5bf4-4b0d-b3c6-cce5bf473d91": {
+            "arguments": [
+              "torta peixe"
+            ]
+          },
+          "79d839e9-0a00-48e0-ac84-fb5a9a63e3e0": {
+            "text": [
+              "ir para outro lugar"
+            ]
+          },
+          "82f70000-3d2b-4c0a-aca8-0e9243d5f993": {
+            "text": [
+              "Peixe \u00e9 \u00f3timo"
+            ]
+          },
+          "85e0e02c-1e3c-4dc5-b634-f90eb7d75a9a": {
+            "text": [
+              "Frango \u00e9 \u00f3timo"
+            ]
+          },
+          "b2fccb02-5ac3-465c-9887-b7a63f24a21b": {
+            "arguments": [
+              "salada de vegetais"
+            ]
+          },
+          "ce60693c-13aa-4f83-9fd0-4076c09272d0": {
+            "arguments": [
+              "sandu\u00edche de bife"
+            ]
+          },
+          "d55c7584-840b-4a23-af93-baeb1419c330": {
+            "text": [
+              "Ol\u00e1, bem-vindo a esta pesquisa"
+            ]
+          },
+          "f1b6476f-6b2d-4a70-9ff4-81d8f7024b27": {
+            "quick_replies": [
+              "Curry de frango",
+              "torta de peixe fresco",
+              "sandu\u00edche de bife grande",
+              "salada de vegetais",
+              "voltar"
+            ],
+            "text": [
+              "O que voc\u00ea gostaria para o jantar?"
+            ]
+          },
+          "fdb14735-c22b-4272-9477-cbb3f61d662f": {
+            "text": [
+              "Bife \u00e9 \u00f3timo"
+            ]
+          }
+        }
+      },
       "metadata": {
-        "revision": 1
+        "revision": 91
       },
       "name": "Converting Quick Replies Test",
       "nodes": [
@@ -81,16 +230,16 @@
               "quick_replies": [],
               "text": "Hello welcome to this survey",
               "type": "send_msg",
-              "uuid": "b7ec3486-3456-4881-952a-22f1f8c5e9d0"
+              "uuid": "d55c7584-840b-4a23-af93-baeb1419c330"
             }
           ],
           "exits": [
             {
-              "destination_uuid": "1f9c5010-3128-4966-a395-dd48e4f4bcca",
-              "uuid": "1dc18d3f-296c-4430-8e02-9f3e0c81acd2"
+              "destination_uuid": "53a9b0db-1c7f-4e53-bc98-2acb1b4a97d6",
+              "uuid": "091ab291-1b24-4d6a-8b02-e902fed468db"
             }
           ],
-          "uuid": "b1951ffc-5e2b-4733-a6b0-5164e59b03bd"
+          "uuid": "e447625f-347a-4017-a772-41a0490e9428"
         },
         {
           "actions": [
@@ -100,135 +249,135 @@
               "type": "send_msg",
               "all_urns": false,
               "quick_replies": [
-                "chicken",
-                "fish",
-                "steak",
+                "chicken curry",
+                "fresh fish pie",
+                "big steak sandwich",
+                "veg salad",
                 "back"
               ],
-              "uuid": "023b7a6c-ed4b-4320-bfaf-561ee28aaa2c"
+              "uuid": "f1b6476f-6b2d-4a70-9ff4-81d8f7024b27"
             }
           ],
           "exits": [
             {
-              "destination_uuid": "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127",
-              "uuid": "e11ddaca-1de6-4145-b9fa-83a385455de1"
+              "destination_uuid": "0681b401-7b3a-4251-98b5-758c67998380",
+              "uuid": "f1ddce60-3327-4a16-8399-ab4171123102"
             }
           ],
-          "uuid": "1f9c5010-3128-4966-a395-dd48e4f4bcca"
+          "uuid": "53a9b0db-1c7f-4e53-bc98-2acb1b4a97d6"
         },
         {
-          "uuid": "315611ca-bbe4-4afe-bb16-24c4f0ed5feb",
-          "actions": [
-            {
-              "attachments": [],
-              "text": "Let's go back somewhere",
-              "type": "send_msg",
-              "quick_replies": [],
-              "uuid": "36d9cda2-5051-4711-87f8-1e84aa762d9c"
-            }
-          ],
-          "exits": [
-            {
-              "uuid": "39c0d6ca-d7a0-409d-b69f-b4c0a6ad4b34",
-              "destination_uuid": null
-            }
-          ]
-        },
-        {
-          "uuid": "4f0dd2ad-06c7-4674-b9c9-34d91c2ee127",
           "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "c510ebf9-23e0-4660-813b-7931c80886bd",
+              "uuid": "7c6d4cc4-c51a-47d8-bc0c-072da4ff98ba"
+            },
+            {
+              "destination_uuid": "ef08cd12-6ef7-4763-be33-8a4a726c6255",
+              "uuid": "e14ca362-2cda-4d6e-916a-bde3b1814519"
+            },
+            {
+              "destination_uuid": "c5f4f151-26a0-456b-aab8-f4ccfd4c6bc7",
+              "uuid": "34dea39a-1034-44ad-837c-0ce560e63067"
+            },
+            {
+              "destination_uuid": "e8fae396-215a-48b5-bb98-a8323a3a2470",
+              "uuid": "1fecbed6-8eca-45a9-939e-455482dc085e"
+            },
+            {
+              "destination_uuid": "eeb42d7d-1c18-4c4f-a09f-72055ee9b141",
+              "uuid": "f8aa5481-7f69-4659-ac78-e34a192e7fc1"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "704739bd-3d95-4295-9bc8-b13645e984bb"
+            }
+          ],
           "router": {
-            "type": "switch",
-            "default_category_uuid": "2e8ba568-c847-4b4b-b89d-e9a09ddfc8f5",
             "cases": [
               {
                 "arguments": [
                   "chicken"
                 ],
+                "category_uuid": "6b6a8993-187f-433b-ab5e-d343191b5530",
                 "type": "has_any_word",
-                "uuid": "976b844f-8ca1-4fe4-b9cd-1201171cc3c5",
-                "category_uuid": "453ea73e-82e6-4129-92a8-c43cec290a9b"
+                "uuid": "614bcc84-3402-4f10-9efd-ba31ac9b4856"
               },
               {
                 "arguments": [
-                  "fish"
+                  "fish pie"
                 ],
-                "type": "has_any_word",
-                "uuid": "86e3e6e8-07c1-4e43-a63c-fe12341b307e",
-                "category_uuid": "4a36b252-6cb5-4c5e-8859-b9fe3ee311c6"
+                "category_uuid": "38aff408-9144-40a4-9299-c57a4ee07c1b",
+                "type": "has_all_words",
+                "uuid": "70ab14a4-5bf4-4b0d-b3c6-cce5bf473d91"
               },
               {
                 "arguments": [
-                  "steak"
+                  "steak sandwich"
                 ],
-                "type": "has_any_word",
-                "uuid": "8b7dd677-3c38-474d-a3bf-d07f577682ef",
-                "category_uuid": "ae29e862-7f5c-44be-96ec-61493ffa6de3"
+                "category_uuid": "b0e3cb3a-f843-4342-afd3-ffc36679225a",
+                "type": "has_phrase",
+                "uuid": "ce60693c-13aa-4f83-9fd0-4076c09272d0"
+              },
+              {
+                "arguments": [
+                  "veg salad"
+                ],
+                "category_uuid": "e28f0f4e-9055-4cd5-8c67-7714928e2986",
+                "type": "has_only_phrase",
+                "uuid": "b2fccb02-5ac3-465c-9887-b7a63f24a21b"
               },
               {
                 "arguments": [
                   "back"
                 ],
+                "category_uuid": "0432e796-9120-43d8-8b91-caa9708d53b3",
                 "type": "has_any_word",
-                "uuid": "d70234f9-1377-4a62-909d-8a6482238e76",
-                "category_uuid": "6b9b104c-565d-4f30-900f-7d203aae6245"
+                "uuid": "2dfd9143-f96b-4193-bdc1-563286cea20e"
               }
             ],
             "categories": [
               {
-                "exit_uuid": "40c6c767-3d87-4292-9158-022bce2edfa1",
+                "exit_uuid": "7c6d4cc4-c51a-47d8-bc0c-072da4ff98ba",
                 "name": "Chicken",
-                "uuid": "453ea73e-82e6-4129-92a8-c43cec290a9b"
+                "uuid": "6b6a8993-187f-433b-ab5e-d343191b5530"
               },
               {
-                "exit_uuid": "008616b3-ef6b-425e-9912-dd91bfa56c0e",
+                "exit_uuid": "e14ca362-2cda-4d6e-916a-bde3b1814519",
                 "name": "Fish",
-                "uuid": "4a36b252-6cb5-4c5e-8859-b9fe3ee311c6"
+                "uuid": "38aff408-9144-40a4-9299-c57a4ee07c1b"
               },
               {
-                "exit_uuid": "5f7d8bd7-2db8-4833-b762-890e74caa850",
+                "exit_uuid": "34dea39a-1034-44ad-837c-0ce560e63067",
                 "name": "Steak",
-                "uuid": "ae29e862-7f5c-44be-96ec-61493ffa6de3"
+                "uuid": "b0e3cb3a-f843-4342-afd3-ffc36679225a"
               },
               {
-                "uuid": "6b9b104c-565d-4f30-900f-7d203aae6245",
+                "exit_uuid": "1fecbed6-8eca-45a9-939e-455482dc085e",
+                "name": "Salad",
+                "uuid": "e28f0f4e-9055-4cd5-8c67-7714928e2986"
+              },
+              {
+                "exit_uuid": "f8aa5481-7f69-4659-ac78-e34a192e7fc1",
                 "name": "Back",
-                "exit_uuid": "7ffd7ebf-fdcc-4e98-b779-124425bb65ff"
+                "uuid": "0432e796-9120-43d8-8b91-caa9708d53b3"
               },
               {
-                "exit_uuid": "837fcd17-4f45-42e0-b28f-9b180ffce90d",
+                "exit_uuid": "704739bd-3d95-4295-9bc8-b13645e984bb",
                 "name": "Other",
-                "uuid": "2e8ba568-c847-4b4b-b89d-e9a09ddfc8f5"
+                "uuid": "bd996136-c6ae-44ff-a049-19376db648ae"
               }
             ],
+            "default_category_uuid": "bd996136-c6ae-44ff-a049-19376db648ae",
             "operand": "@input.text",
+            "result_name": "Result 1",
+            "type": "switch",
             "wait": {
               "type": "msg"
-            },
-            "result_name": "Result 1"
-          },
-          "exits": [
-            {
-              "destination_uuid": "69389aa8-74b9-4f45-90ea-626fdf6e9c11",
-              "uuid": "40c6c767-3d87-4292-9158-022bce2edfa1"
-            },
-            {
-              "destination_uuid": "80597d8d-0da3-4249-9b05-ae13326ccb10",
-              "uuid": "008616b3-ef6b-425e-9912-dd91bfa56c0e"
-            },
-            {
-              "destination_uuid": "8fefbc39-c795-4df8-a24f-2f10079513b9",
-              "uuid": "5f7d8bd7-2db8-4833-b762-890e74caa850"
-            },
-            {
-              "uuid": "7ffd7ebf-fdcc-4e98-b779-124425bb65ff",
-              "destination_uuid": "315611ca-bbe4-4afe-bb16-24c4f0ed5feb"
-            },
-            {
-              "destination_uuid": "b3431955-027a-4dd3-bb0b-816bed68f8c8",
-              "uuid": "837fcd17-4f45-42e0-b28f-9b180ffce90d"
             }
-          ]
+          },
+          "uuid": "0681b401-7b3a-4251-98b5-758c67998380"
         },
         {
           "actions": [
@@ -237,34 +386,52 @@
               "quick_replies": [],
               "text": "Chicken is great",
               "type": "send_msg",
-              "uuid": "3c511110-fdc2-4524-892e-e4b2c85f4888"
+              "uuid": "85e0e02c-1e3c-4dc5-b634-f90eb7d75a9a"
             }
           ],
           "exits": [
             {
               "destination_uuid": null,
-              "uuid": "9e716a23-a221-4d56-9377-450d5f4b9f62"
+              "uuid": "463f5270-5c5d-4ef8-9816-84dcc78bc49e"
             }
           ],
-          "uuid": "69389aa8-74b9-4f45-90ea-626fdf6e9c11"
+          "uuid": "c510ebf9-23e0-4660-813b-7931c80886bd"
         },
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Thanks for your response",
+              "text": "Go somewhere else",
               "type": "send_msg",
-              "uuid": "2df7398e-d066-480e-882e-abfd1e6d7aca"
+              "uuid": "79d839e9-0a00-48e0-ac84-fb5a9a63e3e0"
             }
           ],
           "exits": [
             {
               "destination_uuid": null,
-              "uuid": "e23e8ffa-1770-441f-8175-45fe8026ea66"
+              "uuid": "53ed74ba-0f93-4693-b111-438b1d648459"
             }
           ],
-          "uuid": "b3431955-027a-4dd3-bb0b-816bed68f8c8"
+          "uuid": "eeb42d7d-1c18-4c4f-a09f-72055ee9b141"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Salad is good",
+              "type": "send_msg",
+              "uuid": "616e0e6f-831a-4f9f-8cde-c53a98de3ed1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "ae3df6b0-6158-4ba1-93e8-6b4b1a72ff21"
+            }
+          ],
+          "uuid": "e8fae396-215a-48b5-bb98-a8323a3a2470"
         },
         {
           "actions": [
@@ -273,16 +440,16 @@
               "quick_replies": [],
               "text": "Fish is great",
               "type": "send_msg",
-              "uuid": "d6a71b4d-ac0e-4445-a2da-fe60776f9649"
+              "uuid": "82f70000-3d2b-4c0a-aca8-0e9243d5f993"
             }
           ],
           "exits": [
             {
               "destination_uuid": null,
-              "uuid": "14908f89-01ff-49eb-b996-a3b1d078ded4"
+              "uuid": "6904d21d-b8ef-472b-b387-0fe7d0a203c2"
             }
           ],
-          "uuid": "80597d8d-0da3-4249-9b05-ae13326ccb10"
+          "uuid": "ef08cd12-6ef7-4763-be33-8a4a726c6255"
         },
         {
           "actions": [
@@ -291,22 +458,22 @@
               "quick_replies": [],
               "text": "Steak is great",
               "type": "send_msg",
-              "uuid": "42f9f773-fa4e-49f1-a235-db739fc6a476"
+              "uuid": "fdb14735-c22b-4272-9477-cbb3f61d662f"
             }
           ],
           "exits": [
             {
               "destination_uuid": null,
-              "uuid": "d81ee140-2caa-4844-8e2f-fff523c38389"
+              "uuid": "9fde6b31-5054-4b82-b295-1fcb256ac3f6"
             }
           ],
-          "uuid": "8fefbc39-c795-4df8-a24f-2f10079513b9"
+          "uuid": "c5f4f151-26a0-456b-aab8-f4ccfd4c6bc7"
         }
       ],
       "spec_version": "13.1.0",
       "type": "messaging",
       "uuid": "44da2ecc-4589-4f6c-9551-af092a0073e5",
-      "revision": 4
+      "revision": 92
     }
   ],
   "campaigns": [],
