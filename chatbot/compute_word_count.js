@@ -36,6 +36,18 @@ function filter_checkin(fl){
 }
 filter_flows(filter_checkin)
 
+group_names.push("Welcome flows")
+function filter_welcome(fl){
+    return (fl.name.includes("Welcome") | fl.name.includes("Registration"))
+}
+filter_flows(filter_welcome)
+
+group_names.push("Help flows")
+function filter_help(fl){
+    return (fl.name.includes("Help"))
+}
+filter_flows(filter_help)
+
 
 group_names.push("Content flows - most relevant")
 function filter_flows_rel(fl){
