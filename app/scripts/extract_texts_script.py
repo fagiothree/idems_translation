@@ -1,34 +1,35 @@
 import json
 import os
+import sys
 import re           # for doing regex search
 from pathlib import Path
 
 
-def extract_texts():
-    srcs = [
-        'template',
-        'global',
-        'tour',
-        'data_list',
-    ]
-    results_all = []
+def extract_all_text(config_path):
+    config_path = Path(sys.argv[1])
+    with open(config_path) as config_file:
+        data = json.load(config_file)
+
+        in_dir = Path(data['ComposeResult'])
+        out_dir = Path(data['ExtractResult'])
+
+    extract_texts(in_dir, out_dir)
+
+def extract_texts(in_dir, out_dir):
+    #get a list of all the files in our input directory
+    srcs = os.listdir(in_dir)
 
     for src in srcs:
-        results = process_file(src)
-        save_results(src, results)
+        results = process_file(src, in_dir)
+        save_results(src, results, out_dir)
         print_report(src, results)
-        results_all += results
 
-    # Result from all files
-    print(f"Processing 'all'")
-    print(f'Length: {len(results_all)}')
-    save_results('all', dedupe(results_all))
-    print_report('all', results_all)
-
-def process_file(src):
+def process_file(src, in_dir):
     print(f"Processing '{src}'")
 
-    input_file_path = Path(os.getcwd()) / 'input' / f'input_{src}.json'
+    results = []
+
+    input_file_path = in_dir / src
 
     if not input_file_path.exists():
         print(f'File not found, file={input_file_path}')
@@ -37,17 +38,18 @@ def process_file(src):
     with open(input_file_path, 'r', encoding='utf-8') as input_file:
         contents = json.load(input_file)
 
-    results = []
-
+    #loop through all the flows in our file
     for object in contents:
+        flow_type = object.get('flow_type')
         rows = object.get('rows', [])
-        process_rows(rows, results, src)
+        process_rows(rows, results, flow_type)
 
     print(f'Length: {len(results)}')
 
     return dedupe(remove_empty(results))
 
-def process_rows(val, result, filename):
+def process_rows(rows, results, flow_type):
+
     excluded_types = (
         'nested_properties',
         'template',
@@ -59,79 +61,58 @@ def process_rows(val, result, filename):
         'lottie_animation'
     )
 
-    for item in val:
-        if filename == 'template' or filename == 'global':
-            if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
-                item_value = item.get('value')
-                value_type = str(item.get('type'))
-                if not value_type in excluded_types:
-                    if isinstance(item_value, str):
-                        value_string = str(item_value).strip()
-                        matched_expressions=[]
-                        if filename =='template':
-                            if item.get('_dynamicFields')!=None and item.get('_dynamicFields').get('value') != None:
-                                for matched_expression in item.get('_dynamicFields').get('value'):
-                                    if matched_expression.get('matchedExpression')!= None:
-                                        matched_expressions.append(matched_expression.get('matchedExpression'))
-                        elif filename =='global':
-                            get_matched_text(value_string, matched_expressions)
-                        add_to_result(value_string, matched_expressions, result, filename)
-                    if isinstance(item_value, list):
-                        i=-1
-                        matched_expressions=[]
-                        if item.get('_dynamicFields')!=None:
-                            i=0
-                            matched_expression_list= item.get('_dynamicFields').get('value')
-                        for list_item in item_value:
-                            if 'text:' in str(list_item):
-                                begin_str = str(list_item).find('text:')+5
-                                end_str = str(list_item).find('|', begin_str)
-                                if end_str > 0:
-                                    value_string=str(list_item[begin_str:end_str]).strip()
-                                    #print(value_string)
-                                else:
-                                    value_string=str(list_item[begin_str:]).strip()
-                                    #print(value_string)
-                                if i>=0:
-                                    if matched_expression_list.get(i) != None:
-                                        for matched_expression in matched_expression_list.get(i):
-                                            if matched_expression.get('matchedExpression')!= None:
-                                                matched_expressions.append(matched_expression.get('matchedExpression'))
-                                    i=i+1
-                                add_to_result(value_string,matched_expressions, result, filename)
-                if item.get('rows')!=None :
-                    process_rows(item.get('rows'), result, filename)
-        elif filename == 'data_list':
-            if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
-                if item.get('_translatedFields') != None:
-                    for elt in item.get('_translatedFields'):
-                        value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
-                        #print(value_string, 'Ok', elt)
-                        matched_expressions = []
-                        get_matched_text(value_string, matched_expressions)
-                        result.append(add_to_result(value_string, matched_expressions, result, filename))
-        else:
-            if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
-                value_type = str(item.get('type'))
-                if 'title' in item and not value_type in excluded_types:
-                    item_value_title = item.get('title')
-                    value_title_string = str(item_value_title).strip()
-                    matched_expressions=[]
-                    get_matched_text(value_title_string, matched_expressions)
-                    result.append(add_to_result(value_title_string, matched_expressions, result, filename))
-                if 'message_text' in item and not value_type in excluded_types:
-                    item_value_message = item.get('message_text')
-                    value_message_string = str(item_value_message).strip()
-                    matched_expressions=[]
-                    get_matched_text(value_message_string, matched_expressions)
-                    result.append(add_to_result(value_message_string, matched_expressions, result, filename))
+    for item in rows:        
+        if not 'exclude_from_translation' in item or not bool(item.get('exclude_from_translation')) == True:
+            match flow_type:
 
-def add_to_result(value_string, matched_expressions, result, filename):
+                case 'template' | 'global':
+                    item_value = item.get('value')
+                    value_type = str(item.get('type'))
+                    if not value_type in excluded_types:
+                        if isinstance(item_value, str):
+                            value_string = str(item_value).strip()
+                            matched_expressions = get_matched_text(item, value_string, flow_type)
+                            add_to_result(value_string, matched_expressions, results, flow_type)
+                        if isinstance(item_value, list):
+                            for i in range(0, len(item_value)):
+                                if 'text:' in str(item_value[i]):
+                                    begin_str = str(item_value[i]).find('text:')+5
+                                    end_str = str(item_value[i]).find('|', begin_str)
+                                    if end_str > 0:
+                                        value_string=str(item_value[i][begin_str:end_str]).strip()
+                                    else:
+                                        value_string=str(item_value[i][begin_str:]).strip()
+                                    matched_expressions = get_matched_text(item, value_string, flow_type, "list", i)
+                                    add_to_result(value_string, matched_expressions, results, flow_type)
+                    if item.get('rows')!=None:
+                        process_rows(item.get('rows'), results, flow_type)
+
+
+                case 'tour':
+                    if 'title' in item:
+                        value_string = str(item.get('title')).strip()
+                        matched_expressions = get_matched_text(item, value_string, flow_type)
+                        add_to_result(value_string, matched_expressions, results, flow_type)
+                    if 'message_text' in item:
+                        value_string = str(item.get('message_text')).strip()
+                        matched_expressions = get_matched_text(item, value_string, flow_type)
+                        add_to_result(value_string, matched_expressions, results, flow_type)
+
+                case 'data_list':
+                    if item.get('_translatedFields') != None:
+                        for elt in item.get('_translatedFields'):
+                            value_string = str(item.get('_translatedFields').get(str(elt)).get('eng')).strip()
+                            matched_expressions = get_matched_text(item, value_string, flow_type)
+                            add_to_result(value_string, matched_expressions, results, flow_type)
+            
+
+def add_to_result(value_string, matched_expressions, results, flow_type):
+    
     if is_valid_value_string(value_string):
         result_item = {}
         result_item['SourceText'] = value_string
         result_item['text'] = value_string
-        result_item['type'] = filename
+        result_item['type'] = flow_type
         if len(matched_expressions) == 1:
             result_item['note'] = 'The string ' + \
                matched_expressions[0] \
@@ -142,36 +123,56 @@ def add_to_result(value_string, matched_expressions, result, filename):
                 note_text = note_text+'\n     '+matched_expression
 
             result_item['note'] = note_text
-        result.append(result_item)
+        results.append(result_item)
 
 def is_valid_value_string(value_string):
     ignore_start = ('https', '@', 'plh_', '+@', '!@', '!!@')
     ignore_end = ('.json', '.png', '.svg', '.mp3', '.mp4')
 
-    return not value_string.endswith(ignore_end) and \
-        not value_string == 'true' and \
-        not value_string == 'false' and \
-        value_string != 'None' and \
-        value_string != "" and \
-        not value_string.isnumeric() and \
+    result = False
+
+    #split the string into a number of words. If we find any readable words in the string (based on criteria below) then the string is valid
+
+    value_strings = value_string.split()
+
+    for word in value_strings:
+
+        if not word.endswith(ignore_end) and \
+        not word.startswith(ignore_start) and \
+        not word == 'true' and \
+        not word == 'false' and \
+        word != 'None' and \
+        word != "" and \
+        not word.isnumeric() and \
         not (
             (not value_string.isalpha()) and \
             len(re.findall(r"\w", value_string)) == len(value_string)
         ) and \
-        not (
-            ("@" in value_string) and \
-            (" " not in value_string)
-        ) and \
-        not (
-            value_string.startswith(ignore_start) and \
-            (" " not in value_string)
-        )
+        not "@" in word:
+            result = True 
 
-def get_matched_text(value_string, matched_expressions):
-    if str(value_string).count('@') > 0:
-        for txt in value_string.split():
-            if '@' in txt:
-                matched_expressions.append(txt)
+    return result        
+
+def get_matched_text(item, value_string, flow_type, type = "string", i = 0):
+    matched_expressions = []
+    if type == "string":
+        if flow_type =='template':                                
+            if item.get('_dynamicFields')!=None and item.get('_dynamicFields').get('value') != None:
+                for values in item.get('_dynamicFields').get('value'):
+                    if values.get('matchedExpression')!= None:
+                        matched_expressions.append(values.get('matchedExpression'))
+        elif str(value_string).count('@') > 0:
+            for txt in value_string.split():
+                if '@' in txt:
+                    matched_expressions.append(txt)
+    if type == "list":
+        if item.get('_dynamicFields')!=None:
+            matched_expression_list= item.get('_dynamicFields').get('value')
+            if matched_expression_list.get(i) != None:
+                for values in matched_expression_list.get(i):
+                    if values.get('matchedExpression')!= None:
+                        matched_expressions.append(values.get('matchedExpression'))
+    return matched_expressions
 
 def remove_empty(results):
     tmp = [i for i in results if i]
@@ -183,10 +184,10 @@ def dedupe(results):
     print(f'Length after removing duplicates: {len(results)}')
     return tmp
 
-def save_results(src, results):
-    out_dir = Path(os.getcwd()) / 'output'
+def save_results(src, results, out_dir):
+    out_dir = out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
-    file_name = f'output_{src}.json'
+    file_name = src
     results_file_path = out_dir / file_name
     with open(results_file_path, 'w', encoding='utf-8') as results_file:
         json.dump(results, results_file, ensure_ascii=False, indent=2)
@@ -197,6 +198,7 @@ def print_report(src, results):
     print(f'Number of words for translation in output_{src}.json: ', sum(len(i.split()) for i in texts))
     print('----------------------------------------------------------')
 
+if __name__ == "__main__":
+    extract_texts(Path("./app/test_files_in"), Path("./app/test_files_out"))
 
-if __name__ == '__main__':
-    extract_texts()
+

@@ -3,13 +3,14 @@ const path = require('path');
 const findMissing = require('./find_missing_bits_to_translate.js');
 const inventory = require('./make_inventory.js');
 const { json_to_po, po_to_json } = require('./converter.js');
-
+const jsonConcat = require("json-concat")
 
 const COMMANDS = {
     missing,
     match,
     add_restored,
-    convert
+    convert,
+    concatenate_json
 };
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -61,6 +62,31 @@ function convert([input_file_path, output_file_path]) {
         console.log(output);
     }
 }
+
+function concatenate_json([sourceDir, destDir, destFilename]) {
+    // Get an array of all the file names in the source directory
+    const sourceFiles = fs.readdirSync(sourceDir);
+    
+    // Filter out any files that aren't JSON files
+    const jsonFiles = sourceFiles.filter(file => path.extname(file) === '.json');
+    
+    // Create an array to hold the parsed JSON data from each file
+    let jsonData = [];
+    
+    // Loop through each JSON file, parse its data, and add it to the jsonData array
+    for (const file of jsonFiles) {
+        const filePath = path.join(sourceDir, file);
+        const fileData = fs.readFileSync(filePath);
+        const parsedData = JSON.parse(fileData);
+        jsonData = jsonData.concat(parsedData);
+    }
+    
+    // Write the concatenated JSON to the output file
+    const outputPath = path.join(destDir, destFilename);
+    fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
+    console.log(`Concatenated ${jsonFiles.length} files into ${destFilename}`);
+}
+
 
 function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());

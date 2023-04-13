@@ -1,0 +1,11 @@
+{
+    "CoreFiles": "../parenting-app-ui/packages/app-data/sheets",
+    "ComposeResult": "app/1_compose_result",
+    "CoreGroups": [["data_list", ["campaign_rows", "campaign_schedule"]],["global", [""]],["template", ["legal_terms"]],["tour", [""]]],
+    "SplitGroups": [["main", "wash_app"], ["legal_terms", "wash_app"]],
+    "ExtractResult": "app/2_extract_result",
+    "ReadyForTranslation": "app/3_ready_for_translators",
+    "PostTranslation": ["../PLH-Digital-Content/translations/wash_app"],
+    "PostTranslationJSONs": "app/4_result_from_translators",
+    "FinalDictionaries": "app/5_completed_dictionaries"
+}
