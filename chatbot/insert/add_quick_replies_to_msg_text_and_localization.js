@@ -124,7 +124,7 @@ function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
     }
-    if (add_selectors){
+    if (add_selectors == "yes"){
         quick_replies.forEach(qr => {
 
             arg_type = retrieve_argument_type(qr.text, router)
