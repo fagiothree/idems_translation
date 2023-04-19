@@ -1,6 +1,6 @@
 // const fs = require('fs');
 // [flows, debug, debug_lang] = move_quick_replies_to_message_text(
-//         readInputFile("./chatbot/test/Input/Tester2.json"),readInputFile("./chatbot/test/Input/select_phrases.json"), readInputFile("./chatbot/test/Input/special_words.json")
+//         readInputFile("./chatbot/test/Input/Tester.json"),readInputFile("./chatbot/test/Input/select_phrases.json"), "yes", readInputFile("./chatbot/test/Input/special_words.json")
 // )
 // function readInputFile(filePath) {
 //     return JSON.parse(fs.readFileSync(filePath).toString());
@@ -262,7 +262,9 @@ function find_new_argument(argument, arg_type, quick_replies, lang = false){
     return [new_arg, unique_selectors]
 }
 
-function arg_qr_match(arg, arg_type, qrtext){
+function arg_qr_match(argument, arg_type, quick_reply_text){
+    let arg = argument.toLowerCase()
+    let qrtext = quick_reply_text.toLowerCase()
     // set up an array with the arguments stored as arrays of words
     let argwords = split_string(arg)
     // set up an array with the quick reply stored as arrays of words
