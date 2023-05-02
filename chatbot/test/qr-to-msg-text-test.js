@@ -6,8 +6,8 @@ function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());
 }
 
-describe('Test of "QR to Message Text" function', function() {
-    it('should run "move_quick_replies_to_message_text" on a sample input and check it matches the ideal output file', function() {
+describe('QR to Message Text', function() {
+    it('runs the function on a sample input and check it matches the ideal output file', function() {
       
       // Run the function we are testing and store the output
       const [data1, debug, debug_lang] = modify.move_quick_replies_to_message_text(

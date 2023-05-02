@@ -6,8 +6,8 @@ function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());
 }
 
-describe('Test of "Has_any_word_check" function', function() {
-    it('This function is used to look at arguments on the wait for response nodes, if we have duplication within the arguments then it may cause the flow to run incorrectly, this test runs the function on a sample input and check it matches the ideal output file', function() {
+describe('Has_any_word_check', function() {
+    it('This test runs the function on a sample input and check it matches the ideal output file', function() {
       
       // Run the function we are testing and store the output
       const [data1, fixlog] = modify.fix_has_any_words(

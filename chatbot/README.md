@@ -40,7 +40,7 @@ Move quick replies to message text.
 ```
 node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <add_selectors> <special_words>
 
-'add_selectors' expects a boolean, if you want to add the numerical quick replies back in, example input: true
+'add_selectors' expects either "yes" or "no", if you want to add the numerical quick replies back in, example input: "yes"
 'special_words' expects a path to JSON which has a list of words which will be reinstated as full quick replies as opposed to numbers. The special_words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script
 ```
 

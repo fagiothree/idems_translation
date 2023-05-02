@@ -6,8 +6,8 @@ function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());
 }
 
-describe('Test of "Fixer Arg and QR after translation" function', function() {
-    it('should fix the arguments of various nodes to ensure the logic of the english is consistent with the translation, runs the function on a sample input and check it matches the ideal output file', function() {
+describe('Fixer Arg and QR after translation', function() {
+    it('runs the function on a sample input and check it matches the ideal output file', function() {
       
       // Run the function we are testing and store the output
       const [data1, debug_lang, languages] = modify.fix_arg_qr_translation(

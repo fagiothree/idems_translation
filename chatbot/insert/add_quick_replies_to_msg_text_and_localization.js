@@ -1,11 +1,3 @@
-// const fs = require('fs');
-// [flows, debug, debug_lang] = move_quick_replies_to_message_text(
-//         readInputFile("./chatbot/test/Input/Tester.json"),readInputFile("./chatbot/test/Input/select_phrases.json"), "yes", readInputFile("./chatbot/test/Input/special_words.json")
-// )
-// function readInputFile(filePath) {
-//     return JSON.parse(fs.readFileSync(filePath).toString());
-// }
-
 
 function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, special_words) {
     
@@ -160,7 +152,6 @@ function modify_router_node_cases(node, action, curr_loc, quick_replies, routers
     const dest_id = node.exits[0].destination_uuid;
 
     // TO DO: what happens if there is a node between the send_msg node and the wfr node???
-
     debug += `\n${action.text}\n`;
     for (const lang in curr_loc) {
         debug_lang[lang] += `\n${curr_loc[lang][action.uuid].text[0]}\n`;
@@ -168,7 +159,7 @@ function modify_router_node_cases(node, action, curr_loc, quick_replies, routers
 
     let router = routers[dest_id];
     if (router) {
-        // loop through all the cases in the wfr node
+        
         for (let curr_case of router.router.cases) {
             const case_id = curr_case.uuid;
 
@@ -177,7 +168,6 @@ function modify_router_node_cases(node, action, curr_loc, quick_replies, routers
 
             // get a new argument which works with our new numeric quick replies
             let [new_arg, selectors] = find_new_argument(arg, arg_type, quick_replies)
-
 
             if (new_arg == "") {
                 debug += arg + ' - NO MATCHING QR \n';
@@ -216,7 +206,7 @@ function modify_router_node_cases(node, action, curr_loc, quick_replies, routers
 function retrieve_argument_type(qrtext, router){
     let argument_type = ""
     if (router) {
-        // loop through all the cases in the wfr node
+        
         for (let curr_case of router.router.cases) {
 
             let arg = curr_case.arguments[0]
@@ -237,10 +227,8 @@ function find_new_argument(argument, arg_type, quick_replies, lang = false){
     let arg = argument.toLowerCase()
     let new_arg = "" 
 
-    // look through the quick replies looking for matches with the arguments
     for (let quick_reply of quick_replies){
 
-        //set our quick_reply depending on our language
         if (lang == false){
             qrtext = quick_reply.text.toLowerCase()
         }else{
@@ -265,13 +253,10 @@ function find_new_argument(argument, arg_type, quick_replies, lang = false){
 function arg_qr_match(argument, arg_type, quick_reply_text){
     let arg = argument.toLowerCase()
     let qrtext = quick_reply_text.toLowerCase()
-    // set up an array with the arguments stored as arrays of words
     let argwords = split_string(arg)
-    // set up an array with the quick reply stored as arrays of words
     let qrwords = split_string(qrtext)
 
     if(arg_type == 'has_any_word'){
-        // for the has_any_word case we try to find any matching words between the arg and qr string
         for (const word of argwords){
             if(qrwords.includes(word)){                   
                 return true
@@ -279,7 +264,6 @@ function arg_qr_match(argument, arg_type, quick_reply_text){
         }
     }
     else if(arg_type == 'has_all_words'){
-        // for the has_all_words we need to check all argwords are in a particular quick reply
         for (const word of argwords){ 
             if(qrwords.includes(word)){
                 match_result = true    
@@ -293,13 +277,11 @@ function arg_qr_match(argument, arg_type, quick_reply_text){
         }
     }
     else if(arg_type == 'has_phrase'){
-        // for has phrase we look for a string within a string
         if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(qrtext)) {
             return true                   
         }
     }
     else if(arg_type == 'has_only_phrase'){
-        // for has_only_phrase we look for a complete match
         if (arg.trim() == qrtext.trim()){
             return true                    
         }
