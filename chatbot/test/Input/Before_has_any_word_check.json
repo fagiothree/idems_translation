@@ -1,0 +1,161 @@
+{
+  "version": "13",
+  "site": "https://rapidpro.idems.international",
+  "flows": [
+    {
+      "name": "Checking has any words function",
+      "uuid": "8ddfe626-1286-41a0-89ef-82e55dc6e2f9",
+      "spec_version": "13.1.0",
+      "language": "eng",
+      "type": "messaging",
+      "nodes": [
+        {
+          "uuid": "69906c80-8550-4e2b-986b-1bcf1e6e659e",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "What is your favourite food?",
+              "type": "send_msg",
+              "quick_replies": [
+                "Green chicken curry",
+                "chicken korma",
+                "fish and chips",
+                "sausage and chips"
+              ],
+              "uuid": "fcbfd4df-51ad-4fc1-9af2-358a00f263f5"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "ebcb8f38-ba80-4ec4-91cd-51f691f3e94d",
+              "destination_uuid": "465f01f1-4c5f-4053-93c1-a851f54ca1e3"
+            }
+          ]
+        },
+        {
+          "uuid": "465f01f1-4c5f-4053-93c1-a851f54ca1e3",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "cbb48e19-d858-4cc0-9879-9e5273f2b03b",
+            "cases": [
+              {
+                "arguments": [
+                  "green chicken curry"
+                ],
+                "type": "has_any_word",
+                "uuid": "8ecc53c2-f43e-4686-9f63-496397ab19ba",
+                "category_uuid": "e48dedcc-0b4c-49de-ba4b-d29768461e19"
+              },
+              {
+                "arguments": [
+                  "chicken korma"
+                ],
+                "type": "has_any_word",
+                "uuid": "96e47adb-18dd-4797-b92c-a3bb2c1fed07",
+                "category_uuid": "b190804d-c2dd-418a-820c-87565a07b866"
+              },
+              {
+                "arguments": [
+                  "fish and chips"
+                ],
+                "type": "has_any_word",
+                "uuid": "c6ffb05c-2e88-4ed6-8029-80c921340b8c",
+                "category_uuid": "3ea9db3b-a9a7-4092-950c-a1008bc26755"
+              },
+              {
+                "arguments": [
+                  "sausage and chips"
+                ],
+                "type": "has_any_word",
+                "uuid": "585849fe-fb8c-4aa2-b12b-a0f542d7e977",
+                "category_uuid": "971b313e-fa27-4180-8dee-763d4e393d25"
+              }
+            ],
+            "categories": [
+              {
+                "uuid": "e48dedcc-0b4c-49de-ba4b-d29768461e19",
+                "name": "Green",
+                "exit_uuid": "9d7669fa-e56f-4912-951a-ebe3b3e67c40"
+              },
+              {
+                "uuid": "b190804d-c2dd-418a-820c-87565a07b866",
+                "name": "Chicken",
+                "exit_uuid": "bdedae5e-cf1a-4969-8354-a28ab74b8471"
+              },
+              {
+                "uuid": "3ea9db3b-a9a7-4092-950c-a1008bc26755",
+                "name": "Fish",
+                "exit_uuid": "f2c79d04-e385-4e14-9c6d-fd4f46b1a825"
+              },
+              {
+                "uuid": "971b313e-fa27-4180-8dee-763d4e393d25",
+                "name": "Sausage",
+                "exit_uuid": "7c5dfd1b-2526-4ba1-98be-96ee6f4f4a10"
+              },
+              {
+                "uuid": "cbb48e19-d858-4cc0-9879-9e5273f2b03b",
+                "name": "Other",
+                "exit_uuid": "830d073e-80bb-45ca-9448-12abca42cc72"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 1"
+          },
+          "exits": [
+            {
+              "uuid": "9d7669fa-e56f-4912-951a-ebe3b3e67c40"
+            },
+            {
+              "uuid": "bdedae5e-cf1a-4969-8354-a28ab74b8471"
+            },
+            {
+              "uuid": "f2c79d04-e385-4e14-9c6d-fd4f46b1a825"
+            },
+            {
+              "uuid": "7c5dfd1b-2526-4ba1-98be-96ee6f4f4a10"
+            },
+            {
+              "uuid": "830d073e-80bb-45ca-9448-12abca42cc72",
+              "destination_uuid": null
+            }
+          ]
+        }
+      ],
+      "_ui": {
+        "nodes": {
+          "69906c80-8550-4e2b-986b-1bcf1e6e659e": {
+            "position": {
+              "left": 0,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "465f01f1-4c5f-4053-93c1-a851f54ca1e3": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 100,
+              "top": 240
+            },
+            "config": {
+              "cases": {}
+            }
+          }
+        }
+      },
+      "revision": 4,
+      "expire_after_minutes": 10080,
+      "metadata": {
+        "revision": 1
+      },
+      "localization": {}
+    }
+  ],
+  "campaigns": [],
+  "triggers": [],
+  "fields": [],
+  "groups": []
+}

@@ -1,4 +1,6 @@
-function move_quick_replies_to_message_text(flows, select_phrases,add_selectors) {
+
+function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, special_words) {
+    
     const exceptions = [
         'no',
         'prefer not to say',
@@ -41,6 +43,8 @@ function move_quick_replies_to_message_text(flows, select_phrases,add_selectors)
                 },
                 {}
             );
+        
+        let routers_edited = []
 
         for (const node of flow.nodes) {
             for (const action of node.actions) {
@@ -50,9 +54,9 @@ function move_quick_replies_to_message_text(flows, select_phrases,add_selectors)
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(action, curr_loc, quick_replies,add_selectors);
+                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang);
                         
-                        debug = modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang);
+                        modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                         
                     }
                 }
@@ -103,27 +107,51 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function clear_quick_replies(action, curr_loc, quick_replies, add_selectors) {
+function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang) {
+    // id of corresponding wait for response node
+    const dest_id = node.exits[0].destination_uuid;
+    let router = routers[dest_id];
+
     action.quick_replies = [];
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
     }
     if (add_selectors == "yes"){
         quick_replies.forEach(qr => {
-            action.quick_replies.push(String(qr.selector));
-            for (const lang in curr_loc) {
-                curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
+
+            arg_type = retrieve_argument_type(qr.text, router)
+            
+            if (special_words.eng.includes(qr.text)){
+                if(arg_type == 'has_any_word'){
+                    action.quick_replies.push(String(qr.text));
+                }else{
+                    debug += `\nQuick reply '${qr.text}' was present in 'special_words' but could not be instigated here as it is not associated with a 'has_any_word' argument type\n`;
+                    action.quick_replies.push(String(qr.selector));    
+                }
+            } else {
+                action.quick_replies.push(String(qr.selector));                
             }
+            for (const lang in curr_loc) {
+                if (special_words[lang] && special_words[lang].includes(qr.translations[lang])){
+                    if(arg_type == 'has_any_word'){
+                        curr_loc[lang][action.uuid].quick_replies.push(String(qr.translations[lang]));
+                    }else{
+                        debug_lang[lang] += `\nQuick reply '${qr.translations[lang]}' was present in 'special_words' but could not be instigated here as it is not associated with a 'has_any_word' argument type\n`;
+                        curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));
+                    }  
+                } else {
+                    curr_loc[lang][action.uuid].quick_replies.push(String(qr.selector));                
+                }
+            }            
         });
     }
 }
 
-function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, routers, debug, debug_lang) {
+function modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited) {
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
 
     // TO DO: what happens if there is a node between the send_msg node and the wfr node???
-
     debug += `\n${action.text}\n`;
     for (const lang in curr_loc) {
         debug_lang[lang] += `\n${curr_loc[lang][action.uuid].text[0]}\n`;
@@ -131,271 +159,136 @@ function modify_router_node_cases(flow, node, action, curr_loc, quick_replies, r
 
     let router = routers[dest_id];
     if (router) {
+        
         for (let curr_case of router.router.cases) {
             const case_id = curr_case.uuid;
 
-            if (curr_case.type === 'has_any_word') {
-                // save the list of arguments in a list (it's a list of 1 string)
-                let arg_list = split_args(curr_case.arguments[0]);
-                let old_test = arg_list.join(",") + ",";
-                let new_test = arg_list.join(",") + ",";
+            let arg = curr_case.arguments[0]
+            let arg_type = curr_case.type
 
-                // variable to check if the matching between arguments and quick replies is consistent across languages
-                let matching_selectors = new Set();
+            // get a new argument which works with our new numeric quick replies
+            let [new_arg, selectors] = find_new_argument(arg, arg_type, quick_replies)
 
-                // find matching quick reply
-                for (let arg of arg_list) {
+            if (new_arg == "") {
+                debug += arg + ' - NO MATCHING QR \n';
+            }
+            else {
+                curr_case.arguments = [new_arg];
+            }
+
+            // complete the same process for the corresponding translation arguments
+            for (const [lang, messages] of Object.entries(curr_loc)) {
+                arg_lang = messages[case_id].arguments[0];
+                let [new_arg_lang, selectors_lang] = find_new_argument(arg_lang, arg_type, quick_replies, lang)
+
+                if (new_arg_lang == "") {
+                    if(routers_edited.includes(dest_id)){
+                        debug_lang[lang] += arg_lang + ' - This wfr node has multiple nodes going into it, this is not the first time it has been processed, the arguments have already been modified\n';
+                    }else{
+                        debug_lang[lang] += arg_lang + ' - NO MATCHING QR \n';
+                    }
                     
-                    debug += `arg: ${arg}\n`;
-                    //let r_exp = new RegExp(`\\b${arg}\\b`, "i");
-                    let r_exp = new RegExp(`\\b${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, "i");
-
-                    for (let quick_reply of quick_replies) {
-                        if (r_exp.test(quick_reply.text)) {
-                            new_test += quick_reply.selector + ",";
-                            matching_selectors.add(quick_reply.selector);
-                            debug += new_test + '\n';
-                        }
-                    }
-                }
-
-                if (new_test == old_test) {
-                    //console.log(`no match main version in flow ${flow.name}`);
-                    debug += 'NO MATCH \n';
+                }else if(selectors != selectors_lang){
+                    debug_lang[lang] += 'Translation relationship does not match english version \n';
                 }
                 else {
-                    curr_case.arguments = [new_test];
-                }
-
-                const unique_selectors = Array.from(matching_selectors).sort().join(',');
-
-                // do the same for the languages in localiz
-                let arg_list_lang = {};
-                let old_test_lang = {};
-                let new_test_lang = {};
-                let matching_selectors_lang = {};
-
-                debug += `arg list: ${arg_list}\n`;
-
-                for (const [lang, messages] of Object.entries(curr_loc)) {
-                    arg_list_lang[lang] = split_args(messages[case_id].arguments[0]);
-                    old_test_lang[lang] = arg_list_lang[lang].join(",") + ",";
-                    new_test_lang[lang] = arg_list_lang[lang].join(",") + ",";
-                    matching_selectors_lang[lang] = new Set();
-
-                    debug_lang[lang] += `arg list: ${arg_list_lang[lang]}\n`;
-
-                    // find matching quick reply in localization
-                    for (let arg of arg_list_lang[lang]) {
-                       
-                        debug_lang[lang] += `arg: ${arg}\n`;
-                        
-                        let r_exp = new RegExp(`\\b${arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-                        
-
-                        for (let quick_reply of quick_replies) {
-                            if (r_exp.test(quick_reply.translations[lang])) {
-                                new_test_lang[lang] += quick_reply.selector + ',';
-                                matching_selectors_lang[lang].add(quick_reply.selector);
-                                debug_lang[lang] += new_test_lang[lang] + '\n';
-                            }
-                        }
-                    }
-
-                    if (new_test_lang[lang] == old_test_lang[lang]) {
-                        //console.log(`no match ${lang} in flow ${flow.name}`);
-                        debug_lang[lang] += 'NO MATCH \n';
-                    }
-
-                    const unique_selectors_lang = Array.from(matching_selectors_lang[lang]).sort().join(',');
-                    if (unique_selectors != unique_selectors_lang) {
-                        //console.log(` in flow ${flow.name} no matching selectors original ${matching_selectors} and ${lang} ${matching_selectors_lang[lang]}`);
-                        debug_lang[lang] += 'NO MATCHING SELECTORS \n';
-                    }
-
-                    if (new_test_lang[lang] != old_test_lang[lang] && unique_selectors == unique_selectors_lang) {
-                        messages[case_id].arguments = [new_test_lang[lang]];
-                    }
+                    messages[case_id].arguments = [new_arg_lang];
                 }
             }
-            else if (curr_case.type === 'has_all_words') {
-                let arg_list = split_args(curr_case.arguments[0]);
-                let new_test = '';
-
-                // find matching qr
-                for (const quick_reply of quick_replies) {
-                    const match_all = arg_list.every(
-                        (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.text)
-                        //word) => new RegExp(word, 'i').test(quick_reply.text)
-                    );
-
-                    if (match_all) {
-                        new_test += quick_reply.selector + ',';
-                    }
-                }
-
-                if (new_test === '') {
-                    //console.log(`no match ${flow.name}`);
-                    debug += 'NO MATCH \n';
-                }
-                else {
-                    curr_case.arguments = [new_test];
-                }
-
-                // do the same for the languages in localiz
-                let arg_list_lang = {};
-                let new_test_lang = {};
-
-                debug += `arg list: ${arg_list}\n`;
-
-                for (const [lang, messages] in Object.entries(curr_loc)) {
-                    arg_list_lang[lang] = split_args(messages[case_id].arguments[0]);
-                    new_test_lang[lang] = '';
-
-                    debug_lang[lang] += `arg list: ${arg_list_lang[lang]}\n`;
-
-                    // find matching quick reply in localization
-                    for (const quick_reply of quick_replies) {
-                        const match_all = arg_list_lang[lang].every(                           
-                            (word) => new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])
-                            //(word) => new RegExp(word, 'i').test(quick_reply.translations[lang])
-                        );
-
-                        if (match_all) {
-                            new_test_lang[lang] += quick_reply.selector + ',';
-                        }
-                    }
-
-                    if (new_test_lang[lang] === '') {
-                        //console.log(`no match msa ${flow.name}`);
-                        debug_lang[lang] += 'NO MATCH \n';
-                    }
-
-                    if (new_test_lang[lang] != new_test) {
-                        //console.log(` in flow ${flow.name} no matching selectors`);
-                        debug_lang[lang] += 'NO MATCHING SELECTORS \n';
-                    }
-
-                    if (new_test_lang[lang] != '' && new_test_lang[lang] == new_test) {
-                        messages[case_id].arguments = [new_test_lang[lang]];
-                    }
-                }
-            }
-            else if (curr_case.type === 'has_phrase') {
-                let arg = curr_case.arguments[0];
-                let new_test = '';
-                debug = `arg: ${arg}\n`;
-
-                // find matching qr
-                for (const quick_reply of quick_replies) {
-                    //if (new RegExp(arg, 'i').test(quick_reply.text)) {
-                    if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.text)) {
-                        new_test += quick_reply.selector + ',';
-                    }
-
-                }
-
-                if (new_test === '') {
-                    //console.log(`no match ${flow.name}`);
-                    debug += 'NO MATCH \n';
-                }
-                else {
-                    curr_case.arguments = [new_test];
-                }
-
-                // do the same for the languages in localiz
-                let arg_lang = {};
-                let new_test_lang = {};
-
-                for (const [lang, messages] of Object.entries(curr_loc)) {
-                    arg_lang[lang] = messages[case_id].arguments[0];
-                    new_test_lang[lang] = '';
-                    debug_lang[lang] += `arg: ${arg_lang[lang]}\n`;
-
-                    // find matching quick reply in localization
-                    for (const quick_reply of quick_replies) {
-                        //if (new RegExp(arg, 'i').test(quick_reply.translations[lang])) {
-                        if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(quick_reply.translations[lang])) {
-                            new_test_lang[lang] += quick_reply.selector + ',';
-                        }
-                    }
-
-                    if (new_test_lang[lang] === '') {
-                        //console.log(`no match msa ${flow.name}`);
-                        debug_lang[lang] += 'NO MATCH \n';
-                    }
-
-                    if (new_test_lang[lang] != new_test) {
-                        //console.log(` in flow ${flow.name} no matching selectors`);
-                        debug_lang[lang] += 'NO MATCHING SELECTORS \n';
-                    }
-
-                    if (new_test_lang[lang] !== '' && new_test_lang[lang] == new_test) {
-                        messages[case_id].arguments = [new_test_lang[lang]];
-                    }
-                }
-            }
-            else if (curr_case.type === 'has_only_phrase') {
-                let arg = curr_case.arguments[0];
-                
-                debug += `arg: ${arg}\n`;
-                let new_test = '';
-
-                // find matching qr
-                for (const quick_reply of quick_replies) {
-                    if (quick_reply.text.toLowerCase().trim() == arg.toLowerCase().trim()) {
-                        new_test += quick_reply.selector + ',';
-                        debug += new_test + '\n';
-                    }
-                }
-
-                if (new_test === '') {
-                    debug += 'NO MATCH \n';
-                    //console.log(`no match ${flow.name}`);
-                }
-                else {
-                    curr_case.arguments = [new_test];
-                }
-
-                // do the same for the languages in localiz
-                let arg_lang = {};
-                let new_test_lang = {};
-
-                for (const [lang, messages] of Object.entries(curr_loc)) {
-                    arg_lang[lang] = messages[case_id].arguments[0];
-                    new_test_lang[lang] = '';
-                    debug_lang[lang] += `arg: ${arg_lang[lang]}\n`;
-
-                    // find matching quick reply in localization
-                    for (const quick_reply of quick_replies) {
-                        if (quick_reply.translations[lang].toLowerCase().trim() == arg_lang[lang].toLowerCase().trim()) {
-                            new_test_lang[lang] += quick_reply.selector + ',';
-                            debug_lang[lang] += new_test_lang[lang] + '\n';
-                        }
-                    }
-
-                    if (new_test_lang[lang] === '') {
-                        //console.log('no match msa' + flow.name);
-                        debug_lang[lang] += 'NO MATCH \n';
-                    }
-
-                    if (new_test_lang[lang] != new_test) {
-                        //console.log(` in flow ${flow.name} no matching selectors`);
-                        debug_lang[lang] += 'NO MATCHING SELECTORS \n';
-                    }
-
-                    if (new_test_lang[lang] !== '' && new_test_lang[lang] == new_test) {
-                        messages[case_id].arguments = [new_test_lang[lang]];
-                    }
-                }
-            }
+            
             curr_case.type = 'has_any_word';
+            
         }
     }
-    return debug
+    routers_edited.push(dest_id)
 }
 
-function split_args(args) {
+function retrieve_argument_type(qrtext, router){
+    let argument_type = ""
+    if (router) {
+        
+        for (let curr_case of router.router.cases) {
+
+            let arg = curr_case.arguments[0]
+            let arg_type = curr_case.type
+
+            if(arg_qr_match(arg, arg_type, qrtext)){
+                argument_type += arg_type                
+            }
+        }
+    }
+    return argument_type
+}
+
+function find_new_argument(argument, arg_type, quick_replies, lang = false){
+    
+    let matching_selectors = new Set();
+    
+    let arg = argument.toLowerCase()
+    let new_arg = "" 
+
+    for (let quick_reply of quick_replies){
+
+        if (lang == false){
+            qrtext = quick_reply.text.toLowerCase()
+        }else{
+            qrtext = quick_reply.translations[lang].toLowerCase()
+        }
+        
+        if(arg_qr_match(arg, arg_type, qrtext)){
+            if(arg_type == 'has_any_word'){
+                new_arg += arg + "," + quick_reply.selector + ","
+            }else{
+                new_arg += quick_reply.selector + ","
+            }
+            matching_selectors.add(quick_reply.selector)
+        }  
+    }
+
+    let unique_selectors = Array.from(matching_selectors).sort().join(',')
+
+    return [new_arg, unique_selectors]
+}
+
+function arg_qr_match(argument, arg_type, quick_reply_text){
+    let arg = argument.toLowerCase()
+    let qrtext = quick_reply_text.toLowerCase()
+    let argwords = split_string(arg)
+    let qrwords = split_string(qrtext)
+
+    if(arg_type == 'has_any_word'){
+        for (const word of argwords){
+            if(qrwords.includes(word)){                   
+                return true
+            }
+        }
+    }
+    else if(arg_type == 'has_all_words'){
+        for (const word of argwords){ 
+            if(qrwords.includes(word)){
+                match_result = true    
+            }else {
+                match_result = false
+                break                                               
+            }
+        }
+        if (match_result){
+            return true
+        }
+    }
+    else if(arg_type == 'has_phrase'){
+        if (new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').test(qrtext)) {
+            return true                   
+        }
+    }
+    else if(arg_type == 'has_only_phrase'){
+        if (arg.trim() == qrtext.trim()){
+            return true                    
+        }
+    }
+}
+
+function split_string(args) {
     return args.split(/[\s,]+/).filter((i) => i);
 }
 
