@@ -1,8 +1,8 @@
 
-$flows = "..\..\parenttext-deployment\parenttext-thailand-repo\temp\thailand_flows_in_demo.json"
-$output_folder =  "..\..\parenttext-deployment\parenttext-thailand-repo\temp\temp_transl"
+$flows = "..\..\parenttext-version-2\parenttext_modules.json"
+$output_folder =  "..\..\parenttext-version-2\temp\temp_transl"
 $strings_to_exclude = "..\..\parenttext-deployment\parenttext-international-repo\edits\exeptions_not_translate.json"
-$pot_file_name = "thailand_demo"
+$pot_file_name = "modules_teen"
 
 # extract strings from flows 
 node ..\chatbot\index.js extract $flows $output_folder
