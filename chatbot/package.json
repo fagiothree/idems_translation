@@ -11,7 +11,7 @@
     "url": "git+https://github.com/IDEMSInternational/idems_translation.git"
   },
   "author": "IDEMS",
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "bugs": {
     "url": "https://github.com/IDEMSInternational/idems_translation/issues"
   },
