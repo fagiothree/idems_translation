@@ -38,6 +38,10 @@ function extractTextForTranslation(obj) {
                         char_count +=50;
                     }
                     bitsLengths.push(char_count);
+
+                    eng_localization[action.templating.uuid] = {
+                        variables: action.templating.variables
+                    }
                 }
             });
 
@@ -139,6 +143,24 @@ function createFileForTranslators(obj) {
                 });
             }
 
+            if (bit.variables) {
+                bit.variables.forEach((qr, i) => {
+                    let atom_to_translate = {};
+                    atom_to_translate.flow_id = flow_id;
+                    atom_to_translate.flow_name = flow.name;
+                    atom_to_translate.bit_id = key_bit;
+                    atom_to_translate.bit_type = "variables";
+                    atom_to_translate.type_id = i;
+                    atom_to_translate.text = qr;
+                    atom_to_translate.source_text = atom_to_translate.text;
+
+                    atom_to_translate.word_count = wordCount;
+                    newFile.push(atom_to_translate);
+                    wordCount = wordCount + atom_to_translate.text.split(" ").length;
+                    charCount = charCount + atom_to_translate.text.length;
+                });
+            }
+
             if (bit.arguments) {
                 let atom_to_translate = {};
                 atom_to_translate.flow_id = flow_id;
@@ -162,7 +184,7 @@ function createFileForTranslators(obj) {
 }
 
 function removeRepetitions(obj) {
-    const BIT_TYPES = ["text", "quick_replies", "arguments"];
+    const BIT_TYPES = ["text", "quick_replies", "variables", "arguments"];
     let messages = [];
     let wordCount = 0;
     let charCount = 0;
