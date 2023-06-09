@@ -39,8 +39,10 @@ function extractTextForTranslation(obj) {
                     }
                     bitsLengths.push(char_count);
 
-                    eng_localization[action.templating.uuid] = {
-                        variables: action.templating.variables
+                    if (action.templating) {
+                        eng_localization[action.templating.uuid] = {
+                            variables: action.templating.variables
+                        };
                     }
                 }
             });
