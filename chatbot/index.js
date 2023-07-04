@@ -13,6 +13,7 @@ const COMMANDS = {
     overall_integrity_check,
     fix_arg_qr_translation,
     extract,
+    extract_simple,
     localize,
     move_quick_replies
 };
