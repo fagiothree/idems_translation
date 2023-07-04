@@ -67,6 +67,17 @@ function extract([inputFile, outputDir]) {
     writeOutputFile(outputDir, 'step_3.json', fileForTranslNoRep);
 }
 
+function extract_simple([inputFile, outputDir, outputname]) {
+    const obj = readInputFile(inputFile);
+    //obj = reorderFlowsAlphabeticallyByName(obj);
+    const bits = ex.extractTextForTranslation(obj);
+    const fileForTransl = ex.createFileForTranslators(bits);
+    const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)[0]
+          .map(ex.transformToTranslationFormat);
+
+    writeOutputFile(outputDir, outputname + ".json", fileForTranslNoRep);
+}
+
 function localize([inputFlow, translations, lang, outputName, outputDir]) {
     const [missing, partiallyTranslated, flows] = insert.createLocalization(
         readInputFile(inputFlow),

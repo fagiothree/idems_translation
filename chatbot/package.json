@@ -1,6 +1,6 @@
 {
-  "name": "idems_translation_chatbot",
-  "version": "1.0.0",
+  "name": "@idems/idems_translation_chatbot",
+  "version": "1.0.1",
   "description": "Translation tools for chatbots",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/fagiothree/idems_translation.git"
   },
-  "author": "",
+  "author": "IDEMS",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/fagiothree/idems_translation/issues"
@@ -22,5 +22,8 @@
   "dependencies": {
     "excel4node": "^1.7.2",
     "xlsx": "^0.18.2"
+  },
+  "directories": {
+    "test": "test"
   }
 }
