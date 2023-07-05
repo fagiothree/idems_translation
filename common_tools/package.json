@@ -14,7 +14,6 @@
   },
   "homepage": "https://github.com/idems/idems_translation#readme",
   "dependencies": {
-    "json-concat": "0.0.1",
     "pofile": "^1.1.1",
     "string-similarity": "^4.0.4"
   },
