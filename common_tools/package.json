@@ -8,7 +8,7 @@
     "url": "git+https://github.com/idems/idems_translation.git"
   },
   "author": "IDEMS",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/idems/idems_translation/issues"
   },
