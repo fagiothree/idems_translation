@@ -54,7 +54,7 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, count_threshold, length_threshold);
+                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang);
                         
                         modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                         
