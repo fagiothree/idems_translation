@@ -54,7 +54,7 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang);
+                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, count_threshold, length_threshold);
                         
                         modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                         
@@ -65,6 +65,86 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
     }
 
     return [flows, debug, debug_lang];
+}
+
+function reformat_quick_replies(flows, select_phrases, count_threshold, length_threshold, special_words) {
+    
+    const exceptions = [
+        'no',
+        'prefer not to say',
+        'prefer not to answer',
+        'prefer not to tell',
+        'i prefer not to tell',
+        'does not apply',
+        'go back to the previous options',
+        'i am not interested',
+        'no i do not agree'
+    ];
+
+    let debug = '';
+    let debug_lang = {};
+    if (!select_phrases.hasOwnProperty("eng")){
+        select_phrases["eng"] = "Please select the number for the following options:"
+    }
+ 
+    for (const flow of flows.flows) {
+        
+        let curr_loc = flow.localization;
+
+        debug += `\n\n${flow.name}*************************************\n`;
+        for (const lang in curr_loc) {
+            
+            if (debug_lang.hasOwnProperty(lang)){
+                debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            }else{
+                debug_lang[lang] = `${flow.name}*************************************\n`;
+            }
+ 
+        }
+
+        const routers = flow.nodes
+            .filter((node) => node.router && node.router.operand === '@input.text')
+            .reduce(
+                (acc, node) => {
+                    acc[node.uuid] = node;
+                    return acc;
+                },
+                {}
+            );
+        
+        let routers_edited = []
+
+        for (const node of flow.nodes) {
+            for (const action of node.actions) {
+                if (action.type == 'send_msg') {
+                    if (action.quick_replies.length > 0) {
+                        let max_qr_length = find_max_length(action.quick_replies)
+                        if(action.quick_replies.lenght > count_threshold || max_qr_length > length_threshold){
+                            let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                        
+                            add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                            
+                            clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang);
+                            
+                            modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
+                        }                       
+                    }
+                }
+            }
+        }
+    }
+
+    return [flows, debug, debug_lang];
+}
+
+function find_max_length(quick_replies) {
+    let max_length = 1
+    for (const qr of quick_replies) {
+        if (qr.length > max_length){
+            max_length = qr.length
+        }
+    }
+    return max_length
 }
 
 function augment_quick_replies(curr_act, exceptions, curr_loc) {
@@ -107,7 +187,7 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang) {
+function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, count_threshold = 1, length_threshold = 1) {
     // id of corresponding wait for response node
     const dest_id = node.exits[0].destination_uuid;
     let router = routers[dest_id];
@@ -293,5 +373,6 @@ function split_string(args) {
 }
 
 module.exports = {
-    move_quick_replies_to_message_text
+    move_quick_replies_to_message_text,
+    reformat_quick_replies
 };
