@@ -119,7 +119,7 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                 if (action.type == 'send_msg') {
                     if (action.quick_replies.length > 0) {
                         let max_qr_length = find_max_length(action.quick_replies)
-                        if(action.quick_replies.lenght > count_threshold || max_qr_length > length_threshold){
+                        if(action.quick_replies.length > count_threshold || max_qr_length > length_threshold){
                             let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                         
                             add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
