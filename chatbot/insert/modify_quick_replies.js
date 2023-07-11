@@ -117,9 +117,10 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
         for (const node of flow.nodes) {
             for (const action of node.actions) {
                 if (action.type == 'send_msg') {
-                    if (action.quick_replies.length > 0) {
+                    qr_count = action.quick_replies.length
+                    if (qr_count > 1) { 
                         let max_qr_length = find_max_length(action.quick_replies)
-                        if(action.quick_replies.length > count_threshold || max_qr_length > length_threshold){
+                        if(qr_count > count_threshold || max_qr_length > length_threshold){
                             let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                         
                             add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
