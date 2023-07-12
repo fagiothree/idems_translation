@@ -1,6 +1,6 @@
 const fs = require('fs');
 const assert = require('assert');
-const modify = require('../insert/add_quick_replies_to_msg_text_and_localization.js');
+const modify = require('../insert/modify_quick_replies.js');
 
 function readInputFile(filePath) {
     return JSON.parse(fs.readFileSync(filePath).toString());
