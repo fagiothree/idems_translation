@@ -1,21 +1,24 @@
 {
-  "name": "idems_translation_common",
+  "name": "@idems/idems_translation_common",
   "version": "1.0.0",
   "description": "Common translation tools",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fagiothree/idems_translation.git"
+    "url": "git+https://github.com/idems/idems_translation.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "IDEMS",
+  "license": "GPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/fagiothree/idems_translation/issues"
+    "url": "https://github.com/idems/idems_translation/issues"
   },
-  "homepage": "https://github.com/fagiothree/idems_translation#readme",
+  "homepage": "https://github.com/idems/idems_translation#readme",
   "dependencies": {
-    "json-concat": "0.0.1",
     "pofile": "^1.1.1",
     "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

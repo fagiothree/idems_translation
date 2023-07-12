@@ -6,15 +6,17 @@ const integrity = require('./insert/check_integrity.js')
 const fixer = require('./insert/fix_arg_qr_translation.js')
 const ex = require('./extract/extract.js');
 const insert = require('./insert/create-localization.js');
-const { move_quick_replies_to_message_text } = require('./insert/add_quick_replies_to_msg_text_and_localization.js');
+const modifyqr = require('./insert/modify_quick_replies.js');
 
 const COMMANDS = {
     has_any_words_check,
     overall_integrity_check,
     fix_arg_qr_translation,
     extract,
+    extract_simple,
     localize,
-    move_quick_replies
+    move_quick_replies,
+    reformat_quick_replies
 };
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -67,6 +69,17 @@ function extract([inputFile, outputDir]) {
     writeOutputFile(outputDir, 'step_3.json', fileForTranslNoRep);
 }
 
+function extract_simple([inputFile, outputDir, outputname]) {
+    const obj = readInputFile(inputFile);
+    //obj = reorderFlowsAlphabeticallyByName(obj);
+    const bits = ex.extractTextForTranslation(obj);
+    const fileForTransl = ex.createFileForTranslators(bits);
+    const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)[0]
+          .map(ex.transformToTranslationFormat);
+
+    writeOutputFile(outputDir, outputname + ".json", fileForTranslNoRep);
+}
+
 function localize([inputFlow, translations, lang, outputName, outputDir]) {
     const [missing, partiallyTranslated, flows] = insert.createLocalization(
         readInputFile(inputFlow),
@@ -86,9 +99,23 @@ function move_quick_replies([input_file, select_phrases, outputName, outputDir, 
         special_words = readInputFile(special_words)
     }
 
-    const [flows, debug, debug_lang] = move_quick_replies_to_message_text(
+    const [flows, debug, debug_lang] = modifyqr.move_quick_replies_to_message_text(
         readInputFile(input_file),readInputFile(select_phrases), add_selectors, special_words
     );
+    writeOutputFile(outputDir, outputName + '.json', flows);
+    writeOutputFile(outputDir, 'debug_qr.txt', debug);
+    for (lang in debug_lang){
+        writeOutputFile(outputDir, 'debug_qr_' + lang +'.txt', debug_lang[lang]);
+    }
+}
+
+function reformat_quick_replies([input_file, select_phrases, outputName, outputDir, count_threshold = 1, length_threshold = 1, special_words = false]) {
+
+    if(special_words != false){
+        special_words = readInputFile(special_words)
+    }
+
+    const [flows, debug, debug_lang] = modifyqr.reformat_quick_replies(readInputFile(input_file), readInputFile(select_phrases), Number(count_threshold), Number(length_threshold), special_words)
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);
     for (lang in debug_lang){
