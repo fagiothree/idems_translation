@@ -1,5 +1,5 @@
 {
-  "name": "idems_translation_chatbot",
+  "name": "@idems/idems_translation_chatbot",
   "version": "1.0.2",
   "description": "Translation tools for chatbots",
   "main": "index.js",
