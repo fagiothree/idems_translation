@@ -13,6 +13,7 @@ const COMMANDS = {
     overall_integrity_check,
     fix_arg_qr_translation,
     extract,
+    extract_simple,
     localize,
     move_quick_replies,
     reformat_quick_replies
@@ -66,6 +67,17 @@ function extract([inputFile, outputDir]) {
     writeOutputFile(outputDir, 'step_1.json', bits);
     writeOutputFile(outputDir, 'step_2.json', fileForTransl);
     writeOutputFile(outputDir, 'step_3.json', fileForTranslNoRep);
+}
+
+function extract_simple([inputFile, outputDir, outputname]) {
+    const obj = readInputFile(inputFile);
+    //obj = reorderFlowsAlphabeticallyByName(obj);
+    const bits = ex.extractTextForTranslation(obj);
+    const fileForTransl = ex.createFileForTranslators(bits);
+    const fileForTranslNoRep = ex.removeRepetitions(fileForTransl)[0]
+          .map(ex.transformToTranslationFormat);
+
+    writeOutputFile(outputDir, outputname + ".json", fileForTranslNoRep);
 }
 
 function localize([inputFlow, translations, lang, outputName, outputDir]) {
