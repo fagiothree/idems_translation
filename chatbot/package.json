@@ -1,5 +1,5 @@
 {
-  "name": "@idems/idems_translation_chatbot",
+  "name": "idems_translation_chatbot",
   "version": "1.0.2",
   "description": "Translation tools for chatbots",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fagiothree/idems_translation.git"
+    "url": "git+https://github.com/IDEMSInternational/idems_translation.git"
   },
   "author": "IDEMS",
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/fagiothree/idems_translation/issues"
+    "url": "https://github.com/IDEMSInternational/idems_translation/issues"
   },
-  "homepage": "https://github.com/fagiothree/idems_translation#readme",
+  "homepage": "https://github.com/IDEMSInternational/idems_translation#readme",
   "devDependencies": {
     "mocha": "^9.1.3"
   },
@@ -25,5 +25,11 @@
   },
   "directories": {
     "test": "test"
-  }
+  },
+  "keywords": [
+    "idems",
+    "rapidpro",
+    "chatbot",
+    "translations"
+  ]
 }
