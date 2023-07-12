@@ -172,6 +172,14 @@ function translateLocalization(engLoc, translStep2, engStep2) {
                 .map(atom => atom.text);
         }
 
+        if (bit.hasOwnProperty('variables')) {
+            bit.variables = translStep2
+                .filter(byBitId)
+                .filter(atom => atom.bit_type == "variables")
+                .sort(byTypeId)
+                .map(atom => atom.text);
+        }
+
         if (bit.hasOwnProperty('arguments')) {
             bit.arguments = translStep2
                 .filter(byBitId)
