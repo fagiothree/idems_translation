@@ -145,10 +145,13 @@ function collect_Eng_arguments(node){
     let ArgID = []
 
     // first collect the english arguments
-    for(const curr_case of node.router.cases){                    
-        EngArg.push(curr_case.arguments[0].toString().toLowerCase().trim())//.replace(/,/g," ").replace(/\s\s+/g, ' '))
-        ArgTypes.push(curr_case.type)
-        ArgID.push(curr_case.uuid)                                              
+    for(const curr_case of node.router.cases){ 
+        
+        if(curr_case.arguments[0]){
+            EngArg.push(curr_case.arguments[0].toString().toLowerCase().trim())//.replace(/,/g," ").replace(/\s\s+/g, ' '))
+            ArgTypes.push(curr_case.type)
+            ArgID.push(curr_case.uuid)
+        }                                                      
     }
 
     return [EngArg, ArgTypes, ArgID]
