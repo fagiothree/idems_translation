@@ -119,16 +119,18 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                 if (action.type == 'send_msg') {
                     qr_count = action.quick_replies.length
                     if (qr_count > 1) { 
-                        let max_qr_length = find_max_length(action.quick_replies)
-                        if(qr_count > count_threshold || max_qr_length > length_threshold){
-                            let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
-                        
-                            add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                        if(not_contains_numeric_value(action.quick_replies)){
+                            let max_qr_length = find_max_length(action.quick_replies)
+                            if(qr_count > count_threshold || max_qr_length > length_threshold){
+                                let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                             
-                            clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang);
-                            
-                            modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
-                        }                       
+                                add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                                
+                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang);
+                                
+                                modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
+                            }  
+                        }                            
                     }
                 }
             }
@@ -372,6 +374,15 @@ function arg_qr_match(argument, arg_type, quick_reply_text){
 function split_string(args) {
     return args.split(/[\s,]+/).filter((i) => i);
 }
+
+function not_contains_numeric_value(list) {
+    for (const item of list) {
+      if (typeof item === 'number') {
+        return false;
+      }
+    }
+    return true;
+  }
 
 module.exports = {
     move_quick_replies_to_message_text,
