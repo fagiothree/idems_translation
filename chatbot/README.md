@@ -44,6 +44,15 @@ node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <outpu
 'special_words' expects a path to JSON which has a list of words which will be reinstated as full quick replies as opposed to numbers. The special_words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script
 ```
 
+Reformat quick replies
+```
+node index reformat_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <count_threshold> <length_threshold> <special_words>
+
+'count_threshold' and 'length_threshold' expects integers input as a strings, 
+if the count of quick_replies is above the count threshold or the longest quick_reply is abot the length threshold then the quick_replies will be replaced with numerical prompts
+'special_words' expects a path to JSON which has a list of words which will be reinstated as full quick replies as opposed to numbers. The special_words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script
+```
+
 Overall process visualised in flowchart linked below
 https://docs.google.com/drawings/d/1i-64dAkcYqkLWNJmCpl7no6mQqFD3DJ1vI1lnKqd12U/edit?usp=sharing
 ```
