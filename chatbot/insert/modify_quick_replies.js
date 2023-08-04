@@ -156,16 +156,6 @@ function find_max_length(inputArray) {
     return maxLength;
   }
 
-// function find_max_length(quick_replies) {
-//     let max_length = 1
-//     for (const qr of quick_replies) {
-//         if (qr.length > max_length){
-//             max_length = qr.length
-//         }
-//     }
-//     return max_length
-// }
-
 function augment_quick_replies(curr_act, exceptions, curr_loc) {
  
     return curr_act.quick_replies.map((qr, i, qrs) => {
