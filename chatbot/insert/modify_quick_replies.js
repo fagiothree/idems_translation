@@ -120,9 +120,9 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                     qr_count = action.quick_replies.length
                     if (qr_count > 1) { 
                         if(not_contains_numeric_value(action.quick_replies)){
-                            let max_qr_length = find_max_length(action.quick_replies)
+                            let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                            let max_qr_length = find_max_length(quick_replies)
                             if(qr_count > count_threshold || max_qr_length > length_threshold){
-                                let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                             
                                 add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                                 
@@ -140,15 +140,31 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
     return [flows, debug, debug_lang];
 }
 
-function find_max_length(quick_replies) {
-    let max_length = 1
-    for (const qr of quick_replies) {
-        if (qr.length > max_length){
-            max_length = qr.length
-        }
-    }
-    return max_length
-}
+function find_max_length(inputArray) {
+    let maxLength = 0;
+  
+    inputArray.forEach(item => {
+      // Calculate the length of the English text and update the maxLength if needed
+      maxLength = Math.max(maxLength, item.text.length);
+  
+      // Calculate the maximum length for each translation and update maxLength if needed
+      for (const translation of Object.values(item.translations)) {
+        maxLength = Math.max(maxLength, translation.length);
+      }
+    });
+  
+    return maxLength;
+  }
+
+// function find_max_length(quick_replies) {
+//     let max_length = 1
+//     for (const qr of quick_replies) {
+//         if (qr.length > max_length){
+//             max_length = qr.length
+//         }
+//     }
+//     return max_length
+// }
 
 function augment_quick_replies(curr_act, exceptions, curr_loc) {
  
@@ -203,17 +219,22 @@ function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add
         quick_replies.forEach(qr => {
 
             arg_type = retrieve_argument_type(qr.text, router)
-            
-            if (special_words.eng.includes(qr.text)){
-                if(arg_type == 'has_any_word'){
-                    action.quick_replies.push(String(qr.text));
-                }else{
-                    debug += `\nQuick reply '${qr.text}' was present in 'special_words' but could not be instigated here as it is not associated with a 'has_any_word' argument type\n`;
-                    action.quick_replies.push(String(qr.selector));    
+
+            if(special_words.eng){
+                if (special_words.eng.includes(qr.text)){
+                    if(arg_type == 'has_any_word'){
+                        action.quick_replies.push(String(qr.text));
+                    }else{
+                        debug += `\nQuick reply '${qr.text}' was present in 'special_words' but could not be instigated here as it is not associated with a 'has_any_word' argument type\n`;
+                        action.quick_replies.push(String(qr.selector));    
+                    }
+                } else {
+                    action.quick_replies.push(String(qr.selector));                
                 }
-            } else {
-                action.quick_replies.push(String(qr.selector));                
-            }
+            }else{
+                action.quick_replies.push(String(qr.selector));
+            }                    
+            
             for (const lang in curr_loc) {
                 if (special_words[lang] && special_words[lang].includes(qr.translations[lang])){
                     if(arg_type == 'has_any_word'){
