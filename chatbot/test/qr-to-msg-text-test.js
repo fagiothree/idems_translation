@@ -11,7 +11,7 @@ describe('QR to Message Text', function() {
       
       // Run the function we are testing and store the output
       const [data1, debug, debug_lang] = modify.move_quick_replies_to_message_text(
-        readInputFile("./test/Input/Before_qr_to_msg_text.json"), readInputFile("./test/Input/select_phrases.json"), "yes", readInputFile("./test/Input/special_words.json")
+        readInputFile("./test/Input/Before_qr_to_msg_text.json"), readInputFile("./test/Input/select_phrases.json"), "yes", 10, readInputFile("./test/Input/special_words.json")
       );      
       
         // Load the sample JSON file
