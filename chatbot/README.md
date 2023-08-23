@@ -49,8 +49,9 @@ Reformat quick replies
 ```
 node index reformat_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <count_threshold> <length_threshold> <special_words>
 
-'count_threshold' and 'length_threshold' expects integers input as a strings, 
-if the count of quick_replies is above the count threshold or the longest quick_reply is abot the length threshold then the quick_replies will be replaced with numerical prompts
+'count_threshold' and 'length_threshold' expects integers input, 
+if the count of quick_replies is above the count threshold or the longest quick_reply is above the length threshold then the quick_replies will be replaced with numerical prompts
+'qr_limit' expects an integer input, it is a limit on the number of quick replies you may want to add back in after they have been replaced with numerical prompts. So if we are above the count threshold and above the qr_limit, the node message will be replaced with numerical prompts but those prompts will not be added as quick replies. 
 'special_words' expects a path to JSON which has a list of words which will be reinstated as full quick replies as opposed to numbers. The special_words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script
 ```
 
