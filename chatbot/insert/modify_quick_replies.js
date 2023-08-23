@@ -67,7 +67,7 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
     return [flows, debug, debug_lang];
 }
 
-function reformat_quick_replies(flows, select_phrases, count_threshold, length_threshold, special_words) {
+function reformat_quick_replies(flows, select_phrases, count_threshold, length_threshold, qr_limit ,special_words) {
     
     const exceptions = [
         'no',
@@ -126,7 +126,7 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                             
                                 add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                                 
-                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang);
+                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang, qr_limit);
                                 
                                 modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                             }  

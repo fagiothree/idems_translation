@@ -11,7 +11,7 @@ describe('Reformat QR Test', function() {
       
       // Run the function we are testing and store the output
       const [data1, debug, debug_lang] = modify.reformat_quick_replies(
-        readInputFile("./test/Input/Before_qr_reformat.json"), readInputFile("./test/Input/select_phrases.json"), "100", "22", readInputFile("./test/Input/special_words.json")
+        readInputFile("./test/Input/Before_qr_reformat.json"), readInputFile("./test/Input/select_phrases.json"), 100, 22, 10, readInputFile("./test/Input/special_words.json")
       );      
       
         // Load the sample JSON file
