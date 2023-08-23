@@ -47,7 +47,7 @@ node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <outpu
 
 Reformat quick replies
 ```
-node index reformat_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <count_threshold> <length_threshold> <special_words>
+node index reformat_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <count_threshold> <length_threshold> <qr_limit> <special_words>
 
 'count_threshold' and 'length_threshold' expects integers input, 
 if the count of quick_replies is above the count threshold or the longest quick_reply is above the length threshold then the quick_replies will be replaced with numerical prompts
