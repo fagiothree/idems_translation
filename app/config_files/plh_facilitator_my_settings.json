@@ -1,0 +1,11 @@
+{
+    "CoreFiles": "../parenting-app-ui/.idems_app/deployments/plh_facilitator_my/app_data/sheets",
+    "ComposeResult": "app/1_compose_result",
+    "CoreGroups": [["data_list", ["campaign_rows", "campaign_schedule", "legal_terms"]],["global", ["legal_terms"]],["template", ["legal_terms"]],["tour", [""]]],
+    "SplitGroups": [["main", "plh_facilitator_my"], ["legal_terms", "plh_facilitator_my"]],
+    "ExtractResult": "app/2_extract_result",
+    "ReadyForTranslation": "app/3_ready_for_translators",
+    "PostTranslation": ["../PLH-Digital-Content/translations/plh_facilitator_my"],
+    "PostTranslationJSONs": "app/4_result_from_translators",
+    "FinalDictionaries": "app/5_completed_dictionaries"
+}
