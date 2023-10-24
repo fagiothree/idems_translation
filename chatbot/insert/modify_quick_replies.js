@@ -1,5 +1,5 @@
 
-function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, special_words) {
+function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, qr_limit, special_words) {
     
     const exceptions = [
         'no',
@@ -54,7 +54,7 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                         
-                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang);
+                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, qr_limit);
                         
                         modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                         
@@ -67,7 +67,7 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
     return [flows, debug, debug_lang];
 }
 
-function reformat_quick_replies(flows, select_phrases, count_threshold, length_threshold, special_words) {
+function reformat_quick_replies(flows, select_phrases, count_threshold, length_threshold, qr_limit ,special_words) {
     
     const exceptions = [
         'no',
@@ -126,7 +126,7 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                             
                                 add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
                                 
-                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang);
+                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang, qr_limit);
                                 
                                 modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                             }  
@@ -196,8 +196,9 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, count_threshold = 1, length_threshold = 1) {
+function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, qr_limit = 100) {
     // id of corresponding wait for response node
+
     const dest_id = node.exits[0].destination_uuid;
     let router = routers[dest_id];
 
@@ -205,7 +206,8 @@ function clear_quick_replies(node, routers, action, curr_loc, quick_replies, add
     for (const lang in curr_loc) {
         curr_loc[lang][action.uuid].quick_replies = [];
     }
-    if (add_selectors == "yes"){
+    
+    if (add_selectors == "yes" && quick_replies.length <= qr_limit){
         quick_replies.forEach(qr => {
 
             arg_type = retrieve_argument_type(qr.text, router)
