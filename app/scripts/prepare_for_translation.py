@@ -23,9 +23,14 @@ def main():
 
     for group_info in split_groups_full:
         name = group_info[0]
-        dest_path = group_info[1]
         file_path = extract_result + '/' + name + '.json'
-        folder_name = ready_for_translation + '/' + dest_path + '/en'
+
+        #Check if destination folder information is provided
+        if len(group_info) >= 2:
+            dest_path = group_info[1]            
+            folder_name = ready_for_translation + '/' + dest_path + '/en'
+        else:
+            folder_name = ready_for_translation + '/en'
 
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
