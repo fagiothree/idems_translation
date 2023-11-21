@@ -1,6 +1,6 @@
 {
   "name": "@idems/idems_translation_chatbot",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Translation tools for chatbots",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "mocha": "^9.1.3"
   },
   "dependencies": {
-    "excel4node": "^1.7.2",
+    "excel4node": "^1.8.2",
     "xlsx": "^0.18.2"
   },
   "directories": {
