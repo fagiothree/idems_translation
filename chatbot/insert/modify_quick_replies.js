@@ -141,7 +141,10 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
 }
 
 function convert_qr_to_html(flows) {
-    
+
+    const exceptions = []
+    let debug = '';
+    let debug_lang = {};    
  
     for (const flow of flows.flows) {
         
@@ -167,7 +170,7 @@ function convert_qr_to_html(flows) {
                     if (qr_count > 0) { 
                             let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                               
-                            add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc, select_phrases);
+                            add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc);
                             
                             clear_quick_replies(node, routers, action, curr_loc, quick_replies, "no");                                          
                     }
@@ -235,18 +238,16 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
-function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc, select_phrases) {
+function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc) {
     const formatQuickReplyLink = (text) => `<a href=""weixin://bizmsgmenu?msgmenucontent=${text}&msgmenuid=projectid"">${text}</a>`;
     action.text = [
         action.text,
-        '\n' + select_phrases["eng"],
         ...quick_replies.map((qr) => formatQuickReplyLink(qr.text))
     ].join('\n');
 
     for (const [lang, translations] of Object.entries(curr_loc)) {
         translations[action.uuid].text[0] = [
             translations[action.uuid].text[0],
-            '\n' + select_phrases[lang],
             ...quick_replies.map((qr) => formatQuickReplyLink(qr.translations[lang]))
         ].join('\n');
     }
