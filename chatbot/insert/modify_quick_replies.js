@@ -239,7 +239,7 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
 }
 
 function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc) {
-    const formatQuickReplyLink = (text) => `<a href=""weixin://bizmsgmenu?msgmenucontent=${text}&msgmenuid=projectid"">${text}</a>`;
+    const formatQuickReplyLink = (text) => `<a href="weixin://bizmsgmenu?msgmenucontent=${text}&msgmenuid=projectid">${text}</a>`;
     action.text = [
         action.text,
         ...quick_replies.map((qr) => formatQuickReplyLink(qr.text))
