@@ -16,7 +16,8 @@ const COMMANDS = {
     extract_simple,
     localize,
     move_quick_replies,
-    reformat_quick_replies
+    reformat_quick_replies,
+    convert_qr_to_html
 };
 const args = process.argv.slice(2);
 const command = args.shift();
@@ -116,6 +117,16 @@ function reformat_quick_replies([input_file, select_phrases, outputName, outputD
     }
 
     const [flows, debug, debug_lang] = modifyqr.reformat_quick_replies(readInputFile(input_file), readInputFile(select_phrases), Number(count_threshold), Number(length_threshold), Number(qr_limit), special_words)
+    writeOutputFile(outputDir, outputName + '.json', flows);
+    writeOutputFile(outputDir, 'debug_qr.txt', debug);
+    for (lang in debug_lang){
+        writeOutputFile(outputDir, 'debug_qr_' + lang +'.txt', debug_lang[lang]);
+    }
+}
+
+function convert_qr_to_html([input_file, outputName, outputDir]) {
+
+    const [flows, debug, debug_lang] = modifyqr.convert_qr_to_html(readInputFile(input_file))
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);
     for (lang in debug_lang){

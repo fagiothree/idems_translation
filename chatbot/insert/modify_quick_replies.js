@@ -140,6 +140,48 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
     return [flows, debug, debug_lang];
 }
 
+function convert_qr_to_html(flows) {
+
+    const exceptions = []
+    let debug = '';
+    let debug_lang = {};    
+ 
+    for (const flow of flows.flows) {
+        
+        let curr_loc = flow.localization;
+
+        debug += `\n\n${flow.name}*************************************\n`;
+        for (const lang in curr_loc) {
+            
+            if (debug_lang.hasOwnProperty(lang)){
+                debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            }else{
+                debug_lang[lang] = `${flow.name}*************************************\n`;
+            }
+ 
+        }
+        
+        const routers = []
+
+        for (const node of flow.nodes) {
+            for (const action of node.actions) {
+                if (action.type == 'send_msg') {
+                    qr_count = action.quick_replies.length
+                    if (qr_count > 0) { 
+                            let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                              
+                            add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc);
+                            
+                            clear_quick_replies(node, routers, action, curr_loc, quick_replies, "no");                                          
+                    }
+                }
+            }
+        }
+    }
+
+    return [flows, debug, debug_lang];
+}
+
 function find_max_length(inputArray) {
     let maxLength = 0;
   
@@ -192,6 +234,21 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
             translations[action.uuid].text[0],
             '\n' + select_phrases[lang],
             ...quick_replies.map((qr) => `${qr.selector}. ${qr.translations[lang]}`)
+        ].join('\n');
+    }
+}
+
+function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc) {
+    const formatQuickReplyLink = (text) => `<a href="weixin://bizmsgmenu?msgmenucontent=${text}&msgmenuid=projectid">${text}</a>`;
+    action.text = [
+        action.text,
+        ...quick_replies.map((qr) => formatQuickReplyLink(qr.text))
+    ].join('\n');
+
+    for (const [lang, translations] of Object.entries(curr_loc)) {
+        translations[action.uuid].text[0] = [
+            translations[action.uuid].text[0],
+            ...quick_replies.map((qr) => formatQuickReplyLink(qr.translations[lang]))
         ].join('\n');
     }
 }
@@ -399,5 +456,6 @@ function not_contains_numeric_value(list) {
 
 module.exports = {
     move_quick_replies_to_message_text,
-    reformat_quick_replies
+    reformat_quick_replies,
+    convert_qr_to_html
 };
