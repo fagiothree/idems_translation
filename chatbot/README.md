@@ -60,9 +60,9 @@ Move quick replies to message text.
 node index move_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <add_selectors> <qr_limit> <special_words>
 ```
 
-- `add_selectors` expects either "yes" or "no", if you want to add the numerical quick replies back in, example input: "yes"
-- `qr_limit` expects an integer input, it is a limit on the number of quick replies you want to add back in. So if we are above the limit the `add_selectors` behaviour will be ignored and the quick replies will not be added back in.
-- `special_words` expects a path to JSON which has a list of words which will be reinstated as full quick replies as opposed to numbers. The `special_words` should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script
+- `add_selectors` is either "yes" or "no", depending on whether you want to add the numerical quick replies back in. Example input: "yes".
+- `qr_limit` is an integer. A limit on the number of quick replies you want to add back in. If we are above the limit the `add_selectors` behaviour will be ignored and the quick replies will not be added back in.
+- `special_words` is a path to JSON file which has a list of words which will be reinstated as full quick replies as opposed to numbers. The words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script.
 
 ### reformat\_quick\_replies
 
@@ -72,8 +72,8 @@ Reformat quick replies.
 node index reformat_quick_replies <input-rapidpro-flow-file> <select_phrases> <output_name> <output-dir> <count_threshold> <length_threshold> <qr_limit> <special_words>
 ```
 
-- `count_threshold` and `length_threshold` are integers. if the count of quick_replies is greater than `count_threshold` or the longest quick reply is greater than `length_threshold`, then the quick replies will be replaced with numerical prompts.
-- `qr_limit` is an integer - it is a limit on the number of quick replies you may want to add back in after they have been replaced with numerical prompts. If `count_threshold` and `qr_limit` are exceeded, the node message will be replaced with numerical prompts but those prompts will not be added as quick replies.
+- `count_threshold` and `length_threshold` are integers. If the count of quick_replies is greater than `count_threshold` or the longest quick reply is greater than `length_threshold`, then the quick replies will be replaced with numerical prompts.
+- `qr_limit` is an integer. A limit on the number of quick replies you may want to add back in after they have been replaced with numerical prompts. If `count_threshold` and `qr_limit` are exceeded, the node message will be replaced with numerical prompts but those prompts will not be added as quick replies.
 - `special_words` is a path to a JSON file which has a list of words which will be reinstated as full quick replies as opposed to numbers. The words should be organised by language, an example of the file can be found in `test/Input/special_words.json`. This file can be reviewed for info but should not be modified as it is part of the test script.
 
 ### convert\_qr\_to\_html
