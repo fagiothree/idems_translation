@@ -12,6 +12,8 @@ npm install
 
 ## Running the scripts
 
+The overall process is visualised in a [flowchart].
+
 ### has\_any\_words\_check
 
 Identify and fix possible errors in 'has\_any\_words' arguments.
@@ -84,11 +86,12 @@ Convert Quick Replies to HTML in message text.
 node index convert_qr_to_html <input-rapidpro-flow-file> <output_name> <output-dir>
 ```
 
-Overall process visualised in flowchart linked below
-https://docs.google.com/drawings/d/1i-64dAkcYqkLWNJmCpl7no6mQqFD3DJ1vI1lnKqd12U/edit?usp=sharing
 
 ## Running tests
 
 ```
 npm test
 ```
+
+
+[flowchart]: https://docs.google.com/drawings/d/1i-64dAkcYqkLWNJmCpl7no6mQqFD3DJ1vI1lnKqd12U/edit?usp=sharing
