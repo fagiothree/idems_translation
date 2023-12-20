@@ -243,13 +243,13 @@ function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc) {
     action.text = [
         action.text,
         ...quick_replies.map((qr) => formatQuickReplyLink(qr.text))
-    ].join('\n');
+    ].join('\n\n');
 
     for (const [lang, translations] of Object.entries(curr_loc)) {
         translations[action.uuid].text[0] = [
             translations[action.uuid].text[0],
             ...quick_replies.map((qr) => formatQuickReplyLink(qr.translations[lang]))
-        ].join('\n');
+        ].join('\n\n');
     }
 }
 

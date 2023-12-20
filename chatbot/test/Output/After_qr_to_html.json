@@ -88,7 +88,7 @@
           "9d80b108-d3a7-4be0-89ee-094a20eef5c6": {
             "quick_replies": [],
             "text": [
-              "Τι θα ήθελες για βραδινό\n<a href=\"weixin://bizmsgmenu?msgmenucontent=κοτόπουλο με κάρυ&msgmenuid=projectid\">κοτόπουλο με κάρυ</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=φρέσκια πίτα ψαριού&msgmenuid=projectid\">φρέσκια πίτα ψαριού</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=μεγάλο σάντουιτς με μπριζόλα&msgmenuid=projectid\">μεγάλο σάντουιτς με μπριζόλα</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=σαλάτα λαχανικών&msgmenuid=projectid\">σαλάτα λαχανικών</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=πίσω&msgmenuid=projectid\">πίσω</a>"
+              "Τι θα ήθελες για βραδινό\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=κοτόπουλο με κάρυ&msgmenuid=projectid\">κοτόπουλο με κάρυ</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=φρέσκια πίτα ψαριού&msgmenuid=projectid\">φρέσκια πίτα ψαριού</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=μεγάλο σάντουιτς με μπριζόλα&msgmenuid=projectid\">μεγάλο σάντουιτς με μπριζόλα</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=σαλάτα λαχανικών&msgmenuid=projectid\">σαλάτα λαχανικών</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=πίσω&msgmenuid=projectid\">πίσω</a>"
             ]
           },
           "b50daa56-6044-42a5-b5a7-677626b71771": {
@@ -156,7 +156,7 @@
           "9d80b108-d3a7-4be0-89ee-094a20eef5c6": {
             "quick_replies": [],
             "text": [
-              "O que você gostaria para o jantar?\n<a href=\"weixin://bizmsgmenu?msgmenucontent=Curry de frango&msgmenuid=projectid\">Curry de frango</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=torta de peixe fresco&msgmenuid=projectid\">torta de peixe fresco</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=sanduíche de bife grande&msgmenuid=projectid\">sanduíche de bife grande</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=salada de vegetais&msgmenuid=projectid\">salada de vegetais</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=voltar&msgmenuid=projectid\">voltar</a>"
+              "O que você gostaria para o jantar?\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=Curry de frango&msgmenuid=projectid\">Curry de frango</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=torta de peixe fresco&msgmenuid=projectid\">torta de peixe fresco</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=sanduíche de bife grande&msgmenuid=projectid\">sanduíche de bife grande</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=salada de vegetais&msgmenuid=projectid\">salada de vegetais</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=voltar&msgmenuid=projectid\">voltar</a>"
             ]
           },
           "b50daa56-6044-42a5-b5a7-677626b71771": {
@@ -235,7 +235,7 @@
               "all_urns": false,
               "attachments": [],
               "quick_replies": [],
-              "text": "What would you like for dinner?\n<a href=\"weixin://bizmsgmenu?msgmenucontent=chicken curry&msgmenuid=projectid\">chicken curry</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=fresh fish pie&msgmenuid=projectid\">fresh fish pie</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=big steak sandwich&msgmenuid=projectid\">big steak sandwich</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=veg salad&msgmenuid=projectid\">veg salad</a>\n<a href=\"weixin://bizmsgmenu?msgmenucontent=back&msgmenuid=projectid\">back</a>",
+              "text": "What would you like for dinner?\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=chicken curry&msgmenuid=projectid\">chicken curry</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=fresh fish pie&msgmenuid=projectid\">fresh fish pie</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=big steak sandwich&msgmenuid=projectid\">big steak sandwich</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=veg salad&msgmenuid=projectid\">veg salad</a>\n\n<a href=\"weixin://bizmsgmenu?msgmenucontent=back&msgmenuid=projectid\">back</a>",
               "type": "send_msg",
               "uuid": "9d80b108-d3a7-4be0-89ee-094a20eef5c6"
             }
