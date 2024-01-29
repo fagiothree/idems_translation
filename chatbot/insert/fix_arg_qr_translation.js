@@ -7,9 +7,9 @@ const utility = require('./translation_functions.js');
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-//let filePath = "C:/Users/edmun/Google Drive - EEM Engineering Ltd/Translation Checking/SA 13.12.21/7 - PLH_with_afr_sot_tsn_xho_zul.json"
-//let obj = JSON.parse(fs.readFileSync(filePath).toString());
-//const [a, b] = fix_arg_qr_translation(obj);
+let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/mexico_test.json"
+let obj = JSON.parse(fs.readFileSync(filePath).toString());
+const [a, b] = fix_arg_qr_translation(obj);
 
 function fix_arg_qr_translation(object) {
     
@@ -66,6 +66,9 @@ function fix_arg_qr_translation(object) {
             for (const action of node.actions) {
                 if (action.type == 'send_msg') {                    
                     if (action.quick_replies.length > 0) {
+                        if (node.uuid == "a84a1bfb-e7e8-4778-b7d6-110300731d1c"){
+                            console.log(node.uuid)
+                        }                        
                         TotalQRNodes++     
                         //Before we start checking if there are problems with the translation we first check if there is an associated wait for response node with arguments
                         if(routers[node.exits[0].destination_uuid]){                                           

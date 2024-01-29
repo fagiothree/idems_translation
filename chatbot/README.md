@@ -51,7 +51,7 @@ node index localize <input-rapidpro-flow-file> <translated-strings-file> <langua
 Look for errors in the link between QR and Arguments that have been introduced during translation and apply an auto-fix.
 
 ```
-node index fix_arg_qr_translation <rapidpro-json-file> <output-dir>
+node index fix_arg_qr_translation <rapidpro-json-file> <output-dir> <file-output-name> <log-output-name>
 ```
 
 ### move\_quick\_replies
