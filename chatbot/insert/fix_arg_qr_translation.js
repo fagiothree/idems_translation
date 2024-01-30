@@ -171,9 +171,13 @@ function fix_translated_arguments(flow, node, action, curr_loc, routers, debug_l
             let OriginalArguments = [...OtherArg[lang]]        
 
             // check if the EngQR are the same as the translatedQR, this means the quick replies have not been translated and therefore we shouldnt bother applying a fix           
-            if(utility.arrayEquals(EngQR, OtherQR[lang]) || incompleteQRtranslation[lang]){
-                debug_lang[lang] += '##### Quick replies not translated, therefore no automatic fix attempted\n'
+            if(utility.arrayEquals(EngQR, OtherQR[lang]) || OtherQR[lang] == []){
+                //debug_lang[lang] += '##### Quick replies not translated, therefore no automatic fix attempted\n'
                 break
+            }
+
+            if(incompleteQRtranslation[lang]){
+                debug_lang[lang] += '##### Quick replies not fully translated\n'
             }
 
             if(incompleteargumenttranslation[lang]){
