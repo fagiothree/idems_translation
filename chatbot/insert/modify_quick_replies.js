@@ -1,3 +1,9 @@
+const fs = require('fs'); 
+
+// Code for running local tests on function - leave in place
+// let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/mexico_test.json"
+// let obj = JSON.parse(fs.readFileSync(filePath).toString());
+// const [a, b, c] = reformat_quick_replies(obj, "./test/Input/select_phrases.json", 3, 18, 10 ,"./test/Input/special_words.json")
 
 function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, qr_limit, special_words) {
     
@@ -210,8 +216,12 @@ function augment_quick_replies(curr_act, exceptions, curr_loc) {
         let translations = {};
         
         for (const [lang, messages] of Object.entries(curr_loc)) {
-        
-            translations[lang] = messages[curr_act.uuid].quick_replies[i];
+
+            if (messages[curr_act.uuid]){
+                translations[lang] = messages[curr_act.uuid].quick_replies[i];
+            }else{
+                translations[lang] = ""
+            }         
         }
 
         return {
