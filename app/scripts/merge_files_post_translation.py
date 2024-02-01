@@ -45,7 +45,7 @@ def main():
 
     # Loop through all languages to merge into a single JSON dictionary
     for file in os.listdir(post_translation_jsons):
-        dictionary_name = file + "_dictionary"
+        dictionary_name = file + "_dictionary.json"
         subprocess.run(["node", "./common_tools/index.js", "concatenate_json", os.path.join(post_translation_jsons, file), final_dictionaries, dictionary_name], check=True)
 
 

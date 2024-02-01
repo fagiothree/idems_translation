@@ -53,7 +53,9 @@ cover/
 
 # Translations
 *.mo
-*.pot
+1_compose_result/*
+2_extract_result/*
+4_result_from_translators/*
 
 # Django stuff:
 *.log
