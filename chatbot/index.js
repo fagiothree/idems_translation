@@ -16,6 +16,7 @@ const COMMANDS = {
     extract_simple,
     localize,
     move_quick_replies,
+    move_and_mod_quick_replies,
     reformat_quick_replies,
     reformat_quick_replies_china,
     convert_qr_to_html
@@ -103,6 +104,22 @@ function move_quick_replies([input_file, select_phrases, outputName, outputDir, 
 
     const [flows, debug, debug_lang] = modifyqr.move_quick_replies_to_message_text(
         readInputFile(input_file),readInputFile(select_phrases), add_selectors, Number(qr_limit), special_words
+    );
+    writeOutputFile(outputDir, outputName + '.json', flows);
+    writeOutputFile(outputDir, 'debug_qr.txt', debug);
+    for (lang in debug_lang){
+        writeOutputFile(outputDir, 'debug_qr_' + lang +'.txt', debug_lang[lang]);
+    }
+}
+
+function move_and_mod_quick_replies([input_file, select_phrases, replace_phrases, outputName, outputDir, add_selectors, qr_limit = 100, special_words = false]) {
+
+    if(special_words != false){
+        special_words = readInputFile(special_words)
+    }
+
+    const [flows, debug, debug_lang] = modifyqr.move_and_modidy_qr_to_message_text(
+        readInputFile(input_file),readInputFile(select_phrases), readInputFile(replace_phrases), add_selectors, Number(qr_limit), special_words
     );
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);

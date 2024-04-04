@@ -1,9 +1,9 @@
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-// let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/mexico_test.json"
+// let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/NEXT_replace_test.json"
 // let obj = JSON.parse(fs.readFileSync(filePath).toString());
-// const [a, b, c] = reformat_quick_replies(obj, "./test/Input/select_phrases.json", 3, 18, 10 ,"./test/Input/special_words.json")
+// const [a, b, c] = move_and_modidy_qr_to_message_text(obj, "./test/Input/select_phrases.json", "./test/Input/replace_phrases.json", "No", 100,"./test/Input/special_words.json")
 
 function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, qr_limit, special_words) {
     
@@ -59,6 +59,74 @@ function move_quick_replies_to_message_text(flows, select_phrases, add_selectors
                         let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
                         
                         add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                        
+                        clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, qr_limit);
+                        
+                        modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    return [flows, debug, debug_lang];
+}
+
+function move_and_modidy_qr_to_message_text(flows, select_phrases, replace_phrases, add_selectors, qr_limit, special_words) {
+    
+    const exceptions = [
+        'no',
+        'prefer not to say',
+        'prefer not to answer',
+        'prefer not to tell',
+        'i prefer not to tell',
+        'does not apply',
+        'go back to the previous options',
+        'i am not interested',
+        'no i do not agree'
+    ];
+
+    let debug = '';
+    let debug_lang = {};
+    if (!select_phrases.hasOwnProperty("eng")){
+        select_phrases["eng"] = "Please select the number for the following options:"
+    }
+ 
+    for (const flow of flows.flows) {
+        
+        let curr_loc = flow.localization;
+
+        debug += `\n\n${flow.name}*************************************\n`;
+        for (const lang in curr_loc) {
+            
+            if (debug_lang.hasOwnProperty(lang)){
+                debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            }else{
+                debug_lang[lang] = `${flow.name}*************************************\n`;
+            }
+ 
+        }
+
+        const routers = flow.nodes
+            .filter((node) => node.router && node.router.operand === '@input.text')
+            .reduce(
+                (acc, node) => {
+                    acc[node.uuid] = node;
+                    return acc;
+                },
+                {}
+            );
+        
+        let routers_edited = []
+
+        for (const node of flow.nodes) {
+            for (const action of node.actions) {
+                if (action.type == 'send_msg') {
+                    if (action.quick_replies.length > 0) {
+                        let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                        
+                        add_and_modify_qr_to_msg_text(action, quick_replies, curr_loc, select_phrases, replace_phrases);
                         
                         clear_quick_replies(node, routers, action, curr_loc, quick_replies, add_selectors, special_words, debug, debug_lang, qr_limit);
                         
@@ -327,6 +395,41 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     }
 }
 
+function add_and_modify_qr_to_msg_text(action, quick_replies, curr_loc, select_phrases, replace_phrases) {
+
+    qr_count = action.quick_replies.length
+    first_qr_text = action.quick_replies[0]
+
+    if (qr_count == 1 && replace_phrases.hasOwnProperty(first_qr_text)){
+        action.text = [
+            action.text,
+            '\n' + replace_phrases[first_qr_text]["eng"]
+        ].join('\n');
+
+        for (const [lang, translations] of Object.entries(curr_loc)) {
+            translations[action.uuid].text[0] = [
+                translations[action.uuid].text[0],
+                '\n' + replace_phrases[first_qr_text][lang]
+            ].join('\n');
+        }
+
+    }else{
+        action.text = [
+            action.text,
+            '\n' + select_phrases["eng"],
+            ...quick_replies.map((qr) => `${qr.selector}. ${qr.text}`)
+        ].join('\n');
+
+        for (const [lang, translations] of Object.entries(curr_loc)) {
+            translations[action.uuid].text[0] = [
+                translations[action.uuid].text[0],
+                '\n' + select_phrases[lang],
+                ...quick_replies.map((qr) => `${qr.selector}. ${qr.translations[lang]}`)
+            ].join('\n');
+        }
+    }
+}
+
 function add_quick_replies_to_msg_text_html(action, quick_replies, curr_loc) {
     const formatQuickReplyLink = (text) => `<a href="weixin://bizmsgmenu?msgmenucontent=${text}&msgmenuid=a">${text}</a>`;
     action.text = [
@@ -545,6 +648,7 @@ function not_contains_numeric_value(list) {
 
 module.exports = {
     move_quick_replies_to_message_text,
+    move_and_modidy_qr_to_message_text,
     reformat_quick_replies,
     reformat_quick_replies_china,
     convert_qr_to_html
