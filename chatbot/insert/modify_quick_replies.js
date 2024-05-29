@@ -1,9 +1,9 @@
 const fs = require('fs'); 
 
 // Code for running local tests on function - leave in place
-// let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/NEXT_replace_test.json"
+// let filePath = "C:/Users/edmun/Code/idems_translation/chatbot/test/Other_Test_files/WApp_Test_Before.json"
 // let obj = JSON.parse(fs.readFileSync(filePath).toString());
-// const [a, b, c] = move_and_modidy_qr_to_message_text(obj, "./test/Input/select_phrases.json", "./test/Input/replace_phrases.json", "No", 100,"./test/Input/special_words.json")
+// const [a, b, c] = reformat_quick_replies_whatsapp(obj, "./test/Input/select_phrases.json", "./test/Input/special_words.json")
 
 function move_quick_replies_to_message_text(flows, select_phrases, add_selectors, qr_limit, special_words) {
     
@@ -202,6 +202,77 @@ function reformat_quick_replies(flows, select_phrases, count_threshold, length_t
                                 
                                 clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang, qr_limit);
                                 
+                                modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
+                            }  
+                        }                            
+                    }
+                }
+            }
+        }
+    }
+
+    return [flows, debug, debug_lang];
+}
+
+function reformat_quick_replies_whatsapp(flows, select_phrases, qr_limit, special_words) {
+    
+    const exceptions = [
+        'no',
+        'prefer not to say',
+        'prefer not to answer',
+        'prefer not to tell',
+        'i prefer not to tell',
+        'does not apply',
+        'go back to the previous options',
+        'i am not interested',
+        'no i do not agree'
+    ];
+
+    let debug = '';
+    let debug_lang = {};
+    if (!select_phrases.hasOwnProperty("eng")){
+        select_phrases["eng"] = "Please select the number for the following options:"
+    }
+ 
+    for (const flow of flows.flows) {
+        
+        let curr_loc = flow.localization;
+
+        debug += `\n\n${flow.name}*************************************\n`;
+        for (const lang in curr_loc) {
+            
+            if (debug_lang.hasOwnProperty(lang)){
+                debug_lang[lang] += `\n\n${flow.name}*************************************\n`;
+            }else{
+                debug_lang[lang] = `${flow.name}*************************************\n`;
+            }
+ 
+        }
+
+        const routers = flow.nodes
+            .filter((node) => node.router && node.router.operand === '@input.text')
+            .reduce(
+                (acc, node) => {
+                    acc[node.uuid] = node;
+                    return acc;
+                },
+                {}
+            );
+        
+        let routers_edited = []
+
+        for (const node of flow.nodes) {
+            for (const action of node.actions) {
+                if (action.type == 'send_msg') {
+                    qr_count = action.quick_replies.length
+                    if (qr_count > 1) { 
+                        if(not_contains_numeric_value(action.quick_replies)){
+                            let quick_replies = augment_quick_replies(action, exceptions, curr_loc);
+                            let max_qr_length = find_max_length(quick_replies)
+                            if(qr_count < 4 && max_qr_length > 20 || qr_count > 3 && qr_count < 11 && max_qr_length > 24 || qr_count > qr_limit){
+                            
+                                add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_phrases);
+                                clear_quick_replies(node, routers, action, curr_loc, quick_replies, "yes", special_words, debug, debug_lang, qr_limit);
                                 modify_router_node_cases(node, action, curr_loc, quick_replies, routers, debug, debug_lang, routers_edited);
                             }  
                         }                            
@@ -650,6 +721,7 @@ module.exports = {
     move_quick_replies_to_message_text,
     move_and_modidy_qr_to_message_text,
     reformat_quick_replies,
+    reformat_quick_replies_whatsapp,
     reformat_quick_replies_china,
     convert_qr_to_html
 };

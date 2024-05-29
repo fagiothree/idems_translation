@@ -1,0 +1,373 @@
+{
+  "version": "13",
+  "site": "https://rapidpro.idems.international",
+  "flows": [
+    {
+      "name": "Whatsapp format test before",
+      "uuid": "903e0f71-ec23-4310-8b42-4c6612946bdc",
+      "spec_version": "13.1.0",
+      "language": "eng",
+      "type": "messaging",
+      "nodes": [
+        {
+          "uuid": "b5948dd7-9dcc-432c-b652-97e36b6de9c4",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "What is your favourite primary colour?",
+              "type": "send_msg",
+              "quick_replies": [
+                "Red",
+                "Yellow",
+                "Blue"
+              ],
+              "uuid": "0645ff44-e976-4dc3-be58-9d956a0147ae"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "7818db0d-56c6-4f91-9e49-87ac5d420608",
+              "destination_uuid": "1458f90d-49b6-4975-9649-03dd69a3a3de"
+            }
+          ]
+        },
+        {
+          "uuid": "1458f90d-49b6-4975-9649-03dd69a3a3de",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "b7430934-5017-4ff6-8498-9fd0f93d583c",
+            "cases": [],
+            "categories": [
+              {
+                "uuid": "b7430934-5017-4ff6-8498-9fd0f93d583c",
+                "name": "All Responses",
+                "exit_uuid": "02065b31-75be-4a1c-8ea6-dba8b1b44900"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 1"
+          },
+          "exits": [
+            {
+              "uuid": "02065b31-75be-4a1c-8ea6-dba8b1b44900",
+              "destination_uuid": "73e34d05-ef7f-48f1-abe7-1fac2a928a8b"
+            }
+          ]
+        },
+        {
+          "uuid": "73e34d05-ef7f-48f1-abe7-1fac2a928a8b",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "How are you feeling today",
+              "type": "send_msg",
+              "quick_replies": [
+                "Good",
+                "Neither good nor bad, somewhere in the middle",
+                "Bad"
+              ],
+              "uuid": "a10951e9-fbf3-4666-a6a2-0f8f0299a8de"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "282fd98e-4400-4265-abcb-39e78696b588",
+              "destination_uuid": "6272a3bb-de95-44fa-991f-6f67b0064af7"
+            }
+          ]
+        },
+        {
+          "uuid": "6272a3bb-de95-44fa-991f-6f67b0064af7",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "a97956c0-1549-4b93-bd01-8fd0375696cf",
+            "cases": [],
+            "categories": [
+              {
+                "uuid": "a97956c0-1549-4b93-bd01-8fd0375696cf",
+                "name": "All Responses",
+                "exit_uuid": "c0ae060e-a725-4106-8890-1f166ce4d5c8"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 2"
+          },
+          "exits": [
+            {
+              "uuid": "c0ae060e-a725-4106-8890-1f166ce4d5c8",
+              "destination_uuid": "71792693-4773-4103-9de0-554a2190a972"
+            }
+          ]
+        },
+        {
+          "uuid": "71792693-4773-4103-9de0-554a2190a972",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "What is your favourite of all the colours",
+              "type": "send_msg",
+              "quick_replies": [
+                "Red",
+                "Yellow",
+                "Pink",
+                "Green",
+                "Orange",
+                "Purple",
+                "Blue",
+                "The colours are the same"
+              ],
+              "uuid": "32459da7-5fd5-443d-819d-535e24860cf7"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "bd234949-70ca-4b3b-bfa3-0ab176843e3a",
+              "destination_uuid": "6aea8caa-8cdd-465a-90b9-cbb06f1171b5"
+            }
+          ]
+        },
+        {
+          "uuid": "6aea8caa-8cdd-465a-90b9-cbb06f1171b5",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "6f09d70c-b841-4d46-a08c-e1bf0cdfddcb",
+            "cases": [],
+            "categories": [
+              {
+                "uuid": "6f09d70c-b841-4d46-a08c-e1bf0cdfddcb",
+                "name": "All Responses",
+                "exit_uuid": "b796aff6-d597-4821-a338-8f53b731a322"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 3"
+          },
+          "exits": [
+            {
+              "uuid": "b796aff6-d597-4821-a338-8f53b731a322",
+              "destination_uuid": "1fe09cf6-fa49-4e8e-8142-54f25f55b0a4"
+            }
+          ]
+        },
+        {
+          "uuid": "1fe09cf6-fa49-4e8e-8142-54f25f55b0a4",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "How busy are you at work at the moment?",
+              "type": "send_msg",
+              "quick_replies": [
+                "Very busy",
+                "Some what busy",
+                "I am a bit busy but I also have some time",
+                "Not busy at all"
+              ],
+              "uuid": "5e72e1b6-0afd-408d-916d-f41e4cd6b90d"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "e3a5e53d-d405-4fca-80e7-bcc579defde9",
+              "destination_uuid": "689e2bc8-3440-42d1-a622-6ceba50ca159"
+            }
+          ]
+        },
+        {
+          "uuid": "689e2bc8-3440-42d1-a622-6ceba50ca159",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "896073f5-6360-4562-9912-37ef870c6419",
+            "cases": [],
+            "categories": [
+              {
+                "uuid": "896073f5-6360-4562-9912-37ef870c6419",
+                "name": "All Responses",
+                "exit_uuid": "ef31a8b3-e568-49bb-825a-99ba59c06ad7"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 4"
+          },
+          "exits": [
+            {
+              "uuid": "ef31a8b3-e568-49bb-825a-99ba59c06ad7",
+              "destination_uuid": "480846dd-d225-482d-8b7e-2c14d9bdd9e8"
+            }
+          ]
+        },
+        {
+          "uuid": "480846dd-d225-482d-8b7e-2c14d9bdd9e8",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "Out of the list pick your favourite country",
+              "type": "send_msg",
+              "quick_replies": [
+                "England",
+                "Wales",
+                "Scotland",
+                "Ireland",
+                "France",
+                "Italy",
+                "Spain",
+                "Portugal",
+                "Germany",
+                "Belgium",
+                "Netherlands"
+              ],
+              "uuid": "8e8d60dc-f730-4325-b402-b1294114fa08"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "64205dbc-d658-4886-9b48-7baf4d418641",
+              "destination_uuid": "a93c7e4d-9c18-4501-9e09-006e86a4f479"
+            }
+          ]
+        },
+        {
+          "uuid": "a93c7e4d-9c18-4501-9e09-006e86a4f479",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "6b65e2a9-2577-4e99-8f9d-8171b1c273bd",
+            "cases": [],
+            "categories": [
+              {
+                "uuid": "6b65e2a9-2577-4e99-8f9d-8171b1c273bd",
+                "name": "All Responses",
+                "exit_uuid": "6008f9f3-27f8-424e-9162-59fd21b24eef"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg"
+            },
+            "result_name": "Result 5"
+          },
+          "exits": [
+            {
+              "uuid": "6008f9f3-27f8-424e-9162-59fd21b24eef",
+              "destination_uuid": null
+            }
+          ]
+        }
+      ],
+      "_ui": {
+        "nodes": {
+          "b5948dd7-9dcc-432c-b652-97e36b6de9c4": {
+            "position": {
+              "left": 0,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "1458f90d-49b6-4975-9649-03dd69a3a3de": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 40,
+              "top": 180
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "73e34d05-ef7f-48f1-abe7-1fac2a928a8b": {
+            "position": {
+              "left": 180,
+              "top": 360
+            },
+            "type": "execute_actions"
+          },
+          "6272a3bb-de95-44fa-991f-6f67b0064af7": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 240,
+              "top": 580
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "71792693-4773-4103-9de0-554a2190a972": {
+            "position": {
+              "left": 360,
+              "top": 800
+            },
+            "type": "execute_actions"
+          },
+          "6aea8caa-8cdd-465a-90b9-cbb06f1171b5": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 400,
+              "top": 1000
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "1fe09cf6-fa49-4e8e-8142-54f25f55b0a4": {
+            "position": {
+              "left": 440,
+              "top": 1160
+            },
+            "type": "execute_actions"
+          },
+          "689e2bc8-3440-42d1-a622-6ceba50ca159": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 460,
+              "top": 1400
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "480846dd-d225-482d-8b7e-2c14d9bdd9e8": {
+            "position": {
+              "left": 480,
+              "top": 1580
+            },
+            "type": "execute_actions"
+          },
+          "a93c7e4d-9c18-4501-9e09-006e86a4f479": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 500,
+              "top": 1820
+            },
+            "config": {
+              "cases": {}
+            }
+          }
+        }
+      },
+      "revision": 17,
+      "expire_after_minutes": 10080,
+      "metadata": {
+        "revision": 1
+      },
+      "localization": {}
+    }
+  ],
+  "campaigns": [],
+  "triggers": [],
+  "fields": [],
+  "groups": []
+}
