@@ -1,5 +1,5 @@
 {
-    "CoreFiles": "../parenting-app-ui/packages/app-data/sheets",
+    "CoreFiles": "../parenting-app-ui/.idems_app/deployments/plh_teens_tz/app_data/sheets",
     "ComposeResult": "app/1_compose_result",
     "CoreGroups": [["data_list", ["campaign_rows", "campaign_schedule"]],["global", [""]],["template", ["common_with_parent_text","legal_terms"]],["tour", [""]]],
     "SplitGroups": [["main", "parent_app"], ["legal_terms", "parent_app"] ,["common_with_parent_text", "common"]],
