@@ -10,7 +10,7 @@ describe('Reformat QR Whatsapp Test', function() {
     it('runs the function on a sample input and check it matches the ideal output file', function() {
       
       // Run the function we are testing and store the output
-      const [data1, debug, debug_lang] = modify.reformat_quick_replies(
+      const [data1, debug, debug_lang] = modify.reformat_quick_replies_whatsapp(
         readInputFile("./test/Input/Before_qr_whatsapp_reformat.json"), readInputFile("./test/Input/select_phrases.json"), 10, readInputFile("./test/Input/special_words.json")
       );      
       
