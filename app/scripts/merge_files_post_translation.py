@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-
+import shutil 
 
 def main():
     config_path = Path(sys.argv[1])
@@ -15,6 +15,11 @@ def main():
         post_translation_jsons = data['PostTranslationJSONs']
         final_dictionaries = data['FinalDictionaries']
 
+    # Check if the post_translation_jsons folder exists and delete its contents if it does
+    if os.path.exists(post_translation_jsons):
+        shutil.rmtree(post_translation_jsons)
+    os.makedirs(post_translation_jsons)
+
     # Loop through files where the translations are stored
     for folderpath in post_translation:
 
@@ -22,10 +27,6 @@ def main():
         for folder in os.listdir(folderpath):
             full_lang_path = os.path.join(folderpath, folder)
             lang_name = os.path.basename(folder)
-
-            # check we have a folder ready to store a converted JSON version
-            if not os.path.exists(post_translation_jsons):
-                os.makedirs(post_translation_jsons)
 
             # For all the non-english files, create a destination folder to store a converted JSON version
             if lang_name != "en":
@@ -39,7 +40,7 @@ def main():
                     json_file = os.path.join(dest_lang_path, file_name_without_ext + ".json")
                     subprocess.run(["node", "./common_tools/index.js", "convert", os.path.join(full_lang_path, file), json_file], check=True)
 
-    # check we have a folder ready to store the dictionaries
+    # Check we have a folder ready to store the dictionaries
     if not os.path.exists(final_dictionaries):
         os.makedirs(final_dictionaries)
 
