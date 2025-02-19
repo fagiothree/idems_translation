@@ -528,13 +528,19 @@ function add_quick_replies_to_msg_text(action, quick_replies, curr_loc, select_p
     ].join('\n');
 
     for (const [lang, translations] of Object.entries(curr_loc)) {
-        translations[action.uuid].text[0] = [
+        const lines = [
             translations[action.uuid].text[0],
             '\n' + select_phrases[lang],
             ...quick_replies.map((qr) => `${qr.selector}. ${qr.translations[lang]}`),
-            lang === "ara" ? '\u202e' : ''  // Append RTL marker if language is arabic
-        ].join('\n');
+        ];
+    
+        if (lang === "ara") {
+            lines.push('\n\u202e'); // Append RTL marker only for Arabic
+        }
+    
+        translations[action.uuid].text[0] = lines.join('\n');
     }
+    
 }
 
 

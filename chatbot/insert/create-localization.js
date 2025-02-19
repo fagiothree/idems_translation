@@ -140,7 +140,7 @@ function createLocalization(latestFlows, translations, lang) {
 function translateLocalization(engLoc, translStep2, engStep2, lang) {
     const NEWLINE = '\n';
     const BULLET = '•\t';
-    const RTL_MARKER = '\n\u202e'; // RTL Marker for Arabic
+    const RTL_MARKER = '\u202e'; // RTL Marker for Arabic
     const byTypeId = (a, b) => a.type_id - b.type_id;
     let translatedLoc = JSON.parse(JSON.stringify(engLoc));
     let nPartiallyTranslNodes = 0;
@@ -162,7 +162,7 @@ function translateLocalization(engLoc, translStep2, engStep2, lang) {
                     const newlines = NEWLINE.repeat(atom.has_extraline);
                     const bullet = atom.has_bullet ? BULLET : '';
                     let translatedText = newlines + bullet + atom.text;
-                    return lang === "ara" ? translatedText + RTL_MARKER : translatedText;
+                    return lang === "ara" ? RTL_MARKER + translatedText + RTL_MARKER : translatedText;
                 })
                 .join(NEWLINE);
         }
