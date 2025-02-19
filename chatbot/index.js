@@ -19,6 +19,7 @@ const COMMANDS = {
     move_and_mod_quick_replies,
     reformat_quick_replies,
     reformat_quick_replies_whatsapp,
+    reformat_quick_replies_palestine,
     reformat_quick_replies_china,
     convert_qr_to_html
 };
@@ -150,6 +151,20 @@ function reformat_quick_replies_whatsapp([input_file, select_phrases, outputName
     }
 
     const [flows, debug, debug_lang] = modifyqr.reformat_quick_replies_whatsapp(readInputFile(input_file), readInputFile(select_phrases), Number(qr_limit), special_words)
+    writeOutputFile(outputDir, outputName + '.json', flows);
+    writeOutputFile(outputDir, 'debug_qr.txt', debug);
+    for (lang in debug_lang){
+        writeOutputFile(outputDir, 'debug_qr_' + lang +'.txt', debug_lang[lang]);
+    }
+}
+
+function reformat_quick_replies_palestine([input_file, select_phrases, outputName, outputDir, qr_limit = 10, special_words = false]) {
+
+    if(special_words != false){
+        special_words = readInputFile(special_words)
+    }
+
+    const [flows, debug, debug_lang] = modifyqr.reformat_quick_replies_palestine(readInputFile(input_file), readInputFile(select_phrases), Number(qr_limit), special_words)
     writeOutputFile(outputDir, outputName + '.json', flows);
     writeOutputFile(outputDir, 'debug_qr.txt', debug);
     for (lang in debug_lang){
