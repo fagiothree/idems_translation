@@ -104,7 +104,8 @@ function createLocalization(latestFlows, translations, lang) {
         localization = translateLocalization(
             step1[flow.uuid].localization.eng,
             translatedStep2,
-            step2
+            step2,
+            lang
         );
 
         flowsLocalizations[flow.uuid] = JSON.parse(JSON.stringify(step1[flow.uuid]));
@@ -136,9 +137,10 @@ function createLocalization(latestFlows, translations, lang) {
     ];
 }
 
-function translateLocalization(engLoc, translStep2, engStep2) {
+function translateLocalization(engLoc, translStep2, engStep2, lang) {
     const NEWLINE = '\n';
     const BULLET = '•\t';
+    const RTL_MARKER = '\n\u202e'; // RTL Marker for Arabic
     const byTypeId = (a, b) => a.type_id - b.type_id;
     let translatedLoc = JSON.parse(JSON.stringify(engLoc));
     let nPartiallyTranslNodes = 0;
@@ -159,7 +161,8 @@ function translateLocalization(engLoc, translStep2, engStep2) {
                 .map(atom => {
                     const newlines = NEWLINE.repeat(atom.has_extraline);
                     const bullet = atom.has_bullet ? BULLET : '';
-                    return newlines + bullet + atom.text;
+                    let translatedText = newlines + bullet + atom.text;
+                    return lang === "ara" ? translatedText + RTL_MARKER : translatedText;
                 })
                 .join(NEWLINE);
         }
